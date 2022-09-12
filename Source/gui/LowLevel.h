@@ -7,38 +7,44 @@ namespace gui
     struct LowLevel :
         public Comp
     {
+        static constexpr int NumLanes = 3;
+
         LowLevel(Utils& u) :
             Comp(u, "", CursorType::Default),
-			bpCutoff(u),
-			bpQ(u),
-            feedback(u),
-            damp(u),
-            oct(u),
-            semi(u),
-            fine(u)
+			enabled{Knob(u), Knob(u), Knob(u) },
+			frequency{ Knob(u), Knob(u), Knob(u) },
+			resonance{ Knob(u), Knob(u), Knob(u) },
+			slope{ Knob(u), Knob(u), Knob(u) },
+			drive{ Knob(u), Knob(u), Knob(u) },
+			delay{ Knob(u), Knob(u), Knob(u) },
+			gain{ Knob(u), Knob(u), Knob(u) }
         {
-            makeParameter(bpCutoff, PID::BandpassCutoff, "BP Cutoff");
-			makeParameter(bpQ, PID::BandpassQ, "BP Q");
+            for (auto i = 0; i < NumLanes; ++i)
+            {
+                const auto offset = i * 7;
 
-            makeParameter(feedback, PID::ResonatorFeedback, "Feedback");
-            makeParameter(damp, PID::ResonatorDamp, "Damp");
-			makeParameter(oct, PID::ResonatorOct, "Oct");
-			makeParameter(semi, PID::ResonatorSemi, "Semi");
-			makeParameter(fine, PID::ResonatorFine, "Fine");
+                makeParameter(enabled[i], param::offset(PID::Lane1Enabled, offset), "Enabled");
+                makeParameter(frequency[i], param::offset(PID::Lane1Frequency, offset), "Frequency");
+				makeParameter(resonance[i], param::offset(PID::Lane1Resonance, offset), "Resonance");
+				makeParameter(slope[i], param::offset(PID::Lane1Slope, offset), "Slope");
+				makeParameter(drive[i], param::offset(PID::Lane1Drive, offset), "Drive");
+				makeParameter(delay[i], param::offset(PID::Lane1Delay, offset), "Delay");
+				makeParameter(gain[i], param::offset(PID::Lane1Gain, offset), "Gain");
+
+                addAndMakeVisible(enabled[i]);
+				addAndMakeVisible(frequency[i]);
+				addAndMakeVisible(resonance[i]);
+				addAndMakeVisible(slope[i]);
+				addAndMakeVisible(drive[i]);
+				addAndMakeVisible(delay[i]);
+				addAndMakeVisible(gain[i]);
+            }
 
             layout.init
             (
-                { 3, 5, 5, 5, 5, 5, 3 },
-                { 3, 1, 5, 1, 5, 1, 3 }
+                { 3, 5, 5, 5, 5, 5, 5, 5, 3 },
+                { 3, 2, 5, 2, 5, 2, 5, 3 }
             );
-
-            addAndMakeVisible(bpCutoff);
-			addAndMakeVisible(bpQ);
-            addAndMakeVisible(feedback);
-			addAndMakeVisible(damp);
-			addAndMakeVisible(oct);
-			addAndMakeVisible(semi);
-            addAndMakeVisible(fine);
         }
 
         void paint(Graphics& g) override
@@ -48,32 +54,42 @@ namespace gui
             const Stroke stroke(thicc, Stroke::JointStyle::curved, Stroke::EndCapStyle::rounded);
 
             g.setColour(Colours::c(ColourID::Txt));
-
-            const auto bpArea = layout(1, 1, 5, 2);
-            g.drawFittedText("BP", bpArea.toNearestInt(), Just::centredTop, 1);
-            drawRectEdges(g, bpArea, thicc2, stroke);
-
-            const auto resonatorArea = layout(1, 3, 5, 2);
-            g.drawFittedText("Resonator", resonatorArea.toNearestInt(), Just::centredTop, 1);
-            drawRectEdges(g, resonatorArea, thicc2, stroke);
+            
+            {
+                const auto laneArea = layout(1, 1, 7, 2);
+                g.drawFittedText("Lane 1", laneArea.toNearestInt(), Just::centredTop, 1);
+                drawRectEdges(g, laneArea, thicc2, stroke);
+            }
+            {
+                const auto laneArea = layout(1, 3, 7, 2);
+                g.drawFittedText("Lane 2", laneArea.toNearestInt(), Just::centredTop, 1);
+                drawRectEdges(g, laneArea, thicc2, stroke);
+            }
+			{
+				const auto laneArea = layout(1, 5, 7, 2);
+				g.drawFittedText("Lane 3", laneArea.toNearestInt(), Just::centredTop, 1);
+				drawRectEdges(g, laneArea, thicc2, stroke);
+			}
         }
 
         void resized() override
         {
             layout.resized();
+            for (auto i = 0; i < NumLanes; ++i)
+            {
+                auto y = 2 + i * 2;
 
-            layout.place(bpCutoff, 1, 2, 1, 1, false);
-			layout.place(bpQ, 2, 2, 1, 1, false);
-
-            layout.place(feedback, 1, 4, 1, 1, false);
-            layout.place(damp, 2, 4, 1, 1, false);
-			layout.place(oct, 3, 4, 1, 1, false);
-			layout.place(semi, 4, 4, 1, 1, false);
-			layout.place(fine, 5, 4, 1, 1, false);
+				layout.place(enabled[i], 1, y, 1, 1, false);
+				layout.place(frequency[i], 2, y, 1, 1, false);
+				layout.place(resonance[i], 3, y, 1, 1, false);
+				layout.place(slope[i], 4, y, 1, 1, false);
+				layout.place(drive[i], 5, y, 1, 1, false);
+				layout.place(delay[i], 6, y, 1, 1, false);
+				layout.place(gain[i], 7, y, 1, 1, false);
+            }
         }
 
     protected:
-        Knob bpCutoff, bpQ;
-        Knob feedback, damp, oct, semi, fine;
+        std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, delay, gain;
     };
 }

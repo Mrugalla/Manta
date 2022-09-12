@@ -8,6 +8,9 @@ namespace audio
 	{
 		/* startVal */
 		FilterBandpass(float startVal = 0.f) :
+			alpha(0.f),
+			cosOmega(0.f),
+
 			a0(0.f),
 			a1(0.f),
 			a2(0.f),
@@ -21,29 +24,15 @@ namespace audio
 			
 		}
 
-		/* frequency fc [0, .5[, q-factor q [0, .77[ */
+		/* frequency fc [0, .5[, q-factor q [1, 160..] */
 		void setFc(float fc, float q) noexcept
 		{
 			const auto omega = Tau * fc;
+			cosOmega = -2.f * std::cos(omega);
 			const auto sinOmega = std::sin(omega);
-			const auto cosOmega = std::cos(omega);
-			const auto alpha = sinOmega / (2.f * q);
+			alpha = sinOmega / (2.f * q);
 			
-			a0 = alpha;
-			a1 = 0.f;
-			a2 = -alpha;
-			
-			b1 = -2.f * cosOmega;
-			b2 = 1.f - alpha;
-
-			const auto b0 = 1.f + alpha;
-			const auto b0Inv = 1.f / b0;
-
-			a0 *= b0Inv;
-			a1 *= b0Inv;
-			a2 *= b0Inv;
-			b1 *= -b0Inv;
-			b2 *= -b0Inv;
+			updateCoefficients();
 		}
 		
 		void copy(const FilterBandpass& other) noexcept
@@ -53,6 +42,11 @@ namespace audio
 			a2 = other.a2;
 			b1 = other.b1;
 			b2 = other.b2;
+		}
+
+		float operator()(float x0) noexcept
+		{
+			return processSample(x0);
 		}
 
 		float processSample(float x0) noexcept
@@ -72,7 +66,28 @@ namespace audio
 			return y0;
 		}
 
+	protected:
+		float alpha, cosOmega;
 		float a0, a1, a2, b1, b2;
 		float     x1, x2, y1, y2;
+
+		void updateCoefficients() noexcept
+		{
+			a0 = alpha;
+			a1 = 0.f;
+			a2 = -alpha;
+
+			b1 = cosOmega;
+			b2 = 1.f - alpha;
+
+			const auto b0 = 1.f + alpha;
+			const auto b0Inv = 1.f / b0;
+
+			a0 *= b0Inv;
+			//a1 *= b0Inv;
+			a2 *= b0Inv;
+			b1 *= -b0Inv;
+			b2 *= -b0Inv;
+		}
 	};
 }

@@ -34,10 +34,9 @@ namespace gui
 			repaint();
 #endif
 	}
-
+#if PPD_MIDINumVoices > 0
 	void MIDIVoicesComp::paint(Graphics& g)
 	{
-#if PPD_MIDINumVoices > 0
 		const auto width = static_cast<float>(getWidth());
 		const auto height = static_cast<float>(getHeight());
 
@@ -54,6 +53,8 @@ namespace gui
 			if (voicesActive[v])
 				g.fillRect(x, y, w, h);
 		}
-#endif
 	}
+#else
+	void MIDIVoicesComp::paint(Graphics&) {}
+#endif
 }

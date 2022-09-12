@@ -416,8 +416,10 @@ namespace gui
 #if PPDHasStereoConfig
 		layout.place(stereoConfig, 5.f, 9.f + patchBrowserOffset, 1.f, 1.f, true);
 #endif
+#if PPDHasHQ
 		layout.place(hq, 7.f, 9.f + patchBrowserOffset, 1.f, 1.f, true);
-
+#endif
+		
 		layout.place(ccMonitor, 1.f, 10.f + patchBrowserOffset, 7.f, 1.f, false);
 		layout.place(midiVoices, 1.f, 11.f + patchBrowserOffset, 7.f, 1.f, false);
 

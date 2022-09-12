@@ -9,11 +9,16 @@ namespace param
 		return name.removeCharacters(" ").toLowerCase();
 	}
 
-	PID ll(PID pID, int offset) noexcept
+	PID ll(PID pID, int off) noexcept
 	{
 		auto i = static_cast<int>(pID);
-		i += (NumLowLevelParams - 1) * offset;
+		i += (NumLowLevelParams - 1) * off;
 		return static_cast<PID>(i);
+	}
+	
+	PID offset(PID pID, int off) noexcept
+	{
+		return static_cast<PID>(static_cast<int>(pID) + off);
 	}
 
 	String toString(PID pID)
@@ -46,14 +51,29 @@ namespace param
 		case PID::Power: return "Power";
 
 			// LOW LEVEL PARAMS:
-		case PID::BandpassCutoff: return "Bandpass Cutoff";
-		case PID::BandpassQ: return "Bandpass Q";
+		case PID::Lane1Enabled: return "Lane 1 Enabled";
+		case PID::Lane1Frequency: return "Lane 1 Frequency";
+		case PID::Lane1Resonance: return "Lane 1 Resonance";
+		case PID::Lane1Slope: return "Lane 1 Slope";
+		case PID::Lane1Drive: return "Lane 1 Drive";
+		case PID::Lane1Delay: return "Lane 1 Delay";
+		case PID::Lane1Gain: return "Lane 1 Gain";
 
-		case PID::ResonatorFeedback: return "Resonator Feedback";
-		case PID::ResonatorDamp: return "Resonator Damp";
-		case PID::ResonatorOct: return "Resonator Oct";
-		case PID::ResonatorSemi: return "Resonator Semi";
-		case PID::ResonatorFine: return "Resonator Fine";
+		case PID::Lane2Enabled: return "Lane 2 Enabled";
+		case PID::Lane2Frequency: return "Lane 2 Frequency";
+		case PID::Lane2Resonance: return "Lane 2 Resonance";
+		case PID::Lane2Slope: return "Lane 2 Slope";
+		case PID::Lane2Drive: return "Lane 2 Drive";
+		case PID::Lane2Delay: return "Lane 2 Delay";
+		case PID::Lane2Gain: return "Lane 2 Gain";
+
+		case PID::Lane3Enabled: return "Lane 3 Enabled";
+		case PID::Lane3Frequency: return "Lane 3 Frequency";
+		case PID::Lane3Resonance: return "Lane 3 Resonance";
+		case PID::Lane3Slope: return "Lane 3 Slope";
+		case PID::Lane3Drive: return "Lane 3 Drive";
+		case PID::Lane3Delay: return "Lane 3 Delay";
+		case PID::Lane3Gain: return "Lane 3 Gain";
 
 		default: return "Invalid Parameter Name";
 		}
@@ -101,14 +121,29 @@ namespace param
 		case PID::Power: return "Bypass the plugin with this parameter.";
 
 		// LOW LEVEL PARAMS:
-		case PID::BandpassCutoff: return "Define the cutoff frequency of the bandpass filter.";
-		case PID::BandpassQ: return "Define the Q-Factor of the bandpass filter.";
+		case PID::Lane1Enabled: return "Turn on or off the first lane.";
+		case PID::Lane1Frequency: return "Define the frequency of this lane's bandpass filter.";
+		case PID::Lane1Resonance: return "Define the resonance of this lane's bandpass filter.";
+		case PID::Lane1Slope: return "Define the slope of this lane's bandpass filter.";
+		case PID::Lane1Drive: return "Define this lane's drive.";
+		case PID::Lane1Delay: return "Define this lane's delay in ms.";
+		case PID::Lane1Gain: return "Define this lane's output gain.";
 
-		case PID::ResonatorFeedback: return "Dials in the resonator's feedback.";
-		case PID::ResonatorDamp: return "Dials in the resonator's damp.";
-		case PID::ResonatorOct: return "Retune the resonator in octaves.";
-		case PID::ResonatorSemi: return "Retune the resonator in semitones.";
-		case PID::ResonatorFine: return "Retune the resonator in finetones.";
+		case PID::Lane2Enabled: return "Turn on or off the second lane.";
+		case PID::Lane2Frequency: return "Define the frequency of this lane's bandpass filter.";
+		case PID::Lane2Resonance: return "Define the resonance of this lane's bandpass filter.";
+		case PID::Lane2Slope: return "Define the slope of this lane's bandpass filter.";
+		case PID::Lane2Drive: return "Define this lane's drive.";
+		case PID::Lane2Delay: return "Define this lane's delay in ms.";
+		case PID::Lane2Gain: return "Define this lane's output gain.";
+
+		case PID::Lane3Enabled: return "Turn on or off the third lane.";
+		case PID::Lane3Frequency: return "Define the frequency of this lane's bandpass filter.";
+		case PID::Lane3Resonance: return "Define the resonance of this lane's bandpass filter.";
+		case PID::Lane3Slope: return "Define the slope of this lane's bandpass filter.";
+		case PID::Lane3Drive: return "Define this lane's drive.";
+		case PID::Lane3Delay: return "Define this lane's delay in ms.";
+		case PID::Lane3Gain: return "Define this lane's output gain.";
 
 		default: return "Invalid Tooltip.";
 		}
@@ -138,6 +173,7 @@ namespace param
 		case Unit::Xen: return "notes/oct";
 		case Unit::Note: return "";
 		case Unit::Q: return "q";
+		case Unit::Slope: return "db/oct";
 		default: return "";
 		}
 	}
@@ -227,8 +263,15 @@ namespace param
 	}
 
 	//called by host, normalized, thread-safe
-	float Param::getValue() const { return valNorm.load(); }
-	float Param::getValueDenorm() const noexcept { return range.convertFrom0to1(getValue()); }
+	float Param::getValue() const
+	{
+		return valNorm.load();
+	}
+	
+	float Param::getValueDenorm() const noexcept
+	{
+		return range.convertFrom0to1(getValue());
+	}
 
 	// called by host, normalized, avoid locks, not used (directly) by editor
 	void Param::setValue(float normalized)
@@ -742,6 +785,16 @@ namespace param::strToVal
 			return val;
 		};
 	}
+
+	StrToValFunc slope()
+	{
+		return[p = parse()](const String& txt)
+		{
+			const auto text = txt.trimCharactersAtEnd(toString(Unit::Slope));
+			const auto val = p(text, 0.f);
+			return val / 12.f;
+		};
+	}
 }
 
 namespace param::valToStr
@@ -904,7 +957,7 @@ namespace param::valToStr
 	{
 		return [](float v)
 		{
-			if (v >= 0.f && v < 128.f)
+			if (v >= 0.f)
 			{
 				enum pitchclass { C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B, Num };
 
@@ -923,6 +976,15 @@ namespace param::valToStr
 		{
 			v = std::rint(v * 100.f) * .01f;
 			return String(v) + " " + toString(Unit::Q);
+		};
+	}
+
+	ValToStrFunc slope()
+	{
+		return [](float v)
+		{
+			v = std::rint(v) * 12.f;
+			return String(v) + " " + toString(Unit::Slope);
 		};
 	}
 }
@@ -1006,6 +1068,10 @@ namespace param
 			valToStrFunc = valToStr::q();
 			strToValFunc = strToVal::q();
 			break;
+		case Unit::Slope:
+			valToStrFunc = valToStr::slope();
+			strToValFunc = strToVal::slope();
+			break;
 		default:
 			valToStrFunc = valToStr::empty();
 			strToValFunc = strToVal::percent();
@@ -1056,14 +1122,29 @@ namespace param
 		params.push_back(makeParam(PID::Power, state, 1.f, makeRange::toggle(), Unit::Power));
 
 		// LOW LEVEL PARAMS:
-		params.push_back(makeParam(PID::BandpassCutoff, state, 69.f, makeRange::lin(12.f, 135.f), Unit::Note));
-		params.push_back(makeParam(PID::BandpassQ, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
+		params.push_back(makeParam(PID::Lane1Enabled, state, 1.f, makeRange::toggle(), Unit::Power));
+		params.push_back(makeParam(PID::Lane1Frequency, state, 69.f, makeRange::lin(12.f, 135.f), Unit::Note));
+		params.push_back(makeParam(PID::Lane1Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
+		params.push_back(makeParam(PID::Lane1Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
+		params.push_back(makeParam(PID::Lane1Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
+		params.push_back(makeParam(PID::Lane1Delay, state, 0.f, makeRange::lin(-20.f, 20.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane1Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
 
-		params.push_back(makeParam(PID::ResonatorFeedback, state, 0.f, makeRange::withCentre(-.999f, .999f, 0.f)));
-		params.push_back(makeParam(PID::ResonatorDamp, state, 4200.f, makeRange::withCentre(20.f, 22000.f, 4200.f), Unit::Hz));
-		params.push_back(makeParam(PID::ResonatorOct, state, 0.f, makeRange::withCentre(-3.f, 3.f, 0.f), Unit::Octaves));
-		params.push_back(makeParam(PID::ResonatorSemi, state, 0.f, makeRange::withCentre(-12.f, 12.f, 0.f), Unit::Semi));
-		params.push_back(makeParam(PID::ResonatorFine, state, 0.f, makeRange::withCentre(-1.f, 1.f, 0.f), Unit::Fine));
+		params.push_back(makeParam(PID::Lane2Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
+		params.push_back(makeParam(PID::Lane2Frequency, state, 69.f, makeRange::lin(12.f, 135.f), Unit::Note));
+		params.push_back(makeParam(PID::Lane2Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
+		params.push_back(makeParam(PID::Lane2Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
+		params.push_back(makeParam(PID::Lane2Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
+		params.push_back(makeParam(PID::Lane2Delay, state, 0.f, makeRange::lin(-20.f, 20.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane2Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
+
+		params.push_back(makeParam(PID::Lane3Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
+		params.push_back(makeParam(PID::Lane3Frequency, state, 69.f, makeRange::lin(12.f, 135.f), Unit::Note));
+		params.push_back(makeParam(PID::Lane3Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
+		params.push_back(makeParam(PID::Lane3Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
+		params.push_back(makeParam(PID::Lane3Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
+		params.push_back(makeParam(PID::Lane3Delay, state, 0.f, makeRange::lin(-20.f, 20.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane3Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
 
 		// LOW LEVEL PARAMS END
 

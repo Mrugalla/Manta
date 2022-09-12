@@ -242,6 +242,7 @@ namespace audio
 					voice.sampleIdx = 0;
 				pitchbendBuffer.processInit();
 			});
+#if PPD_MIDINumVoices != 0
 			manager.onNoteOn.push_back([this](const MidiMessage& msg, int s)
 			{
 				for (auto v = 1; v < PPD_MIDINumVoices; ++v)
@@ -263,11 +264,12 @@ namespace audio
 						return;
 					}
 				}
-				
+
 				voiceIndex = (voiceIndex + 1) % PPD_MIDINumVoices;
 				auto& voice = voices[voiceIndex];
 
-				voice.processNoteOn(
+				voice.processNoteOn
+				(
 					{
 						msg.getFloatVelocity(),
 						msg.getNoteNumber(),
@@ -276,9 +278,11 @@ namespace audio
 					s
 				);
 			});
+			
 			manager.onNoteOff.push_back([this](const MidiMessage& msg, int s)
 			{
 				auto noteNumber = msg.getNoteNumber();
+
 				for (auto v = 0; v < PPD_MIDINumVoices; ++v)
 				{
 					const auto v1 = (voiceIndex + 1 + v) % PPD_MIDINumVoices;
@@ -289,6 +293,7 @@ namespace audio
 						return voice.processNoteOff(s);
 				}
 			});
+#endif
 			manager.onPitchbend.push_back([this](const MidiMessage& msg, int s)
 			{
 				const auto pwv = static_cast<float>(msg.getPitchWheelValue());

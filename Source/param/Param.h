@@ -43,14 +43,29 @@ namespace param
 		Power,
 
 		// low level parameters
-		BandpassCutoff,
-		BandpassQ,
+		Lane1Enabled,
+		Lane1Frequency,
+		Lane1Resonance,
+		Lane1Slope,
+		Lane1Drive,
+		Lane1Delay,
+		Lane1Gain,
+		
+		Lane2Enabled,
+		Lane2Frequency,
+		Lane2Resonance,
+		Lane2Slope,
+		Lane2Drive,
+		Lane2Delay,
+		Lane2Gain,
 
-		ResonatorFeedback,
-		ResonatorDamp,
-		ResonatorOct,
-		ResonatorSemi,
-		ResonatorFine,
+		Lane3Enabled,
+		Lane3Frequency,
+		Lane3Resonance,
+		Lane3Slope,
+		Lane3Drive,
+		Lane3Delay,
+		Lane3Gain,
 
 		NumParams
 	};
@@ -59,7 +74,11 @@ namespace param
 	static constexpr int MinLowLevelIdx = static_cast<int>(PID::Power) + 1;
 	static constexpr int NumLowLevelParams = NumParams - MinLowLevelIdx;
 
-	PID ll(PID, int/*offset*/) noexcept;
+	/* pID, offset */
+	PID ll(PID, int) noexcept;
+
+	/* pID, offset */
+	PID offset(PID, int) noexcept;
 
 	String toString(PID);
 
@@ -89,6 +108,7 @@ namespace param
 		Xen,
 		Note,
 		Q,
+		Slope,
 		NumUnits
 	};
 
@@ -256,6 +276,7 @@ namespace param
 		StrToValFunc pan(const Params&);
 		StrToValFunc note();
 		StrToValFunc q();
+		StrToValFunc slope();
 	}
 
 	namespace valToStr
@@ -282,6 +303,7 @@ namespace param
 		ValToStrFunc pan(const Params&);
 		ValToStrFunc note();
 		ValToStrFunc q();
+		ValToStrFunc slope();
 	}
 
 	Param* makeParam(PID, State&,

@@ -188,26 +188,28 @@ namespace audio
 
     Processor::Processor() :
         ProcessorBackEnd(),
-        resonator(midiVoices, xenManager)
+        manta()
     {
     }
 
     void Processor::prepareToPlay(double sampleRate, int maxBlockSize)
     {
         auto latency = 0;
+        auto sampleRateUp = sampleRate;
+        auto blockSizeUp = maxBlockSize;
 #if PPDHasHQ
         oversampler.setEnabled(params[PID::HQ]->getValMod() > .5f);
         oversampler.prepare(sampleRate, maxBlockSize);
-        const auto sampleRateUp = oversampler.getFsUp();
-        const auto sampleRateUpF = static_cast<float>(sampleRateUp);
-        const auto blockSizeUp = oversampler.getBlockSizeUp();
+        sampleRateUp = oversampler.getFsUp();
+        blockSizeUp = oversampler.getBlockSizeUp();
         latency = oversampler.getLatency();
 #endif
+        const auto sampleRateUpF = static_cast<float>(sampleRateUp);
         const auto sampleRateF = static_cast<float>(sampleRate);
 
         midiVoices.prepare(blockSizeUp);
 
-        resonator.prepare(sampleRateUpF, blockSizeUp);
+        manta.prepare(sampleRateUpF, blockSizeUp);
 
         dryWetMix.prepare(sampleRateF, maxBlockSize, latency);
 
@@ -363,32 +365,11 @@ namespace audio
 #endif
     ) noexcept
     {
-        auto fb = params[PID::ResonatorFeedback]->getValModDenorm();
-        auto damp = params[PID::ResonatorDamp]->getValModDenorm();
-        
-        auto oct = params[PID::ResonatorOct]->getValModDenorm();
-        auto semi = params[PID::ResonatorSemi]->getValModDenorm();
-		auto fine = params[PID::ResonatorFine]->getValModDenorm();
-        auto retuneVal = getRetuneValue(oct, semi, fine);
-        
-        resonator(samples, numChannels, numSamples, fb, damp, retuneVal);
-
-        {
-            const auto note = params[PID::BandpassCutoff]->getValModDenorm();
-            const auto freq = noteInFreqHz(note);
-            const auto fc = freqHzInFc(freq, (float)oversampler.getFsUp());
-			const auto q = params[PID::BandpassQ]->getValModDenorm();
-            filter.setFc(fc, q);
-        }
-        
-        for (auto s = 0; s < numSamples; ++s)
-        {
-            samples[0][s] = filter.processSample(samples[0][s]);
-        }
-            
-        
-        for (auto ch = 1; ch < numChannels; ++ch)
-            SIMD::copy(samples[ch], samples[0], numSamples);
+        manta(
+            samples,
+            numChannels,
+            numSamples
+        );
     }
 
     void Processor::releaseResources() {}

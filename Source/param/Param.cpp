@@ -699,10 +699,9 @@ namespace param::strToVal
 				return val;
 
 			enum pitchclass { C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B, Num };
-			enum class State { Pitchclass, FlatOrSharp, Sign, Octave, numStates };
+			enum class State { Pitchclass, FlatOrSharp, Parse, numStates };
 
 			auto state = State::Pitchclass;
-			auto signMult = 1.f;
 			
 			for (auto i = 0; i < text.length(); ++i)
 			{
@@ -738,35 +737,17 @@ namespace param::strToVal
 					else
 						--i;
 					
-					state = State::Sign;
+					state = State::Parse;
 				}
-				else if (state == State::Sign)
+				else if (state == State::Parse)
 				{
-					if (chr == '-')
-						signMult = -1.f;
-					else if (chr == '+')
-						signMult = 1.f;
-					else
-						--i;
-
-					state = State::Octave;
-				}
-				else if (state == State::Octave)
-				{
-					auto digit = audio::getDigit(chr);
-					if (digit < 0 || digit > 9)
+					auto newVal = p(text.substring(i), -1.f);
+					if (newVal == -1.f)
 						return 69.f;
-					else
-					{
-						val += digit * 12.f * signMult;
+					val += 12 + newVal * 12.f;
+					while (val < 0.f)
 						val += 12.f;
-						while (val < 0.f)
-							val += 12.f;
-						while (val >= 128.f)
-							val -= 12.f;
-
-						return val;
-					}
+					return val;
 				}
 				else
 					return 69.f;
@@ -1127,7 +1108,7 @@ namespace param
 		params.push_back(makeParam(PID::Lane1Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane1Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
 		params.push_back(makeParam(PID::Lane1Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane1Delay, state, 0.f, makeRange::lin(-20.f, 20.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane1Delay, state, 0.f, makeRange::lin(0.f, 240.f), Unit::Ms));
 		params.push_back(makeParam(PID::Lane1Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
 
 		params.push_back(makeParam(PID::Lane2Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
@@ -1135,7 +1116,7 @@ namespace param
 		params.push_back(makeParam(PID::Lane2Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane2Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
 		params.push_back(makeParam(PID::Lane2Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane2Delay, state, 0.f, makeRange::lin(-20.f, 20.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane2Delay, state, 0.f, makeRange::lin(0.f, 240.f), Unit::Ms));
 		params.push_back(makeParam(PID::Lane2Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
 
 		params.push_back(makeParam(PID::Lane3Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
@@ -1143,7 +1124,7 @@ namespace param
 		params.push_back(makeParam(PID::Lane3Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane3Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
 		params.push_back(makeParam(PID::Lane3Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane3Delay, state, 0.f, makeRange::lin(-20.f, 20.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane3Delay, state, 0.f, makeRange::lin(0.f, 240.f), Unit::Ms));
 		params.push_back(makeParam(PID::Lane3Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
 
 		// LOW LEVEL PARAMS END

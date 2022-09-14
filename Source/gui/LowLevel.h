@@ -1,13 +1,13 @@
 #pragma once
 #include "Knob.h"
-#include "SplineEditor.h"
+#include "../audio/Manta.h"
 
 namespace gui
 {
     struct LowLevel :
         public Comp
     {
-        static constexpr int NumLanes = 3;
+        static constexpr int NumLanes = audio::Manta::NumLanes;
 
         LowLevel(Utils& u) :
             Comp(u, "", CursorType::Default),
@@ -91,5 +91,6 @@ namespace gui
 
     protected:
         std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, delay, gain;
+        
     };
 }

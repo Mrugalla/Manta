@@ -115,6 +115,10 @@
         <FILE id="dgpmul" name="EnvelopeFollower.h" compile="0" resource="0"
               file="Source/audio/EnvelopeFollower.h"/>
         <FILE id="P0YP67" name="Filter.h" compile="0" resource="0" file="Source/audio/Filter.h"/>
+        <FILE id="gbbOGf" name="LatencyCompensation.cpp" compile="1" resource="0"
+              file="Source/audio/LatencyCompensation.cpp"/>
+        <FILE id="Bn98GQ" name="LatencyCompensation.h" compile="0" resource="0"
+              file="Source/audio/LatencyCompensation.h"/>
         <FILE id="lkrz7T" name="Manta.h" compile="0" resource="0" file="Source/audio/Manta.h"/>
         <FILE id="kQwYTy" name="Meter.cpp" compile="1" resource="0" file="Source/audio/Meter.cpp"/>
         <FILE id="TN2ewh" name="Meter.h" compile="0" resource="0" file="Source/audio/Meter.h"/>

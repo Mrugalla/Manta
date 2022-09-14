@@ -188,7 +188,7 @@ namespace audio
 
     Processor::Processor() :
         ProcessorBackEnd(),
-        manta()
+        manta(xenManager)
     {
     }
 
@@ -210,6 +210,7 @@ namespace audio
         midiVoices.prepare(blockSizeUp);
 
         manta.prepare(sampleRateUpF, blockSizeUp);
+        latency += manta.delaySize / 2;
 
         dryWetMix.prepare(sampleRateF, maxBlockSize, latency);
 
@@ -365,10 +366,59 @@ namespace audio
 #endif
     ) noexcept
     {
-        manta(
+		const auto l1Enabled = params[PID::Lane1Enabled]->getValMod() > .5f;
+        const auto l1Frequency = params[PID::Lane1Frequency]->getValModDenorm();
+        const auto l1Resonance = params[PID::Lane1Resonance]->getValModDenorm();
+		const auto l1Slope = params[PID::Lane1Slope]->getValModDenorm();
+        const auto l1Drive = params[PID::Lane1Drive]->getValMod();
+        const auto l1Delay = params[PID::Lane1Delay]->getValModDenorm();
+        const auto l1Gain = params[PID::Lane1Gain]->getValModDenorm();
+		
+		const auto l2Enabled = params[PID::Lane2Enabled]->getValMod() > .5f;
+		const auto l2Frequency = params[PID::Lane2Frequency]->getValModDenorm();
+		const auto l2Resonance = params[PID::Lane2Resonance]->getValModDenorm();
+		const auto l2Slope = params[PID::Lane2Slope]->getValModDenorm();
+		const auto l2Drive = params[PID::Lane2Drive]->getValMod();
+		const auto l2Delay = params[PID::Lane2Delay]->getValModDenorm();
+		const auto l2Gain = params[PID::Lane2Gain]->getValModDenorm();
+
+		const auto l3Enabled = params[PID::Lane3Enabled]->getValMod() > .5f;
+		const auto l3Frequency = params[PID::Lane3Frequency]->getValModDenorm();
+		const auto l3Resonance = params[PID::Lane3Resonance]->getValModDenorm();
+		const auto l3Slope = params[PID::Lane3Slope]->getValModDenorm();
+		const auto l3Drive = params[PID::Lane3Drive]->getValMod();
+		const auto l3Delay = params[PID::Lane3Delay]->getValModDenorm();
+		const auto l3Gain = params[PID::Lane3Gain]->getValModDenorm();
+
+        manta
+        (
             samples,
             numChannels,
-            numSamples
+            numSamples,
+
+			l1Enabled,
+            std::rint(l1Frequency),
+			l1Resonance,
+			static_cast<int>(std::rint(l1Slope)),
+			l1Drive,
+			l1Delay,
+			l1Gain,
+
+			l2Enabled,
+            std::rint(l2Frequency),
+			l2Resonance,
+			static_cast<int>(std::rint(l2Slope)),
+			l2Drive,
+			l2Delay,
+			l2Gain,
+
+			l3Enabled,
+            std::rint(l3Frequency),
+			l3Resonance,
+			static_cast<int>(std::rint(l3Slope)),
+			l3Drive,
+			l3Delay,
+			l3Gain
         );
     }
 

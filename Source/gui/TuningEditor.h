@@ -184,7 +184,9 @@ namespace gui
 			xen(u),
 			baseNote(u),
 			masterTune(u),
+#if PPDMIDINumVoices != 0
 			pitchbend(u),
+#endif
 			keys(u, "Scrub the keys to test your tuning settings.")
 		{
 			addAndMakeVisible(title);
@@ -210,9 +212,11 @@ namespace gui
 			addAndMakeVisible(masterTune);
 			makeParameter(masterTune, PID::MasterTune, "Master Tune");
 
+#if PPDMIDINumVoices != 0
 			addAndMakeVisible(pitchbend);
 			makeParameter(pitchbend, PID::PitchbendRange, "Pitchbend");
-
+#endif
+			
 			addAndMakeVisible(keys);
 
 			layout.init
@@ -226,9 +230,9 @@ namespace gui
 		{
 			g.fillAll(Colours::c(ColourID::Bg).withAlpha(.98f));
 
-			g.setColour(Colours::c(ColourID::Hover));
-			layout.label(g, "temperament", 2, 8, 1, 1, false);
-			layout.label(g, "0.14", 3, 8, 1, 1, false);
+			//g.setColour(Colours::c(ColourID::Hover));
+			//layout.label(g, "temperament", 2, 8, 1, 1, false);
+			//layout.label(g, "0.14", 3, 8, 1, 1, false);
 		}
 
 		void resized()
@@ -243,8 +247,10 @@ namespace gui
 
 			layout.place(baseNote, 2, 4, 1, 2, false);
 			layout.place(masterTune, 3, 4, 1, 2, false);
+#if PPDMIDINumVoices != 0
 			layout.place(pitchbend, 4, 4, 1, 2, false);
-
+#endif
+			
 			layout.place(keys, 1, 10, 4, 1, false);
 		}
 
@@ -252,7 +258,10 @@ namespace gui
 		Label title, master, selection;
 		XenWheel xen;
 
-		Knob baseNote, masterTune, pitchbend;
+		Knob baseNote, masterTune;
+#if PPDMIDINumVoices != 0
+		Knob pitchbend;
+#endif
 
 		KeyboardComp keys;
 	};

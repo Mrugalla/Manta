@@ -42,7 +42,7 @@ namespace audio
 		}
 
 		template<typename Float>
-		Float noteToFreqHzWithWrap(Float note, Float lowestFreq, Float highestFreq = static_cast<Float>(22000)) const noexcept
+		Float noteToFreqHzWithWrap(Float note, Float lowestFreq = static_cast<Float>(0), Float highestFreq = static_cast<Float>(22000)) const noexcept
 		{
 			auto freq = noteToFreqHz(note);
 			while (freq < lowestFreq)

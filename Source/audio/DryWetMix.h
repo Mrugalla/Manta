@@ -1,28 +1,11 @@
 #pragma once
-#include "AudioUtils.h"
-#include "WHead.h"
+#include "LatencyCompensation.h"
 #include <array>
 
 namespace audio
 {
 	class DryWetMix
 	{
-		struct LatencyCompensation
-		{
-			LatencyCompensation();
-
-			/*blockSize, latency*/
-			void prepare(int, int);
-
-			/*dry,inputSamples,numChannels,numSamples*/
-			void operator()(float**, float**, int, int) noexcept;
-
-		protected:
-			AudioBuffer ring;
-			WHead wHead;
-			int latency;
-		};
-
 		enum
 		{
 #if PPDHasGainIn

@@ -90,4 +90,43 @@ namespace audio
 			b2 *= -b0Inv;
 		}
 	};
+
+	template<size_t NumFilters>
+	struct FilterBandpassSlope
+	{
+		FilterBandpassSlope() :
+			filters(),
+			stage(1)
+		{}
+
+		void setStage(int s) noexcept
+		{
+			stage = s;
+		}
+
+		void setFc(float fc, float q) noexcept
+		{
+			filters[0].setFc(fc, q);
+			for (auto i = 1; i < stage; ++i)
+				filters[i].copy(filters[0]);
+		}
+
+		void copy(FilterBandpassSlope<NumFilters>& other) noexcept
+		{
+			for (auto i = 0; i < stage; ++i)
+				filters[i].copy(other.filters[i]);
+			stage = other.stage;
+		}
+
+		float operator()(float x) noexcept
+		{
+			for (auto i = 0; i < stage; ++i)
+				x = filters[i](x);
+			return x;
+		}
+
+	protected:
+		std::array<FilterBandpass, NumFilters> filters;
+		int stage;
+	};
 }

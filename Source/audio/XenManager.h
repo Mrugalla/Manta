@@ -36,7 +36,8 @@ namespace audio
 		template<typename Float>
 		Float noteToFreqHz(Float note) const noexcept
 		{
-			const auto tmprmt = temperaments[static_cast<int>(std::rint(note))].load();
+			const auto noteCap = juce::jlimit(static_cast<Float>(0), static_cast<Float>(PPD_MaxXen), note);
+			const auto tmprmt = temperaments[static_cast<int>(std::rint(noteCap))].load();
 
 			return noteInFreqHz(note + tmprmt, baseNote, xen, masterTune);
 		}
@@ -52,6 +53,12 @@ namespace audio
 			return freq;
 		}
 
+		template<typename Float>
+		Float freqHzToNote(Float hz) noexcept
+		{
+			return freqHzInNote(hz, baseNote, xen, masterTune);
+		}
+		
 		float getXen() const noexcept
 		{
 			return xen;

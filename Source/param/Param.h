@@ -7,6 +7,7 @@
 
 #include "../arch/State.h"
 #include "../arch/Range.h"
+#include "../audio/XenManager.h"
 
 namespace param
 {
@@ -22,6 +23,9 @@ namespace param
 		GainIn,
 #endif
 		Mix,
+#if PPD_MixOrGainDry
+		MuteDry,
+#endif
 		Gain,
 #if PPDHasPolarity
 		Polarity,
@@ -35,6 +39,14 @@ namespace param
 #if PPDHasStereoConfig
 		StereoConfig,
 #endif
+#if PPDHasLookahead
+		Lookahead,
+#endif
+#if PPDHasDelta
+		Delta,
+#endif
+		
+		// tuning parameters
 		Xen,
 		MasterTune,
 		BaseNote,
@@ -44,7 +56,7 @@ namespace param
 
 		// low level parameters
 		Lane1Enabled,
-		Lane1Frequency,
+		Lane1Pitch,
 		Lane1Resonance,
 		Lane1Slope,
 		Lane1Drive,
@@ -52,7 +64,7 @@ namespace param
 		Lane1Gain,
 		
 		Lane2Enabled,
-		Lane2Frequency,
+		Lane2Pitch,
 		Lane2Resonance,
 		Lane2Slope,
 		Lane2Drive,
@@ -60,7 +72,7 @@ namespace param
 		Lane2Gain,
 
 		Lane3Enabled,
-		Lane3Frequency,
+		Lane3Pitch,
 		Lane3Resonance,
 		Lane3Slope,
 		Lane3Drive,
@@ -107,6 +119,7 @@ namespace param
 		Pan,
 		Xen,
 		Note,
+		Pitch,
 		Q,
 		Slope,
 		NumUnits
@@ -123,6 +136,7 @@ namespace param
 
 	using ParameterBase = juce::AudioProcessorParameter;
 	using State = sta::State;
+	using Xen = audio::XenManager&;
 
 	class Param :
 		public ParameterBase
@@ -222,7 +236,7 @@ namespace param
 		using AudioProcessor = juce::AudioProcessor;
 		using Parameters = std::vector<Param*>;
 
-		Params(AudioProcessor&, State&);
+		Params(AudioProcessor&, State&, const Xen&);
 
 		void loadPatch(juce::ApplicationProperties&);
 
@@ -275,6 +289,7 @@ namespace param
 		StrToValFunc voices();
 		StrToValFunc pan(const Params&);
 		StrToValFunc note();
+		StrToValFunc pitch(const Xen&);
 		StrToValFunc q();
 		StrToValFunc slope();
 	}
@@ -302,15 +317,21 @@ namespace param
 		ValToStrFunc voices();
 		ValToStrFunc pan(const Params&);
 		ValToStrFunc note();
+		ValToStrFunc pitch(const Xen&);
 		ValToStrFunc q();
 		ValToStrFunc slope();
 	}
 
+	/* pID, state, valDenormDefault, range, Unit */
 	Param* makeParam(PID, State&,
-		float /*valDenormDefault*/ = 1.f, const Range& = Range(0.f, 1.f),
+		float = 1.f, const Range& = Range(0.f, 1.f),
 		Unit = Unit::Percent);
 
+	/* pID, state, params */
 	Param* makeParamPan(PID, State&, const Params&);
+
+	/* pID, state, valDenormDefault, range, Xen */
+	Param* makeParamPitch(PID, State&, float, const Range&, const Xen&);
 
 	struct MacroProcessor
 	{

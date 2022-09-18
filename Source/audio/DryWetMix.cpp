@@ -67,7 +67,11 @@ namespace audio
 #endif
 #endif
 		auto mixBuf = bufs[Mix];
+#if PPD_MixOrGainDry == 0
 		mixSmooth(mixBuf, mixP, numSamples);
+#else
+		mixSmooth(mixBuf, decibelToGain(mixP, -80.f), numSamples);
+#endif
 
 		gainP = Decibels::decibelsToGain(gainP);
 #if PPDHasPolarity
@@ -104,11 +108,15 @@ namespace audio
 			SIMD::multiply(samples[ch], gainBuf, numSamples);
 	}
 
-	void DryWetMix::processMix(float** samples, int numChannels, int numSamples) const noexcept
+	void DryWetMix::processMix(float** samples, int numChannels, int numSamples
+#if PPDHasDelta
+		, bool deltaP
+#endif
+		) const noexcept
 	{
 		auto bufs = buffers.getArrayOfReadPointers();
 		const auto mix = bufs[Mix];
-		
+
 		for (auto ch = 0; ch < numChannels; ++ch)
 		{
 			const auto dry = dryBuf.getReadPointer(ch);
@@ -116,12 +124,33 @@ namespace audio
 
 			for (auto s = 0; s < numSamples; ++s)
 			{
-				auto d = dry[s];
-				auto w = smpls[s];
-				auto m = mix[s];
-
+				const auto d = dry[s];
+				const auto w = smpls[s];
+				const auto m = mix[s];
+#if PPD_MixOrGainDry == 0
 				smpls[s] = d + m * (w - d);
+#else
+				smpls[s] = m * d + w;
+#endif
 			}
 		}
+#if PPDHasDelta
+		if(deltaP)
+		{
+			for (auto ch = 0; ch < numChannels; ++ch)
+			{
+				const auto dry = dryBuf.getReadPointer(ch);
+				auto smpls = samples[ch];
+
+				for (auto s = 0; s < numSamples; ++s)
+				{
+					const auto d = dry[s];
+					const auto w = smpls[s];
+					
+					smpls[s] = w - d;
+				}
+			}
+		}
+#endif
 	}
 }

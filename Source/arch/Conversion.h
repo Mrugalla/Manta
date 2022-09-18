@@ -56,7 +56,7 @@ namespace audio
     }
 
     template<typename Float>
-    inline Float freqHzInNote(Float freqHz, Float xen = static_cast<Float>(12), Float rootNote = static_cast<Float>(69)) noexcept
+    inline Float freqHzInNote2(Float freqHz, Float xen = static_cast<Float>(12), Float rootNote = static_cast<Float>(69)) noexcept
     {
         return std::log2(freqHz * static_cast<Float>(.00227272727)) * xen + rootNote;
     }
@@ -78,6 +78,14 @@ namespace audio
 	{
 		return std::pow(static_cast<Float>(10), db * static_cast<Float>(.05));
 	}
+
+    template<typename Float>
+    inline Float decibelToGain(Float db, Float threshold) noexcept
+    {
+        if (db <= threshold)
+            return 0.f;
+        return std::pow(static_cast<Float>(10), db * static_cast<Float>(.05));
+    }
 
     /* oct [-n, n], semi [-12, 12], fine [-1, 1]*/
     template<typename Float>

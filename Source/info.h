@@ -29,12 +29,9 @@ Frequency StringToValue
 	enter note values like C2, D#1, Eb3
 	and more specific ones like C3-edo7-root42-tune432
 
-GainIn GainOut Meters
-	crash -nan if too much gain
-
 Colours
 	if chosen white modulations not visible anymore
-	dark colours make it too dark
+	some dark colours make it too dark
 
 highlevel
 	"remove dc offset" switch (steep highpass)
@@ -46,6 +43,7 @@ Pan Knob
 	when value near 0 draw "C" and not "0" or "-0"
 
 Knob
+	clicking on knob shouldn't change cursor position
 	double-clicks don't always work
 
 SplineEditor
@@ -121,9 +119,6 @@ Oversampler
 FirstTimeAction(s)
 	thing that only makes lookuptables when the plugin is started the first time
 	tutorial
-
-Pre Processor Defines (PPD)
-	PPDSidechainable
 
 HighLevel UI Elements
 	undo/redo buttons

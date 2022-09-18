@@ -154,7 +154,16 @@ namespace gui
 		{
 			Comp::mouseDrag(evt);
 
-			const auto nHoverIdx = getHoverIdx(evt.getPosition());
+			const auto pt = evt.getPosition();
+
+			auto nHoverIdx = getHoverIdx(pt);
+			if (nHoverIdx == -1)
+			{
+				if (pt.x < keys[0]->getX())
+					nHoverIdx = 0;
+				else
+					nHoverIdx = static_cast<int>(keys.size() - 1);
+			}
 			if (hoverIdx != nHoverIdx)
 			{
 				hoverIdx = nHoverIdx;
@@ -187,4 +196,5 @@ namespace gui
 		}
 		
 	};
+	
 }

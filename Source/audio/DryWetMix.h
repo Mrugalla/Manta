@@ -38,14 +38,18 @@ namespace audio
 #endif
 		) noexcept;
 
-		/*samples, numChannels, numSamples*/
+		/* samples, numChannels, numSamples */
 		void processBypass(float**, int, int) noexcept;
 
-		/*samples, numChannels, numSamples*/
+		/* samples, numChannels, numSamples */
 		void processOutGain(float**, int, int) const noexcept;
 
-		/*samples, numChannels, numSamples*/
-		void processMix(float**, int, int) const noexcept;
+		/* samples, numChannels, numSamples, delta */
+		void processMix(float**, int, int
+#if PPDHasDelta
+			, bool
+#endif
+			) const noexcept;
 
 	protected:
 		LatencyCompensation latencyCompensation;

@@ -29,8 +29,13 @@ namespace param
 #if PPDHasGainIn
 		case PID::GainIn: return "Gain In";
 #endif
+#if PPD_MixOrGainDry == 0
 		case PID::Mix: return "Mix";
+#else
+		case PID::Mix: return "Gain Dry";
+#endif
 		case PID::Gain: return "Gain Out";
+		case PID::MuteDry: return "Mute Dry";
 #if PPDHasHQ
 		case PID::HQ: return "HQ";
 #endif
@@ -43,6 +48,14 @@ namespace param
 #if PPDHasStereoConfig
 		case PID::StereoConfig: return "Stereo Config";
 #endif
+#if PPDHasLookahead
+		case PID::Lookahead: return "Lookahead";
+#endif
+#if PPDHasDelta
+		case PID::Delta: return "Delta";
+#endif
+			
+		// TUNING PARAM:
 		case PID::Xen: return "Xen";
 		case PID::MasterTune: return "Master Tune";
 		case PID::BaseNote: return "Base Note";
@@ -50,9 +63,9 @@ namespace param
 
 		case PID::Power: return "Power";
 
-			// LOW LEVEL PARAMS:
+		// LOW LEVEL PARAMS:
 		case PID::Lane1Enabled: return "Lane 1 Enabled";
-		case PID::Lane1Frequency: return "Lane 1 Frequency";
+		case PID::Lane1Pitch: return "Lane 1 Pitch";
 		case PID::Lane1Resonance: return "Lane 1 Resonance";
 		case PID::Lane1Slope: return "Lane 1 Slope";
 		case PID::Lane1Drive: return "Lane 1 Drive";
@@ -60,7 +73,7 @@ namespace param
 		case PID::Lane1Gain: return "Lane 1 Gain";
 
 		case PID::Lane2Enabled: return "Lane 2 Enabled";
-		case PID::Lane2Frequency: return "Lane 2 Frequency";
+		case PID::Lane2Pitch: return "Lane 2 Pitch";
 		case PID::Lane2Resonance: return "Lane 2 Resonance";
 		case PID::Lane2Slope: return "Lane 2 Slope";
 		case PID::Lane2Drive: return "Lane 2 Drive";
@@ -68,7 +81,7 @@ namespace param
 		case PID::Lane2Gain: return "Lane 2 Gain";
 
 		case PID::Lane3Enabled: return "Lane 3 Enabled";
-		case PID::Lane3Frequency: return "Lane 3 Frequency";
+		case PID::Lane3Pitch: return "Lane 3 Pitch";
 		case PID::Lane3Resonance: return "Lane 3 Resonance";
 		case PID::Lane3Slope: return "Lane 3 Slope";
 		case PID::Lane3Drive: return "Lane 3 Drive";
@@ -99,7 +112,12 @@ namespace param
 #if PPDHasGainIn
 		case PID::GainIn: return "Apply input gain to the wet signal.";
 #endif
+#if PPD_MixOrGainDry == 0
 		case PID::Mix: return "Mix the dry with the wet signal.";
+#else
+		case PID::Mix: return "Apply output gain to the dry signal.";
+		case PID::MuteDry: return "Mute the dry signal.";
+#endif
 		case PID::Gain: return "Apply output gain to the wet signal.";
 #if PPDHasHQ
 		case PID::HQ: return "Turn on HQ to apply 2x Oversampling to the signal.";
@@ -113,6 +131,14 @@ namespace param
 #if PPDHasStereoConfig
 		case PID::StereoConfig: return "Define the stereo-configuration. L/R or M/S.";
 #endif
+#if PPDHasLookahead
+		case PID::Lookahead: return "Switch on or off lookahead-related features. (Might increase latency.)";
+#endif
+#if PPDHasDelta
+		case PID::Delta: return "Listen to the difference between the dry and the wet signal.";
+#endif
+		
+		// TUNING PARAMS:
 		case PID::Xen: return "Define the xenharmonic scale.";
 		case PID::MasterTune: return "Retune the entire plugin to a different chamber pitch.";
 		case PID::BaseNote: return "Define the base note of the scale.";
@@ -122,7 +148,7 @@ namespace param
 
 		// LOW LEVEL PARAMS:
 		case PID::Lane1Enabled: return "Turn on or off the first lane.";
-		case PID::Lane1Frequency: return "Define the frequency of this lane's bandpass filter.";
+		case PID::Lane1Pitch: return "Define the pitch of this lane's bandpass filter.";
 		case PID::Lane1Resonance: return "Define the resonance of this lane's bandpass filter.";
 		case PID::Lane1Slope: return "Define the slope of this lane's bandpass filter.";
 		case PID::Lane1Drive: return "Define this lane's drive.";
@@ -130,7 +156,7 @@ namespace param
 		case PID::Lane1Gain: return "Define this lane's output gain.";
 
 		case PID::Lane2Enabled: return "Turn on or off the second lane.";
-		case PID::Lane2Frequency: return "Define the frequency of this lane's bandpass filter.";
+		case PID::Lane2Pitch: return "Define the pitch of this lane's bandpass filter.";
 		case PID::Lane2Resonance: return "Define the resonance of this lane's bandpass filter.";
 		case PID::Lane2Slope: return "Define the slope of this lane's bandpass filter.";
 		case PID::Lane2Drive: return "Define this lane's drive.";
@@ -138,7 +164,7 @@ namespace param
 		case PID::Lane2Gain: return "Define this lane's output gain.";
 
 		case PID::Lane3Enabled: return "Turn on or off the third lane.";
-		case PID::Lane3Frequency: return "Define the frequency of this lane's bandpass filter.";
+		case PID::Lane3Pitch: return "Define the pitch of this lane's bandpass filter.";
 		case PID::Lane3Resonance: return "Define the resonance of this lane's bandpass filter.";
 		case PID::Lane3Slope: return "Define the slope of this lane's bandpass filter.";
 		case PID::Lane3Drive: return "Define this lane's drive.";
@@ -172,6 +198,7 @@ namespace param
 		case Unit::Pan: return "%";
 		case Unit::Xen: return "notes/oct";
 		case Unit::Note: return "";
+		case Unit::Pitch: return "";
 		case Unit::Q: return "q";
 		case Unit::Slope: return "db/oct";
 		default: return "";
@@ -757,6 +784,18 @@ namespace param::strToVal
 		};
 	}
 
+	StrToValFunc pitch(const Xen& xenManager)
+	{
+		return[hzFunc = hz(), noteFunc = note(), &xen = xenManager](const String& txt)
+		{
+			auto freqHz = hzFunc(txt);
+			if (freqHz != 0.f)
+				return xen.freqHzToNote(freqHz);
+
+			return noteFunc(txt);
+		};
+	}
+
 	StrToValFunc q()
 	{
 		return[p = parse()](const String& txt)
@@ -951,6 +990,14 @@ namespace param::valToStr
 		};
 	}
 
+	ValToStrFunc pitch(const Xen& xenManager)
+	{
+		return [noteFunc = note(), hzFunc = hz(), &xen = xenManager](float v)
+		{
+			return noteFunc(v) + "; " + hzFunc(xen.noteToFreqHz(v));
+		};
+	}
+
 	ValToStrFunc q()
 	{
 		return [](float v)
@@ -1070,62 +1117,84 @@ namespace param
 		return new Param(id, { -1.f, 1.f }, 0.f, valToStrFunc, strToValFunc, state, Unit::Pan);
 	}
 
+	Param* makeParamPitch(PID id, State& state, float valDenormDefault, const Range& range, const Xen& xen)
+	{
+		ValToStrFunc valToStrFunc = valToStr::pitch(xen);
+		StrToValFunc strToValFunc = strToVal::pitch(xen);
+
+		return new Param(id, range, valDenormDefault, valToStrFunc, strToValFunc, state, Unit::Pitch);
+	}
+
 	// PARAMS
 
-	Params::Params(AudioProcessor& audioProcessor, State& _state) :
+	Params::Params(AudioProcessor& audioProcessor, State& _state, const Xen& xen) :
 		params(),
 		state(_state),
 		modDepthLocked(false)
 	{
-		params.push_back(makeParam(PID::Macro, state, 0.f));
+		{ // HIGH LEVEL PARAMS:
+			params.push_back(makeParam(PID::Macro, state, 0.f));
 #if PPDHasGainIn
-		params.push_back(makeParam(PID::GainIn, state, 0.f, makeRange::withCentre(PPD_GainIn_Min, PPD_GainIn_Max, 0.f), Unit::Decibel));
+			params.push_back(makeParam(PID::GainIn, state, 0.f, makeRange::withCentre(PPD_GainIn_Min, PPD_GainIn_Max, 0.f), Unit::Decibel));
 #endif
-		params.push_back(makeParam(PID::Mix, state));
-		params.push_back(makeParam(PID::Gain, state, 0.f, makeRange::withCentre(PPD_GainOut_Min, PPD_GainOut_Max, 0.f), Unit::Decibel));
+#if PPD_MixOrGainDry == 0
+			params.push_back(makeParam(PID::Mix, state));
+#else
+			params.push_back(makeParam(PID::Mix, state, 0.f, makeRange::withCentre(-80.f, 0.f, -6.f), Unit::Decibel));
+			params.push_back(makeParam(PID::MuteDry, state, 0.f, makeRange::toggle(), Unit::Mute));
+#endif
+			params.push_back(makeParam(PID::Gain, state, 0.f, makeRange::withCentre(PPD_GainOut_Min, PPD_GainOut_Max, 0.f), Unit::Decibel));
 #if PPDHasPolarity
-		params.push_back(makeParam(PID::Polarity, state, 0.f, makeRange::toggle(), Unit::Polarity));
+			params.push_back(makeParam(PID::Polarity, state, 0.f, makeRange::toggle(), Unit::Polarity));
 #endif
 #if PPDHasUnityGain && PPDHasGainIn
-		params.push_back(makeParam(PID::UnityGain, state, (PPD_UnityGainDefault ? 1.f : 0.f), makeRange::toggle(), Unit::Polarity));
+			params.push_back(makeParam(PID::UnityGain, state, (PPD_UnityGainDefault ? 1.f : 0.f), makeRange::toggle(), Unit::Polarity));
 #endif
 #if PPDHasHQ
-		params.push_back(makeParam(PID::HQ, state, 0.f, makeRange::toggle()));
+			params.push_back(makeParam(PID::HQ, state, 0.f, makeRange::toggle()));
 #endif
 #if PPDHasStereoConfig
-		params.push_back(makeParam(PID::StereoConfig, state, 1.f, makeRange::toggle(), Unit::StereoConfig));
+			params.push_back(makeParam(PID::StereoConfig, state, 1.f, makeRange::toggle(), Unit::StereoConfig));
 #endif
-		params.push_back(makeParam(PID::Xen, state, 12.f, makeRange::withCentre(1.f, PPD_MaxXen, 12.f), Unit::Xen));
-		params.push_back(makeParam(PID::MasterTune, state, 440.f, makeRange::withCentre(420.f, 460.f, 440.f), Unit::Hz));
-		params.push_back(makeParam(PID::BaseNote, state, 69.f, makeRange::withCentre(0.f, 127.f, 69.f), Unit::Note));
-		params.push_back(makeParam(PID::PitchbendRange, state, 2.f, makeRange::stepped(0.f, 48.f, 1.f), Unit::Semi));
+#if PPDHasLookahead
+			params.push_back(makeParam(PID::Lookahead, state, 1.f, makeRange::toggle(), Unit::Power));
+#endif
+#if PPDHasDelta
+			params.push_back(makeParam(PID::Delta, state, 0.f, makeRange::toggle(), Unit::Power));
+#endif
+			// TUNING PARAMS:
+			params.push_back(makeParam(PID::Xen, state, 12.f, makeRange::withCentre(1.f, PPD_MaxXen, 12.f), Unit::Xen));
+			params.push_back(makeParam(PID::MasterTune, state, 440.f, makeRange::withCentre(420.f, 460.f, 440.f), Unit::Hz));
+			params.push_back(makeParam(PID::BaseNote, state, 69.f, makeRange::withCentre(0.f, 127.f, 69.f), Unit::Note));
+			params.push_back(makeParam(PID::PitchbendRange, state, 2.f, makeRange::stepped(0.f, 48.f, 1.f), Unit::Semi));
 
-		params.push_back(makeParam(PID::Power, state, 1.f, makeRange::toggle(), Unit::Power));
+			params.push_back(makeParam(PID::Power, state, 1.f, makeRange::toggle(), Unit::Power));
+		}
 
 		// LOW LEVEL PARAMS:
 		params.push_back(makeParam(PID::Lane1Enabled, state, 1.f, makeRange::toggle(), Unit::Power));
-		params.push_back(makeParam(PID::Lane1Frequency, state, 69.f, makeRange::lin(12.f, 135.f), Unit::Note));
-		params.push_back(makeParam(PID::Lane1Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
+		params.push_back(makeParamPitch(PID::Lane1Pitch, state, 69.f, makeRange::lin(0.f, 127.f), xen));
+		params.push_back(makeParam(PID::Lane1Resonance, state, 40.f, makeRange::withCentre(1.f, 80.f, 12.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane1Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
 		params.push_back(makeParam(PID::Lane1Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane1Delay, state, 0.f, makeRange::lin(0.f, 240.f), Unit::Ms));
-		params.push_back(makeParam(PID::Lane1Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
+		params.push_back(makeParam(PID::Lane1Delay, state, 0.f, makeRange::lin(0.f, 40.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane1Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
 		params.push_back(makeParam(PID::Lane2Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
-		params.push_back(makeParam(PID::Lane2Frequency, state, 69.f, makeRange::lin(12.f, 135.f), Unit::Note));
-		params.push_back(makeParam(PID::Lane2Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
+		params.push_back(makeParamPitch(PID::Lane2Pitch, state, 69.f, makeRange::lin(0.f, 127.f), xen));
+		params.push_back(makeParam(PID::Lane2Resonance, state, 40.f, makeRange::withCentre(1.f, 80.f, 12.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane2Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
 		params.push_back(makeParam(PID::Lane2Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane2Delay, state, 0.f, makeRange::lin(0.f, 240.f), Unit::Ms));
-		params.push_back(makeParam(PID::Lane2Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
+		params.push_back(makeParam(PID::Lane2Delay, state, 0.f, makeRange::lin(0.f, 40.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane2Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
 		params.push_back(makeParam(PID::Lane3Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
-		params.push_back(makeParam(PID::Lane3Frequency, state, 69.f, makeRange::lin(12.f, 135.f), Unit::Note));
-		params.push_back(makeParam(PID::Lane3Resonance, state, 40.f, makeRange::withCentre(1.f, 160.f, 40.f), Unit::Q));
+		params.push_back(makeParamPitch(PID::Lane3Pitch, state, 69.f, makeRange::lin(0.f, 127.f), xen));
+		params.push_back(makeParam(PID::Lane3Resonance, state, 40.f, makeRange::withCentre(1.f, 80.f, 12.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane3Slope, state, 1.f, makeRange::lin(1.f, 4.f), Unit::Slope));
 		params.push_back(makeParam(PID::Lane3Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane3Delay, state, 0.f, makeRange::lin(0.f, 240.f), Unit::Ms));
-		params.push_back(makeParam(PID::Lane3Gain, state, 0.f, makeRange::lin(-60.f, 60.f), Unit::Decibel));
+		params.push_back(makeParam(PID::Lane3Delay, state, 0.f, makeRange::lin(0.f, 40.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane3Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
 		// LOW LEVEL PARAMS END
 

@@ -91,6 +91,7 @@ namespace gui
 		Load,
 		Remove,
 		TuningFork,
+		Lookahead,
 		NumSymbols
 	};
 

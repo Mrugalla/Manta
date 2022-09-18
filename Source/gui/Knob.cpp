@@ -231,18 +231,6 @@ namespace gui
                 {
                     if (mouse.mods.isCtrlDown())
                         param->setValueNotifyingHost(param->getDefaultValue());
-                    else
-                    {
-                        PointF centre(
-                            static_cast<float>(k.getWidth()) * .5f,
-                            static_cast<float>(k.getHeight()) * .5f
-                        );
-                        const LineF fromCentre(centre, mouse.position);
-                        const auto angle = fromCentre.getAngle();
-
-                        const auto newValue = juce::jlimit(0.f, 1.f, (angle + angleWidth) / angleRange);
-                        param->setValue(newValue);
-                    }
                 }
                 param->endGesture();
             }

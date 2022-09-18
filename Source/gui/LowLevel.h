@@ -1,6 +1,7 @@
 #pragma once
 #include "Knob.h"
 #include "../audio/Manta.h"
+#include "SpectroBeamComp.h"
 
 namespace gui
 {
@@ -17,14 +18,15 @@ namespace gui
 			slope{ Knob(u), Knob(u), Knob(u) },
 			drive{ Knob(u), Knob(u), Knob(u) },
 			delay{ Knob(u), Knob(u), Knob(u) },
-			gain{ Knob(u), Knob(u), Knob(u) }
+			gain{ Knob(u), Knob(u), Knob(u) },
+            spectroBeam(u, u.audioProcessor.spectroBeam)
         {
             for (auto i = 0; i < NumLanes; ++i)
             {
                 const auto offset = i * 7;
 
                 makeParameter(enabled[i], param::offset(PID::Lane1Enabled, offset), "Enabled");
-                makeParameter(frequency[i], param::offset(PID::Lane1Frequency, offset), "Frequency");
+                makeParameter(frequency[i], param::offset(PID::Lane1Pitch, offset), "Pitch");
 				makeParameter(resonance[i], param::offset(PID::Lane1Resonance, offset), "Resonance");
 				makeParameter(slope[i], param::offset(PID::Lane1Slope, offset), "Slope");
 				makeParameter(drive[i], param::offset(PID::Lane1Drive, offset), "Drive");
@@ -38,12 +40,14 @@ namespace gui
 				addAndMakeVisible(drive[i]);
 				addAndMakeVisible(delay[i]);
 				addAndMakeVisible(gain[i]);
+
+                addAndMakeVisible(spectroBeam);
             }
 
             layout.init
             (
                 { 3, 5, 5, 5, 5, 5, 5, 5, 3 },
-                { 3, 2, 5, 2, 5, 2, 5, 3 }
+                { 3, 2, 5, 2, 5, 2, 5, 3, 3 }
             );
         }
 
@@ -55,6 +59,7 @@ namespace gui
 
             g.setColour(Colours::c(ColourID::Txt));
             
+			///*
             {
                 const auto laneArea = layout(1, 1, 7, 2);
                 g.drawFittedText("Lane 1", laneArea.toNearestInt(), Just::centredTop, 1);
@@ -70,6 +75,8 @@ namespace gui
 				g.drawFittedText("Lane 3", laneArea.toNearestInt(), Just::centredTop, 1);
 				drawRectEdges(g, laneArea, thicc2, stroke);
 			}
+            //*/
+            
         }
 
         void resized() override
@@ -78,19 +85,23 @@ namespace gui
             for (auto i = 0; i < NumLanes; ++i)
             {
                 auto y = 2 + i * 2;
-
-				layout.place(enabled[i], 1, y, 1, 1, false);
+                ///*
+                layout.place(enabled[i], 1, y, 1, 1, false);
 				layout.place(frequency[i], 2, y, 1, 1, false);
 				layout.place(resonance[i], 3, y, 1, 1, false);
 				layout.place(slope[i], 4, y, 1, 1, false);
 				layout.place(drive[i], 5, y, 1, 1, false);
 				layout.place(delay[i], 6, y, 1, 1, false);
 				layout.place(gain[i], 7, y, 1, 1, false);
+                //*/
             }
+
+			layout.place(spectroBeam, 1, 7, 7, 1, false);
         }
 
     protected:
         std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, delay, gain;
+        SpectroBeamComp<11> spectroBeam;
         
     };
 }

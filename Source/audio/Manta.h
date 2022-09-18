@@ -11,7 +11,7 @@ namespace audio
 	{
 		static constexpr int NumLanes = 3;
 		static constexpr int MaxSlopeStage = 4; //4*12db/oct
-		static constexpr int DelayLength = 240; //ms
+		static constexpr int DelayLength = 40; //ms
 		
 		static constexpr float DelayLengthHalf = static_cast<float>(DelayLength / 2);
 
@@ -134,7 +134,7 @@ namespace audio
 			}
 
 			void operator()(float** samples, int numChannels, int numSamples,
-				bool enabled, float _frequency, float _resonance, int _slope, float _drive, float _delay, float _gain,
+				bool enabled, float _pitch, float _resonance, int _slope, float _drive, float _delay, float _gain,
 				const int* wHead, const XenManager& xen) noexcept
 			{
 				auto lane = laneBuffer.getArrayOfWritePointers();
@@ -149,7 +149,7 @@ namespace audio
 				for (auto ch = 0; ch < numChannels; ++ch)
 					SIMD::copy(lane[ch], samples[ch], numSamples);
 
-				const auto freqHz = xen.noteToFreqHzWithWrap(_frequency);
+				const auto freqHz = xen.noteToFreqHzWithWrap(_pitch);
 				const auto freqFc = freqHzInFc(freqHz, Fs);
 
 				const auto fcBuf = frequency(freqFc, numSamples);
@@ -248,17 +248,17 @@ namespace audio
 		}
 
 		/* samples, numChannels, numSamples,
-		* l1Enabled [0, 1], l1Frequency [12, N]note, l1Resonance [1, N]q, l1Slope [1, 4]db/oct, l1Drive [0, 1]%, l1Delay [-20, 20]ms, l1Gain [-60, 60]db
-		* l2Enabled [0, 1], l2Frequency [12, N]note, l2Resonance [1, N]q, l2Slope [1, 4]db/oct, l2Drive [0, 1]%, l2Delay [-20, 20]ms, l2Gain [-60, 60]db
-		* l3Enabled [0, 1], l3Frequency [12, N]note, l3Resonance [1, N]q, l3Slope [1, 4]db/oct, l3Drive [0, 1]%, l3Delay [-20, 20]ms, l3Gain [-60, 60]db
+		* l1Enabled [0, 1], l1Pitch [12, N]note, l1Resonance [1, N]q, l1Slope [1, 4]db/oct, l1Drive [0, 1]%, l1Delay [-0, DelayLength]ms, l1Gain [-60, 60]db
+		* l2Enabled [0, 1], l2Pitch [12, N]note, l2Resonance [1, N]q, l2Slope [1, 4]db/oct, l2Drive [0, 1]%, l2Delay [-0, DelayLength]ms, l2Gain [-60, 60]db
+		* l3Enabled [0, 1], l3Pitch [12, N]note, l3Resonance [1, N]q, l3Slope [1, 4]db/oct, l3Drive [0, 1]%, l3Delay [-0, DelayLength]ms, l3Gain [-60, 60]db
 		*/
 		void operator()(float** samples, int numChannels, int numSamples,
-			bool l1Enabled, float l1Frequency, float l1Resonance, int l1Slope, float l1Drive, float l1Delay, float l1Gain,
-			bool l2Enabled, float l2Frequency, float l2Resonance, int l2Slope, float l2Drive, float l2Delay, float l2Gain,
-			bool l3Enabled, float l3Frequency, float l3Resonance, int l3Slope, float l3Drive, float l3Delay, float l3Gain) noexcept
+			bool l1Enabled, float l1Pitch, float l1Resonance, int l1Slope, float l1Drive, float l1Delay, float l1Gain,
+			bool l2Enabled, float l2Pitch, float l2Resonance, int l2Slope, float l2Drive, float l2Delay, float l2Gain,
+			bool l3Enabled, float l3Pitch, float l3Resonance, int l3Slope, float l3Drive, float l3Delay, float l3Gain) noexcept
 		{
 			bool enabled[NumLanes] = { l1Enabled, l2Enabled, l3Enabled };
-			float frequency[NumLanes] = { l1Frequency, l2Frequency, l3Frequency };
+			float pitch[NumLanes] = { l1Pitch, l2Pitch, l3Pitch };
 			float resonance[NumLanes] = { l1Resonance, l2Resonance, l3Resonance };
 			int slope[NumLanes] = { l1Slope, l2Slope, l3Slope };
 			float drive[NumLanes] = { l1Drive, l2Drive, l3Drive };
@@ -279,7 +279,7 @@ namespace audio
 					numSamples,
 					
 					enabled[i],
-					frequency[i],
+					pitch[i],
 					resonance[i],
 					slope[i],
 					drive[i],
@@ -310,16 +310,8 @@ namespace audio
 
 todo:
 
-lookahead + lane delays
-	lookahead enable button exists (highlevel)
-		adds dsp latency to global latency in processor's prepare
-		changes wether delay parameters are [-120,120], or [0, 120]
-
 tuningeditor keyboard component must play synth when note pressed
 	for previewing current scale
 	let play chromatic for previewing current scale
-
-frequency parameter shows in notes and freq
-	in regard to xenManager
 
 */

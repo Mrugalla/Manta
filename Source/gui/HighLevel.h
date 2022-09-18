@@ -47,16 +47,8 @@ namespace gui
 #if PPDHasUnityGain && PPDHasGainIn
 		Button unityGain;
 #endif
-#if PPDHasHQ
-		Button hq;
-#endif
-#if PPDHasStereoConfig
-		Button stereoConfig;
-#endif
-		Button power;
-#if PPDHasPolarity
-		Button polarity;
-#endif
+		std::vector<std::unique_ptr<Button>> buttonsBottom;
+
 		MIDICCMonitor ccMonitor;
 		MIDIVoicesComp midiVoices;
 

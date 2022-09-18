@@ -35,6 +35,7 @@ namespace gui
 	{
 		label.setText(txt);
 		label.textCID = ColourID::Interact;
+		label.mode = Label::Mode::TextToLabelBounds;
 		addAndMakeVisible(label);
 	}
 
@@ -43,6 +44,7 @@ namespace gui
 		toggleTexts = txt;
 		label.setText("");
 		label.textCID = ColourID::Interact;
+		label.mode = Label::Mode::TextToLabelBounds;
 		addAndMakeVisible(label);
 	}
 
@@ -738,6 +740,48 @@ namespace gui
 					g.drawLine(centre.x, y1, centre.x, y2, thicc);
 					g.fillEllipse(x1, y2, x2 - x1, width * .1f);
 				}
+				else if (symbol == ButtonSymbol::Lookahead)
+				{
+					const auto thicc3 = thicc * 3.f;
+					bounds = maxQuadIn(bounds).reduced(thicc3);
+					
+					const auto x = bounds.getX();
+					const auto y = bounds.getY();
+					const auto w = bounds.getWidth();
+					const auto rad = w * .5f;
+					const PointF centre(x + rad, y + rad);
+					
+					const Stroke stroke(thicc, Stroke::JointStyle::beveled, Stroke::EndCapStyle::butt);
+					
+					Path arc;
+					arc.addCentredArc
+					(
+						centre.x,
+						centre.y,
+						rad,
+						rad,
+						Pi,
+						0.f,
+						-Pi - PiHalf, true
+					);
+					const auto arrowStart = arc.getCurrentPosition();
+					const PointF arrowEnd
+					(
+						arrowStart.x,
+						arrowStart.y + thicc3
+					);
+					
+					arc.addArrow({arrowStart, arrowEnd}, thicc, thicc3, thicc3);
+					g.strokePath(arc, stroke);
+					
+					const auto h = bounds.getHeight();
+					const auto y0 = y + h * .3f;
+					const auto y1 = y + h * .7f;
+					g.drawLine({ centre.x, y0, centre.x, y1 }, thicc);
+					const auto x0 = centre.x + w * .2f;
+					g.drawLine({ centre.x, y1, x0, y1 }, thicc);
+					
+				}
 			});
 	}
 
@@ -813,6 +857,7 @@ namespace gui
 
 /*
 
+todo:
 toggleState == 1
 	has glow
 

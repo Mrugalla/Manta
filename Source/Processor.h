@@ -11,9 +11,9 @@
 #include "audio/MidSide.h"
 #include "audio/Oversampling.h"
 #include "audio/Meter.h"
-#include "audio/Manta.h"
 
-#include "audio/Resonator.h"
+#include "audio/Manta.h"
+#include "audio/SpectroBeam.h"
 
 #include "audio/AudioUtils.h"
 
@@ -60,12 +60,11 @@ namespace audio
         AppProps props;
         ProcessSuspender sus;
 
+        XenManager xenManager;
         State state;
         Params params;
         MacroProcessor macroProcessor;
-		XenManager xenManager;
         MIDIManager midiManager;
-
         DryWetMix dryWetMix;
 #if PPDHasHQ
         Oversampler oversampler;
@@ -82,6 +81,9 @@ namespace audio
 #if PPDHasStereoConfig
         bool midSideEnabled;
 #endif
+#if PPDHasLookahead
+		bool lookaheadEnabled;
+#endif
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProcessorBackEnd)
     };
@@ -95,8 +97,15 @@ namespace audio
 
         void processBlock(AudioBuffer&, juce::MidiBuffer&);
         
-        /* samples,numChannels,numSamples,samplesSC,numChannelsSC */
-        void processBlockCustom(float**, int, int
+        /* samples, numChannels, numSamples, samplesSC, numChannelsSC */
+        void processBlockDownsampled(float**, int numChannels, int numSamples
+#if PPDHasSidechain
+            , float**, int
+#endif
+        ) noexcept;
+
+        /* samples, numChannels, numSamples, samplesSC, numChannelsSC */
+        void processBlockUpsampled(float**, int, int
 #if PPDHasSidechain
             , float**, int
 #endif
@@ -111,5 +120,6 @@ namespace audio
         juce::AudioProcessorEditor* createEditor() override;
 
         Manta manta;
+        SpectroBeam<11> spectroBeam;
     };
 }

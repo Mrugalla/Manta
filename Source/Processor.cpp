@@ -27,9 +27,9 @@ namespace audio
         props(),
         sus(*this),
         state(),
-        params(*this, state),
-        macroProcessor(params),
         xenManager(),
+        params(*this, state, xenManager),
+        macroProcessor(params),
         midiManager(params, state),
 #if PPDHasHQ
         oversampler(),
@@ -37,6 +37,9 @@ namespace audio
         meters()
 #if PPDHasStereoConfig
         , midSideEnabled(false)
+#endif
+#if PPDHasLookahead
+		, lookaheadEnabled(false)
 #endif
 		, midiVoices(midiManager)
     {
@@ -153,11 +156,20 @@ namespace audio
 
     void ProcessorBackEnd::timerCallback()
     {
+        bool shallForcePrepare = false;
 #if PPDHasHQ
         const auto ovsrEnabled = params[PID::HQ]->getValMod() > .5f;
         if (oversampler.isEnabled() != ovsrEnabled)
-            forcePrepareToPlay();
+            shallForcePrepare = true;
 #endif
+#if PPDHasLookahead
+		const auto _lookaheadEnabled = params[PID::Lookahead]->getValMod() > .5f;
+		if (lookaheadEnabled != _lookaheadEnabled)
+			shallForcePrepare = true;
+#endif
+
+        if (shallForcePrepare)
+			forcePrepareToPlay();
     }
 
     void ProcessorBackEnd::processBlockBypassed(AudioBuffer& buffer, juce::MidiBuffer&)
@@ -188,7 +200,8 @@ namespace audio
 
     Processor::Processor() :
         ProcessorBackEnd(),
-        manta(xenManager)
+        manta(xenManager),
+        spectroBeam()
     {
     }
 
@@ -204,13 +217,17 @@ namespace audio
         blockSizeUp = oversampler.getBlockSizeUp();
         latency = oversampler.getLatency();
 #endif
+		
+#if PPDHasLookahead
+        lookaheadEnabled = params[PID::Lookahead]->getValMod() > .5f;
+#endif
         const auto sampleRateUpF = static_cast<float>(sampleRateUp);
         const auto sampleRateF = static_cast<float>(sampleRate);
 
         midiVoices.prepare(blockSizeUp);
 
         manta.prepare(sampleRateUpF, blockSizeUp);
-        latency += manta.delaySize / 2;
+        latency += lookaheadEnabled ? manta.delaySize / 2 : 0;
 
         dryWetMix.prepare(sampleRateF, maxBlockSize, latency);
 
@@ -255,7 +272,11 @@ namespace audio
         const auto constSamples = mainBuffer.getArrayOfReadPointers();
         const auto numChannels = mainBuffer.getNumChannels();
 
-        dryWetMix.saveDry(
+#if PPD_MixOrGainDry
+        bool muteDry = params[PID::MuteDry]->getValMod() > .5f;
+#endif
+        dryWetMix.saveDry
+        (
             samples,
             numChannels,
             numSamples,
@@ -265,7 +286,11 @@ namespace audio
             params[PID::UnityGain]->getValMod(),
 #endif
 #endif
+#if PPD_MixOrGainDry == 0
             params[PID::Mix]->getValMod(),
+#else
+			params[PID::Mix]->getValModDenorm(),
+#endif
             params[PID::Gain]->getValModDenorm()
 #if PPDHasPolarity
             , (params[PID::Polarity]->getValMod() > .5f ? -1.f : 1.f)
@@ -284,27 +309,30 @@ namespace audio
 #if PPDHasSidechain
             encodeMS(samples, numSamples, 1);
 #endif
-        } 
+        }
 
 #endif
+
+        processBlockDownsampled(samples, numChannels, numSamples);
 
 #if PPDHasHQ
-            auto resampledBuf = &oversampler.upsample(buffer);
+        auto resampledBuf = &oversampler.upsample(buffer);
 #else
-            auto resampledBuf = &buffer;
+        auto resampledBuf = &buffer;
 #endif
-            auto resampledMainBuf = mainBus->getBusBuffer(*resampledBuf);
-            
+        auto resampledMainBuf = mainBus->getBusBuffer(*resampledBuf);
+
 #if PPDHasSidechain
         if (wrapperType != wrapperType_Standalone)
         {
             auto scBus = getBus(true, 1);
             if (scBus != nullptr)
-                if(scBus->isEnabled())
+                if (scBus->isEnabled())
                 {
                     auto scBuffer = scBus->getBusBuffer(*resampledBuf);
 
-                    processBlockCustom(
+                    processBlockUpsampled
+                    (
                         resampledMainBuf.getArrayOfWritePointers(),
                         resampledMainBuf.getNumChannels(),
                         resampledMainBuf.getNumSamples(),
@@ -312,20 +340,20 @@ namespace audio
                         scBuffer.getNumChannels()
                     );
                 }
-        }
+		}
         else
         {
 
         }
 #else
-        processBlockCustom
+        processBlockUpsampled
         (
             resampledMainBuf.getArrayOfWritePointers(),
             resampledMainBuf.getNumChannels(),
             resampledMainBuf.getNumSamples()
         );
 #endif
-            
+
 #if PPDHasHQ
         oversampler.downsample(mainBuffer);
 #endif
@@ -333,16 +361,27 @@ namespace audio
 #if PPDHasStereoConfig
         if (midSideEnabled)
         {
-			decodeMS(samples, numSamples, 0);
+            decodeMS(samples, numSamples, 0);
 #if PPDHasSidechain
-			encodeMS(samples, numSamples, 1);
+            encodeMS(samples, numSamples, 1);
 #endif
         }
 #endif
-        
+
         dryWetMix.processOutGain(samples, numChannels, numSamples);
         meters.processOut(constSamples, numChannels, numSamples);
-        dryWetMix.processMix(samples, numChannels, numSamples);
+#if PPD_MixOrGainDry
+        if (!muteDry)
+#endif
+        dryWetMix.processMix
+        (
+            samples,
+            numChannels,
+            numSamples
+#if PPDHasDelta
+            , params[PID::Delta]->getValMod() > .5f
+#endif
+        );
 
 #if JUCE_DEBUG
         for (auto ch = 0; ch < numChannels; ++ch)
@@ -360,14 +399,23 @@ namespace audio
 #endif
     }
 
-    void Processor::processBlockCustom(float** samples, int numChannels, int numSamples
+    void Processor::processBlockDownsampled(float** samples, int numChannels, int numSamples
+#if PPDHasSidechain
+        , float** samplesSC, int numChannelsSC
+#endif
+        ) noexcept
+        {
+            spectroBeam(samples, numChannels, numSamples);
+        }
+
+    void Processor::processBlockUpsampled(float** samples, int numChannels, int numSamples
 #if PPDHasSidechain
         , float** samplesSC, int numChannelsSC
 #endif
     ) noexcept
     {
-		const auto l1Enabled = params[PID::Lane1Enabled]->getValMod() > .5f;
-        const auto l1Frequency = params[PID::Lane1Frequency]->getValModDenorm();
+        const auto l1Enabled = params[PID::Lane1Enabled]->getValMod() > .5f;
+        const auto l1Pitch = params[PID::Lane1Pitch]->getValModDenorm();
         const auto l1Resonance = params[PID::Lane1Resonance]->getValModDenorm();
 		const auto l1Slope = params[PID::Lane1Slope]->getValModDenorm();
         const auto l1Drive = params[PID::Lane1Drive]->getValMod();
@@ -375,7 +423,7 @@ namespace audio
         const auto l1Gain = params[PID::Lane1Gain]->getValModDenorm();
 		
 		const auto l2Enabled = params[PID::Lane2Enabled]->getValMod() > .5f;
-		const auto l2Frequency = params[PID::Lane2Frequency]->getValModDenorm();
+		const auto l2Pitch = params[PID::Lane2Pitch]->getValModDenorm();
 		const auto l2Resonance = params[PID::Lane2Resonance]->getValModDenorm();
 		const auto l2Slope = params[PID::Lane2Slope]->getValModDenorm();
 		const auto l2Drive = params[PID::Lane2Drive]->getValMod();
@@ -383,7 +431,7 @@ namespace audio
 		const auto l2Gain = params[PID::Lane2Gain]->getValModDenorm();
 
 		const auto l3Enabled = params[PID::Lane3Enabled]->getValMod() > .5f;
-		const auto l3Frequency = params[PID::Lane3Frequency]->getValModDenorm();
+		const auto l3Pitch = params[PID::Lane3Pitch]->getValModDenorm();
 		const auto l3Resonance = params[PID::Lane3Resonance]->getValModDenorm();
 		const auto l3Slope = params[PID::Lane3Slope]->getValModDenorm();
 		const auto l3Drive = params[PID::Lane3Drive]->getValMod();
@@ -397,7 +445,7 @@ namespace audio
             numSamples,
 
 			l1Enabled,
-            std::rint(l1Frequency),
+            std::rint(l1Pitch),
 			l1Resonance,
 			static_cast<int>(std::rint(l1Slope)),
 			l1Drive,
@@ -405,7 +453,7 @@ namespace audio
 			l1Gain,
 
 			l2Enabled,
-            std::rint(l2Frequency),
+            std::rint(l2Pitch),
 			l2Resonance,
 			static_cast<int>(std::rint(l2Slope)),
 			l2Drive,
@@ -413,7 +461,7 @@ namespace audio
 			l2Gain,
 
 			l3Enabled,
-            std::rint(l3Frequency),
+            std::rint(l3Pitch),
 			l3Resonance,
 			static_cast<int>(std::rint(l3Slope)),
 			l3Drive,

@@ -73,9 +73,7 @@ namespace gui
 
 		ContextMenuKnobs(Utils&);
 	};
-
-
-
+	
     struct TextEditorKnobs :
         public TextEditor
     {

@@ -25,16 +25,7 @@ namespace gui
 #if PPDHasUnityGain && PPDHasGainIn
 		unityGain(u, param::toTooltip(PID::UnityGain)),
 #endif
-#if PPDHasHQ
-		hq(u, param::toTooltip(PID::HQ)),
-#endif
-#if PPDHasStereoConfig
-		stereoConfig(u, param::toTooltip(PID::StereoConfig)),
-#endif
-		power(u, param::toTooltip(PID::Power)),
-#if PPDHasPolarity
-		polarity(u, param::toTooltip(PID::Polarity)),
-#endif
+		buttonsBottom(),
 
 		ccMonitor(u, u.getMIDILearn()),
 		midiVoices(u),
@@ -285,24 +276,44 @@ namespace gui
 #endif
 		makeParameter(gainOut, PID::Gain, "Out", true, &utils.getMeter(PPDHasGainIn ? 1 : 0));
 		addAndMakeVisible(gainOut);
+#if PPD_MixOrGainDry == 0
 		makeParameter(mix, PID::Mix, "Mix");
+#else
+		makeParameter(mix, PID::Mix, "Gain Dry");
+#endif
 		addAndMakeVisible(mix);
 #if PPDHasHQ
-		makeParameterSwitchButton(hq, PID::HQ, "HQ");
-		hq.getLabel().mode = Label::Mode::TextToLabelBounds;
-		addAndMakeVisible(hq);
+		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::HQ)));
+		makeParameterSwitchButton(*buttonsBottom.back(), PID::HQ, "HQ");
+		buttonsBottom.back()->getLabel().mode = Label::Mode::TextToLabelBounds;
 #endif
 #if PPDHasStereoConfig
-		makeParameterSwitchButton(stereoConfig, PID::StereoConfig, ButtonSymbol::StereoConfig);
-		stereoConfig.getLabel().mode = Label::Mode::TextToLabelBounds;
-		addAndMakeVisible(stereoConfig);
+		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::StereoConfig)));
+		makeParameterSwitchButton(*buttonsBottom.back(), PID::StereoConfig, ButtonSymbol::StereoConfig);
+		buttonsBottom.back()->getLabel().mode = Label::Mode::TextToLabelBounds;
 #endif
-		makeParameterSwitchButton(power, PID::Power, ButtonSymbol::Power);
-		addAndMakeVisible(power);
+		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::Power)));
+		makeParameterSwitchButton(*buttonsBottom.back(), PID::Power, ButtonSymbol::Power);
 #if PPDHasPolarity
-		makeParameterSwitchButton(polarity, PID::Polarity, ButtonSymbol::Polarity);
-		addAndMakeVisible(polarity);
+		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::Polarity)));
+		makeParameterSwitchButton(*buttonsBottom.back(), PID::Polarity, ButtonSymbol::Polarity);
 #endif
+#if PPDHasLookahead
+		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::Lookahead)));
+		makeParameterSwitchButton(*buttonsBottom.back(), PID::Lookahead, ButtonSymbol::Lookahead);
+#endif
+#if PPD_MixOrGainDry == 1
+		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::MuteDry)));
+		makeParameterSwitchButton(*buttonsBottom.back(), PID::MuteDry, "Mute\nDry");
+#endif
+#if PPDHasDelta
+		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::Delta)));
+		makeParameterSwitchButton(*buttonsBottom.back(), PID::Delta, "D");
+#endif
+
+		for (auto& bb : buttonsBottom)
+			addAndMakeVisible(*bb);
+
 		addAndMakeVisible(ccMonitor);
 
 		makeSymbolButton(menuButton, ButtonSymbol::Settings);
@@ -408,18 +419,23 @@ namespace gui
 #endif
 
 		layout.place(mix, 3.f, 7.f + patchBrowserOffset, 3.f, 1.f, true);
-
-		layout.place(power, 1.f, 9.f + patchBrowserOffset, 1.f, 1.f, true);
-#if PPDHasPolarity
-		layout.place(polarity, 3.f, 9.f + patchBrowserOffset, 1.f, 1.f, true);
-#endif
-#if PPDHasStereoConfig
-		layout.place(stereoConfig, 5.f, 9.f + patchBrowserOffset, 1.f, 1.f, true);
-#endif
-#if PPDHasHQ
-		layout.place(hq, 7.f, 9.f + patchBrowserOffset, 1.f, 1.f, true);
-#endif
 		
+		{
+			const auto bbBounds = layout(1.f, 9.f + patchBrowserOffset, 7.f, 1.f, false);
+			const auto sizeF = static_cast<float>(buttonsBottom.size());
+			const auto sizeFInv = 1.f / sizeF;
+			const auto w = bbBounds.getWidth() * sizeFInv;
+			const auto y = bbBounds.getY();
+			const auto h = bbBounds.getHeight();
+			for (auto i = 0; i < buttonsBottom.size(); ++i)
+			{
+				const auto r = static_cast<float>(i) * sizeFInv;
+				auto x = bbBounds.getX() + r * bbBounds.getWidth();
+				const BoundsF bbBound(x, y, w, h);
+				buttonsBottom[i]->setBounds(maxQuadIn(bbBound).toNearestInt());
+			}
+		}
+
 		layout.place(ccMonitor, 1.f, 10.f + patchBrowserOffset, 7.f, 1.f, false);
 		layout.place(midiVoices, 1.f, 11.f + patchBrowserOffset, 7.f, 1.f, false);
 

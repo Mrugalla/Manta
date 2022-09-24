@@ -68,4 +68,58 @@ namespace audio
 		float xen, masterTune, baseNote;
 		std::array<std::atomic<float>, PPD_MaxXen + 1> temperaments;
 	};
+	
+}
+
+#include "Oscillator.h"
+
+namespace audio
+{
+	struct TuningEditorSynth
+	{
+		using SIMD = juce::FloatVectorOperations;
+
+		TuningEditorSynth(const XenManager& _xen) :
+			pitch(69.f),
+			noteOn(false),
+			
+			xen(_xen),
+			osc(),
+			buffer()
+		{
+
+		}
+
+		void prepare(float Fs, int blockSize)
+		{
+			const auto fsInv = 1.f / Fs;
+			osc.prepare(fsInv);
+
+			buffer.resize(blockSize, 0.f);
+		}
+
+		void operator()(float** samples, int numChannels, int numSamples) noexcept
+		{
+			if (noteOn.load())
+			{
+				auto buf = buffer.data();
+
+				const auto freqHz = xen.noteToFreqHzWithWrap(pitch.load());
+				osc.setFreqHz(freqHz);
+
+				for (auto s = 0; s < numSamples; ++s)
+					buf[s] = std::tanh(4.f * osc()) * .25f;
+
+				for (auto ch = 0; ch < numChannels; ++ch)
+					SIMD::add(samples[ch], buf, numSamples);
+			}
+		}
+
+		std::atomic<float> pitch;
+		std::atomic<bool> noteOn;
+	protected:
+		const XenManager& xen;
+		OscSine<float> osc;
+		std::vector<float> buffer;
+	};
 }

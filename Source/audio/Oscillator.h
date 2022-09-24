@@ -1,9 +1,14 @@
 #pragma once
-#include "AudioUtils.h"
+#include "../arch/Conversion.h"
+#include "../arch/Smooth.h"
+#include <juce_audio_processors/juce_audio_processors.h>
 #include "Phasor.h"
+#include <array>
 
 namespace audio
 {
+	using AudioBuffer = juce::AudioBuffer<float>;
+	
 	template<typename Float>
 	struct OscSine
 	{
@@ -21,6 +26,11 @@ namespace audio
 			phasor.setFrequencyHz(hz);
 		}
 		
+		void reset(Float phase = static_cast<Float>(0))
+		{
+			phasor.reset(phase);
+		}
+
 		Float* operator()(Float* buffer, int numSamples) noexcept
 		{
 			for (auto s = 0; s < numSamples; ++s)
@@ -33,9 +43,8 @@ namespace audio
 			return synthesizeSample();
 		}
 
-	protected:
 		Phasor<Float> phasor;
-
+	protected:
 		Float synthesizeSample()
 		{
 			const auto phase = phasor().phase;
@@ -47,6 +56,7 @@ namespace audio
 	struct RingModSimple
 	{
 		using Osc = OscSine<Float>;
+		using Smooth = smooth::Smooth<Float>;
 		
 		RingModSimple() :
 			osc(),

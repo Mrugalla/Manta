@@ -218,6 +218,22 @@ namespace gui
 #endif
 			
 			addAndMakeVisible(keys);
+			
+			keys.onDown = [&synth = utils.audioProcessor.tuningEditorSynth](int pitch)
+			{
+				synth.pitch.store(static_cast<float>(pitch));
+				synth.noteOn.store(true);
+			};
+
+			keys.onDrag = [&synth = utils.audioProcessor.tuningEditorSynth](int pitch)
+			{
+				synth.pitch.store(static_cast<float>(pitch));
+			};
+
+			keys.onUp = [&synth = utils.audioProcessor.tuningEditorSynth](int)
+			{
+				synth.noteOn.store(false);
+			};
 
 			layout.init
 			(

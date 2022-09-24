@@ -37,6 +37,11 @@ namespace audio
 			fsInv = _fsInv;
 		}
 		
+		void reset(Float p = static_cast<Float>(0)) noexcept
+		{
+			phase.phase = p;
+		}
+		
 		Phase operator()() noexcept
 		{
 			phase.phase += inc;

@@ -360,15 +360,18 @@ namespace gui
 		{
 			const auto& node = nodes[i].vt;
 
-			buttons.emplace_back(std::make_unique<Button>(
+			buttons.emplace_back(std::make_unique<Button>
+			(
 				utils, node.getProperty("tooltip").toString()
-				));
+			));
 
 			auto& btn = *buttons[i];
 
-			makeTextButton(btn, "- " + node.getProperty("id").toString(), true, 1);
-			btn.getLabel().just = Just::left;
-			btn.getLabel().font = Font();
+			makeTextButton(btn, node.getProperty("id").toString(), true, 1);
+			auto& lbl = btn.getLabel();
+			lbl.just = Just::left;
+			lbl.font = getFontDosisMedium();
+			lbl.mode = Label::Mode::TextToLabelBounds;
 		}
 
 		makeButtonsGroup(buttons, 0);

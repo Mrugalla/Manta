@@ -310,8 +310,5 @@ namespace audio
 
 todo:
 
-tuningeditor keyboard component must play synth when note pressed
-	for previewing current scale
-	let play chromatic for previewing current scale
 
 */

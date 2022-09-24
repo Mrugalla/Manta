@@ -25,9 +25,12 @@ HOW TO USE:
 
 TO DO:
 
-Frequency StringToValue
-	enter note values like C2, D#1, Eb3
-	and more specific ones like C3-edo7-root42-tune432
+settings
+	"manifest of wisdom" text doesn't resize itself correctly on init
+
+tuningeditor
+	button to play chromatic scale for preview
+	gain of keyboard component parameter
 
 Colours
 	if chosen white modulations not visible anymore
@@ -43,8 +46,7 @@ Pan Knob
 	when value near 0 draw "C" and not "0" or "-0"
 
 Knob
-	clicking on knob shouldn't change cursor position
-	double-clicks don't always work
+	double-clicks should return to default
 
 SplineEditor
 	Sometimes selection range shows wrong range

@@ -41,7 +41,8 @@ namespace audio
 #if PPDHasLookahead
 		, lookaheadEnabled(false)
 #endif
-		, midiVoices(midiManager)
+		, midiVoices(midiManager),
+        tuningEditorSynth(xenManager)
     {
         {
             juce::PropertiesFile::Options options;
@@ -225,6 +226,7 @@ namespace audio
         const auto sampleRateF = static_cast<float>(sampleRate);
 
         midiVoices.prepare(blockSizeUp);
+		tuningEditorSynth.prepare(sampleRateF, maxBlockSize);
 
         manta.prepare(sampleRateUpF, blockSizeUp);
         latency += lookaheadEnabled ? manta.delaySize / 2 : 0;
@@ -312,7 +314,6 @@ namespace audio
         }
 
 #endif
-
         processBlockDownsampled(samples, numChannels, numSamples);
 
 #if PPDHasHQ
@@ -367,6 +368,7 @@ namespace audio
 #endif
         }
 #endif
+        tuningEditorSynth(samples, numChannels, numSamples);
 
         dryWetMix.processOutGain(samples, numChannels, numSamples);
         meters.processOut(constSamples, numChannels, numSamples);

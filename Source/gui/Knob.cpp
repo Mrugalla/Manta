@@ -205,6 +205,8 @@ namespace gui
 
             k.label.setText(param->getCurrentValueAsText());
             k.label.repaint();
+
+            DBG("down");
         };
 
         knob.onDrag = [param](Knob& k, PointF& dragOffset, bool shiftDown)
@@ -236,13 +238,15 @@ namespace gui
             }
             else if (mouse.mods.isRightButtonDown())
                 if (!mouse.mouseWasDraggedSinceMouseDown())
-                    if (mouse.mods.isCtrlDown())
+                    if (mouse.mods.isAltDown())
                         param->setValueWithGesture(param->getDefaultValue());
                     else
                         k.notify(EvtType::ParametrRightClicked, &k);
 
             k.label.setText(param->getCurrentValueAsText());
             k.label.repaint();
+
+            DBG("up");
         };
 
         knob.onWheel = [param](Knob& k)
@@ -256,9 +260,12 @@ namespace gui
 
         knob.onDoubleClick = [param](Knob& k)
         {
+            DBG("doubleclick");
+			
+            if (param->isInGesture())
+                return;
+			
             const auto dVal = param->getDefaultValue();
-
-            while (param->isInGesture()) {}
             param->setValueWithGesture(dVal);
 
             k.label.setText(param->getCurrentValueAsText());

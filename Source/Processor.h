@@ -71,6 +71,7 @@ namespace audio
 #endif
         Meters meters;
         MIDIVoices midiVoices;
+        TuningEditorSynth tuningEditorSynth;
 
         void forcePrepareToPlay();
 

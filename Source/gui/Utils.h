@@ -24,7 +24,8 @@ namespace gui
 	juce::MouseCursor makeCursor(CursorType);
 
 	void hideCursor();
-	void showCursor(const Component&, const Point* = nullptr);
+	void showCursor(const Component&);
+	void centreCursor(const Component&, juce::MouseInputSource&);
 
 	class Utils
 	{

@@ -156,17 +156,21 @@ namespace gui
 
 	void hideCursor()
 	{
-		juce::Desktop::getInstance().getMainMouseSource().enableUnboundedMouseMovement(true, false);
+		auto mms = juce::Desktop::getInstance().getMainMouseSource();
+		mms.enableUnboundedMouseMovement(true, false);
 	}
 
-	void showCursor(const Component& comp, const Point* pos)
+	void showCursor(const Component& comp)
 	{
 		auto mms = juce::Desktop::getInstance().getMainMouseSource();
-		const Point centre(comp.getWidth() / 2, comp.getHeight() / 2);
-		if (pos == nullptr)
-			pos = &centre;
-		mms.setScreenPosition((comp.getScreenPosition() + *pos).toFloat());
+		centreCursor(comp, mms);
 		mms.enableUnboundedMouseMovement(false, true);
+	}
+
+	void centreCursor(const Component& comp, juce::MouseInputSource& mms)
+	{
+		const Point centre(comp.getWidth() / 2, comp.getHeight() / 2);
+		mms.setScreenPosition((comp.getScreenPosition() + centre).toFloat());
 	}
 
 	void appendRandomString(String& str, Random& rand, int length, const String& legalChars)

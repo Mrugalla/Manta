@@ -273,7 +273,7 @@ namespace gui
 				updateHandlePosX(relPos * scrollable.actualHeight);
 			}
 			const auto pos = mouse.position.toInt();
-			showCursor(*this, &pos);
+			showCursor(*this);
 		}
 	}
 

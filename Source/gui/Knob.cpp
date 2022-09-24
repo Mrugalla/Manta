@@ -84,7 +84,8 @@ namespace gui
             if (hidesCursor)
                 hideCursor();
 
-            dragXY.setXY(
+            dragXY.setXY
+            (
                 mouse.position.x,
                 mouse.position.y
             );
@@ -205,8 +206,6 @@ namespace gui
 
             k.label.setText(param->getCurrentValueAsText());
             k.label.repaint();
-
-            DBG("down");
         };
 
         knob.onDrag = [param](Knob& k, PointF& dragOffset, bool shiftDown)
@@ -245,8 +244,6 @@ namespace gui
 
             k.label.setText(param->getCurrentValueAsText());
             k.label.repaint();
-
-            DBG("up");
         };
 
         knob.onWheel = [param](Knob& k)
@@ -260,8 +257,6 @@ namespace gui
 
         knob.onDoubleClick = [param](Knob& k)
         {
-            DBG("doubleclick");
-			
             if (param->isInGesture())
                 return;
 			

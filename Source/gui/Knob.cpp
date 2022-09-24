@@ -81,9 +81,6 @@ namespace gui
     {
         if (mouse.mods.isLeftButtonDown())
         {
-            if (hidesCursor)
-                hideCursor();
-
             dragXY.setXY
             (
                 mouse.position.x,
@@ -98,6 +95,9 @@ namespace gui
     {
         if (mouse.mods.isLeftButtonDown())
         {
+            if (hidesCursor)
+                hideCursor();
+			
             auto dragOffset = mouse.position - dragXY;
             auto shiftDown = mouse.mods.isShiftDown();
             onDrag(*this, dragOffset, shiftDown);
@@ -110,7 +110,8 @@ namespace gui
         onUp(*this, mouse);
 
         if (hidesCursor)
-            showCursor(*this);
+			if(mouse.mouseWasDraggedSinceMouseDown())
+                showCursor(*this);
     }
 
     void Knob::mouseWheelMove(const Mouse& mouse, const MouseWheel& wheel)
@@ -230,7 +231,7 @@ namespace gui
             {
                 if (!mouse.mouseWasDraggedSinceMouseDown())
                 {
-                    if (mouse.mods.isCtrlDown())
+                    if (mouse.mods.isAltDown())
                         param->setValueNotifyingHost(param->getDefaultValue());
                 }
                 param->endGesture();

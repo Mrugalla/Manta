@@ -45,9 +45,6 @@ when saving a modpatch the preset browser needs to update its list too
 Pan Knob
 	when value near 0 draw "C" and not "0" or "-0"
 
-Knob
-	double-clicks should return to default
-
 SplineEditor
 	Sometimes selection range shows wrong range
 		and that feels bad

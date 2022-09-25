@@ -27,7 +27,6 @@ TO DO:
 
 tuningeditor
 	button to play chromatic scale for preview
-	gain of keyboard component parameter
 
 Colours
 	if chosen white modulations not visible anymore

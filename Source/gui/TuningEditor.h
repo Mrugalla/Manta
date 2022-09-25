@@ -242,7 +242,7 @@ namespace gui
 				gain,
 				"Gain",
 				"Adjust the tuning editor's output level",
-				utils.audioProcessor.tuningEditorSynth.gain
+				&utils.audioProcessor.tuningEditorSynth.gain
 			);
 
 			layout.init

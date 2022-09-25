@@ -170,7 +170,7 @@ namespace gui
         static constexpr float AngleRange = AngleWidth * 2.f;
         enum { Value, MaxModDepth, ValMod, ModBias, Meter, NumValues };
 		
-        inline std::function<void(Graphics&, Colour, const PointF&, float, float, float, Stroke&)> paintLines()
+        static std::function<void(Graphics&, Colour, const PointF&, float, float, float, Stroke&)> paintLines()
         {
             return [](Graphics& g, Colour col, const PointF& centre, float radius, float radiusInner, float radDif, Stroke& strokeType)
             {
@@ -202,7 +202,7 @@ namespace gui
             };
         }
 
-        inline std::function<void(Graphics&, const PointF&, const float*, float, float, float, float,
+        static std::function<void(Graphics&, const PointF&, const float*, float, float, float, float,
             float, float, float, float, Stroke)> paintMod()
         {
             return [](Graphics& g, const PointF& centre, const float* vals,
@@ -253,7 +253,7 @@ namespace gui
             };
         }
 
-        inline std::function<void(Graphics&, Colour, const PointF&,
+        static std::function<void(Graphics&, Colour, const PointF&,
             float, float, float, float, float, float)> paintTick()
         {
             return [](Graphics& g, Colour col, const PointF& centre,
@@ -268,7 +268,7 @@ namespace gui
             };
         }
 		
-        inline std::function<void(Knob&, Graphics&)> paint(bool modulatable)
+        static std::function<void(Knob&, Graphics&)> paint(bool modulatable)
         {
             const auto pl = paintLines();
             const auto pm = paintMod();
@@ -325,7 +325,7 @@ namespace gui
             };
         }
 
-        inline std::function<void(Knob&, Graphics&)> paintMeter(bool modulatable)
+        static std::function<void(Knob&, Graphics&)> paintMeter(bool modulatable)
         {
             const auto pl = paintLines();
             const auto pm = paintMod();
@@ -342,6 +342,7 @@ namespace gui
                 const auto radius = k.knobBounds.getWidth() * .5f;
                 const auto radiusInner = radius * .8f;
                 const auto radDif = (radius - radiusInner) * .8f;
+                const auto radiusBetween = radiusInner + radDif;
 
                 PointF centre
                 (
@@ -410,15 +411,112 @@ namespace gui
 
     // PARAMETER CREATION FREE FUNCS
 
-    void makePseudoParameter(Knob& knob, const String& name, String&& tooltip, std::atomic<float>& param)
+    void makePseudoParameter(Knob& knob, const String& name, String&& tooltip, std::atomic<float>* param)
     {
+        knob.setName(name);
         knob.setTooltip(std::move(tooltip));
+        knob.label.setText(name);
+		
+        auto onPaint = laf0::paint(false);
+        knob.onPaint = onPaint;
+
+        knob.onEnter = [param](Knob& k)
+        {
+            k.label.setText(String(param->load(), 2));
+            k.label.repaint();
+        };
+
+        knob.onExit = [](Knob& k)
+        {
+            k.label.setText(k.getName());
+            k.label.repaint();
+        };
+
+        knob.onDown = [param](Knob& k)
+        {
+            k.label.setText(String(param->load(), 2));
+            k.label.repaint();
+        };
+
+        knob.onDrag = [param](Knob& k, PointF& dragOffset, bool shiftDown)
+        {
+            if (shiftDown)
+                dragOffset *= SensitiveDrag;
+
+            const auto speed = 1.f / k.getUtils().getDragSpeed();
+
+            const auto newValue = juce::jlimit(0.f, 1.f, param->load() - dragOffset.y * speed);
+            param->store(newValue);
+            k.values[0] = newValue;
+
+            k.label.setText(String(newValue, 2));
+            repaintWithChildren(&k);
+        };
+
+        knob.onUp = [param](Knob& k, const Mouse& mouse)
+        {
+            if (mouse.mods.isLeftButtonDown())
+            {
+                if (!mouse.mouseWasDraggedSinceMouseDown())
+                {
+                    if (mouse.mods.isAltDown())
+                        param->store(.25f);
+                }
+            }
+            else if (mouse.mods.isRightButtonDown())
+                if (!mouse.mouseWasDraggedSinceMouseDown())
+                    if (mouse.mods.isAltDown())
+                        param->store(.25f);
+
+            const auto newValue = param->load();
+            k.values[0] = newValue;
+            k.label.setText(String(newValue, 2));
+            repaintWithChildren(&k);
+        };
+
+        knob.onWheel = [param](Knob& k)
+        {
+            const auto newValue = juce::jlimit(0.f, 1.f, param->load() + k.dragXY.y);
+            param->store(newValue);
+            k.values[0] = newValue;
+
+            k.label.setText(String(newValue, 2));
+            repaintWithChildren(&k);
+        };
+
+        knob.onDoubleClick = [param](Knob& k)
+        {
+            const auto dVal = .25f;
+            param->store(dVal);
+            k.values[0] = dVal;
+
+            k.label.setText(String(dVal, 2));
+            repaintWithChildren(&k);
+        };
+
+        knob.values.reserve(1);
+        auto& values = knob.values;
+
+        values.emplace_back(param->load());
+
+        knob.onResize = [](Knob& k)
+        {
+            const auto thicc = k.getUtils().thicc;
+            auto& layout = k.getLayout();
+
+            k.knobBounds = layout(0, 0, 3, 2, true).reduced(thicc);
+            layout.place(k.label, 0, 2, 3, 1, false);
+        };
+
+        knob.init
+        (
+            { 40, 40, 40 },
+            { 100, 40, 40 }
+        );
     }
 
     void makeParameter(Knob& knob, PID pID, const String& name, const Knob::OnPaint& onPaint, bool modulatable, const std::atomic<float>* meter)
     {
-        //const bool hasMeter = meter != nullptr;
-
         knob.getInfo = [pID](int i)
         {
             if (i == 0)
@@ -432,8 +530,6 @@ namespace gui
 
         auto& utils = knob.getUtils();
         auto param = utils.getParam(pID);
-        const auto angleWidth = PiQuart * 3.f;
-        const auto angleRange = angleWidth * 2.f;
 
         knob.locked = param->isLocked();
 
@@ -475,7 +571,7 @@ namespace gui
             k.notify(EvtType::ParametrDragged, &k);
         };
 
-        knob.onUp = [param, angleWidth, angleRange](Knob& k, const Mouse& mouse)
+        knob.onUp = [param](Knob& k, const Mouse& mouse)
         {
             if (mouse.mods.isLeftButtonDown())
             {
@@ -520,8 +616,7 @@ namespace gui
             k.notify(EvtType::ParametrDragged, &k);
         };
 
-        enum { Value, MaxModDepth, ValMod, ModBias, Meter, NumValues };
-        knob.values.reserve(NumValues);
+        knob.values.reserve(laf0::NumValues);
         auto& values = knob.values;
 
         values.emplace_back(param->getValue());
@@ -545,13 +640,13 @@ namespace gui
 
             auto& vals = k.values;
 
-            if (vals[Value] != vn || vals[MaxModDepth] != mmd || vals[ValMod] != vm || vals[ModBias] != mb || vals[Meter] != metr)
+            if (vals[laf0::Value] != vn || vals[laf0::MaxModDepth] != mmd || vals[laf0::ValMod] != vm || vals[laf0::ModBias] != mb || vals[laf0::Meter] != metr)
             {
-                vals[Value] = vn;
-                vals[MaxModDepth] = mmd;
-                vals[ValMod] = vm;
-                vals[ModBias] = mb;
-                vals[Meter] = metr;
+                vals[laf0::Value] = vn;
+                vals[laf0::MaxModDepth] = mmd;
+                vals[laf0::ValMod] = vm;
+                vals[laf0::ModBias] = mb;
+                vals[laf0::Meter] = metr;
                 return true;
             }
 
@@ -571,12 +666,12 @@ namespace gui
 
             auto& vals = k.values;
 
-            if (vals[Value] != vn || vals[MaxModDepth] != mmd || vals[ValMod] != vm || vals[ModBias] != mb)
+            if (vals[laf0::Value] != vn || vals[laf0::MaxModDepth] != mmd || vals[laf0::ValMod] != vm || vals[laf0::ModBias] != mb)
             {
-                vals[Value] = vn;
-                vals[MaxModDepth] = mmd;
-                vals[ValMod] = vm;
-                vals[ModBias] = mb;
+                vals[laf0::Value] = vn;
+                vals[laf0::MaxModDepth] = mmd;
+                vals[laf0::ValMod] = vm;
+                vals[laf0::ModBias] = mb;
                 return true;
             }
 

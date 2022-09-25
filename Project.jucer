@@ -114,6 +114,8 @@
         <FILE id="DT8T5u" name="Bitcrusher.h" compile="0" resource="0" file="Source/audio/Bitcrusher.h"/>
         <FILE id="gCh4Uk" name="DryWetMix.cpp" compile="1" resource="0" file="Source/audio/DryWetMix.cpp"/>
         <FILE id="KPtX3O" name="DryWetMix.h" compile="0" resource="0" file="Source/audio/DryWetMix.h"/>
+        <FILE id="gwfryT" name="EnvelopeFollower.cpp" compile="1" resource="0"
+              file="Source/audio/EnvelopeFollower.cpp"/>
         <FILE id="dgpmul" name="EnvelopeFollower.h" compile="0" resource="0"
               file="Source/audio/EnvelopeFollower.h"/>
         <FILE id="P0YP67" name="Filter.h" compile="0" resource="0" file="Source/audio/Filter.h"/>

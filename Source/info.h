@@ -67,7 +67,6 @@ FormularParser
 		make callbacks instead of buffers?
 
 TextEditor
-	minimize > back > click > tick doesn't move > 2nd click > does move
 	multiline text
 		where does click put tick?
 
@@ -82,17 +81,15 @@ MIDI Learn
 	1 cc to n parameters?
 	different midi channnels (16 * 128 CCs instead of 128)
 	possible to save and load default state of whole midi learn patch
-
-ContextMenu
-	implement context menu(s) for
-		ccMonitor
+	ContextMenu
+		implement context menu(s) for
+			ccMonitor
 
 Label
 	make free func(s) for grouping labels (n buttons)
 
 Options Menu
-	think about how to make automatic tutorials or manuals
-	how to make automatic updates possible
+	how to make automatic updates
 
 All Params
 	saving and loading max mod depths as preset
@@ -105,15 +102,11 @@ Oversampler
 
 FirstTimeAction(s)
 	thing that only makes lookuptables when the plugin is started the first time
-	tutorial
+	tutorials
 
 HighLevel UI Elements
 	undo/redo buttons
 	sidechain activated?
-
-Label
-	fix duplicate updateTextBounds() in resized()
-	reason for this: wrong font heights in menu
 
 -------------------------------------------------------------------
 

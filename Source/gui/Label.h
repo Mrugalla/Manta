@@ -30,14 +30,13 @@ namespace gui
 		Font font;
 		float minFontHeight;
 		Mode mode;
+
+		void updateTextBounds();
 	protected:
 		String text;
 
 		void paint(Graphics&) override;
 
 		void resized() override;
-
-	private:
-		void updateTextBounds();
 	};
 }

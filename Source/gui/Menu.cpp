@@ -518,6 +518,7 @@ namespace gui
 					1,
 					false
 				);
+				btn.getLabel().updateTextBounds();
 			}
 		}
 	}

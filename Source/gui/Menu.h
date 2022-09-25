@@ -238,7 +238,7 @@ namespace gui
 	public:
 		NavBar(Utils&, const ValueTree&);
 
-		/*subMenu,parent*/
+		/* subMenu, parent */
 		void init(std::unique_ptr<CompModular>&, Comp&);
 
 	protected:

@@ -60,6 +60,9 @@ namespace gui
         CursorType activeCursor;
     };
 
+    /* knob, name, tooltip, pseudo-parameter */
+    void makePseudoParameter(Knob&, const String&, String&&, std::atomic<float>&);
+
 	/* knob, pID, name, modulatable, meter */
     void makeParameter(Knob&, PID, const String&, bool = true, const std::atomic<float>* = nullptr);
 

@@ -187,7 +187,8 @@ namespace gui
 #if PPDMIDINumVoices != 0
 			pitchbend(u),
 #endif
-			keys(u, "Scrub the keys to test your tuning settings.")
+			keys(u, "Scrub the keys to test your tuning settings."),
+			gain(u)
 		{
 			addAndMakeVisible(title);
 			title.textCID = ColourID::Txt;
@@ -199,7 +200,7 @@ namespace gui
 			master.font = title.font;
 			master.mode = title.mode;
 
-			addAndMakeVisible(selection);
+			//addAndMakeVisible(selection);
 			selection.textCID = title.textCID;
 			selection.font = title.font;
 			selection.mode = title.mode;
@@ -235,9 +236,18 @@ namespace gui
 				synth.noteOn.store(false);
 			};
 
+			addAndMakeVisible(gain);
+			makePseudoParameter
+			(
+				gain,
+				"Gain",
+				"Adjust the tuning editor's output level",
+				utils.audioProcessor.tuningEditorSynth.gain
+			);
+
 			layout.init
 			(
-				{ 1, 13, 5, 5, 5, 1 },
+				{ 1, 13, 5, 5, 5, 3, 1 },
 				{ 1, 3, 1, 3, 5, 5, 1, 3, 5, 1, 3, 1 }
 			);
 		}
@@ -255,9 +265,9 @@ namespace gui
 		{
 			layout.resized();
 
-			layout.place(title, 1, 1, 4, 1, false);
-			layout.place(master, 2, 3, 2, 1, false);
-			layout.place(selection, 2, 7, 3, 1, false);
+			layout.place(title, 1, 1, 5, 1, false);
+			layout.place(master, 2, 3, 3, 1, false);
+			layout.place(selection, 2, 7, 4, 1, false);
 
 			layout.place(xen, 1, 3, 1, 6, true);
 
@@ -268,6 +278,7 @@ namespace gui
 #endif
 			
 			layout.place(keys, 1, 10, 4, 1, false);
+			layout.place(gain, 5, 10, 1, 1, false);
 		}
 
 	protected:
@@ -280,5 +291,6 @@ namespace gui
 #endif
 
 		KeyboardComp keys;
+		Knob gain;
 	};
 }

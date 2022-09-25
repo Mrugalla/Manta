@@ -25,9 +25,6 @@ HOW TO USE:
 
 TO DO:
 
-settings
-	"manifest of wisdom" text doesn't resize itself correctly on init
-
 tuningeditor
 	button to play chromatic scale for preview
 	gain of keyboard component parameter
@@ -53,14 +50,6 @@ SplineEditor
 		sometimes makes points on draggable
 	make points come from outside architecturally (maybe?)
 	wavetable from spline
-
-Macro Dropdown
-	Save All MaxModDepths and Bias-Patch
-	Load Some MaxModDepths and Bias-Patch (FileChooser?)
-	Switch: Control MaxModDepth or Bias
-	Switch: Rel/Abs MaxModDepth
-	Flip Parameter Value with MaxModDepth
-	Remove All MaxModDepth and Bias
 
 Colours
 	figure out natural hue steps
@@ -122,6 +111,10 @@ FirstTimeAction(s)
 HighLevel UI Elements
 	undo/redo buttons
 	sidechain activated?
+
+Label
+	fix duplicate updateTextBounds() in resized()
+	reason for this: wrong font heights in menu
 
 -------------------------------------------------------------------
 

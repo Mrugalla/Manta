@@ -54,7 +54,9 @@ Switch to mod-depth-control."/>
     <title y="0" />
     <colourscheme y="1" id="colourscheme"/>
   </menu>
-  <menu id="The Manifest of Wisdom" x="1" y="1;13" tooltip="Use the manifest of wisdom to let your inspiration flow.">
+  <menu id=
+"The Manifest
+of Wisdom" x="1" y="1;13" tooltip="Use the manifest of wisdom to let your inspiration flow.">
     <title y="0" />
     <erkenntnisse y="1" id="erkenntnisse"/>
   </menu>
@@ -63,12 +65,11 @@ Switch to mod-depth-control."/>
     <txt id="ThanksText" x=".1" y="1" w="2.8" h="1" just="topLeft" text=
 "Hi,
 
-my name is Florian Mrugalla and I am now making beats since
-I was a child. VST is a technology owned by Steinberg, their
-trademark. But it's actually much more than that. VST plugins
-enable us to come together and engage in passionate discussions
-and they mangage to throw us into deep transcendental moments
-of trance on a regular basis.
+my name is Florian Mrugalla and I am making beats and designing
+sound since I was a child. VST is a technology and trademark owned by
+Steinberg. But it's actually much more than that. VST plugins
+enable us to come together and engage in passionate discourse about
+art. I am very grateful for the opportunity to be part of this.
 
 That is why I consider VST a lifestyle!
 

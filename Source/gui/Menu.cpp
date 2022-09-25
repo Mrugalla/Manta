@@ -103,7 +103,8 @@ namespace gui
 		if (!folder.exists())
 			folder.createDirectory();
 
-		layout.init(
+		layout.init
+		(
 			{ 1, 1, 1, 1 },
 			{ 8, 1, 1 }
 		);
@@ -286,7 +287,8 @@ namespace gui
 
 		for (auto& cmp : comps)
 			if (cmp.c != nullptr)
-				layout.place(
+				layout.place
+				(
 					*cmp.c,
 					cmp.b.getX(),
 					cmp.b.getY(),
@@ -338,7 +340,7 @@ namespace gui
 
 	NavBar::NavBar(Utils& u, const ValueTree& xml) :
 		Comp(u, "", CursorType::Default),
-		label(u, "Nav:"),
+		label(u, "Navigation"),
 		nodes(makeNodes(xml)),
 		buttons(),
 		numMenus(static_cast<int>(nodes.size())),
@@ -353,6 +355,7 @@ namespace gui
 		layout.init(b, a);
 
 		label.textCID = ColourID::Hover;
+		label.mode = Label::Mode::TextToLabelBounds;
 		addAndMakeVisible(label);
 
 		buttons.reserve(numMenus);
@@ -395,7 +398,7 @@ namespace gui
 				sub.reset(new CompModular(utils, "", CursorType::Default));
 
 				auto& comps = sub->comps;
-
+				
 				{
 					const auto& xLayoutProp = node.vt.getProperty("x");
 					const auto& yLayoutProp = node.vt.getProperty("y");
@@ -467,7 +470,8 @@ namespace gui
 					}
 
 					if (comp != nullptr)
-						comps.push_back(ComponentWithBounds({
+						comps.push_back(ComponentWithBounds(
+							{
 								comp,
 								{
 									static_cast<float>(xProp),
@@ -497,7 +501,7 @@ namespace gui
 		layout.resized();
 
 		layout.place(label, 0, 0, deepestNode + 1, 1, false);
-
+		
 		if (numMenus > 0)
 		{
 			for (auto i = 0; i < numMenus; ++i)
@@ -505,7 +509,9 @@ namespace gui
 				auto& btn = *buttons[i];
 				const auto& node = nodes[i];
 
-				layout.place(btn,
+				layout.place
+				(
+					btn,
 					0.f + .5f * node.x,
 					1 + node.y,
 					1.f + deepestNode - .5f * node.x,
@@ -524,12 +530,14 @@ namespace gui
 		navBar(u, xml),
 		subMenu(nullptr)
 	{
-		layout.init(
+		layout.init
+		(
 			{ 20, 50, 20 },
 			{ 20, 50, 750, 20 }
 		);
 
 		label.textCID = ColourID::Hover;
+		label.mode = Label::Mode::TextToLabelBounds;
 		addAndMakeVisible(label);
 		addAndMakeVisible(navBar);
 
@@ -546,12 +554,11 @@ namespace gui
 	void Menu::resized()
 	{
 		layout.resized();
-
+		
 		layout.place(label, 1, 1, 1, 1, false);
 		layout.place(navBar, 0, 2, 1, 1, false);
 		if (subMenu != nullptr)
 			layout.place(*subMenu, 1, 2, 2, 1, false);
-
 	}
 
 

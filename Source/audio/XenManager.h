@@ -1,6 +1,7 @@
 #pragma once
 #include "../arch/Conversion.h"
 #include "../arch/Interpolation.h"
+#include "../arch/State.h"
 #include <array>
 #include <atomic>
 
@@ -81,6 +82,7 @@ namespace audio
 
 		TuningEditorSynth(const XenManager& _xen) :
 			pitch(69.f),
+			gain(.25f),
 			noteOn(false),
 			
 			xen(_xen),
@@ -88,6 +90,20 @@ namespace audio
 			buffer()
 		{
 
+		}
+
+		void loadPatch(sta::State& state)
+		{
+			const auto idStr = getIDString();
+			auto g = state.get(idStr, "gain");
+			if (g != nullptr)
+				gain.store(static_cast<float>(*g));
+		}
+
+		void savePatch(sta::State& state)
+		{
+			const auto idStr = getIDString();
+			state.set(idStr, "gain", gain.load());
 		}
 
 		void prepare(float Fs, int blockSize)
@@ -104,22 +120,29 @@ namespace audio
 			{
 				auto buf = buffer.data();
 
+				auto g = gain.load();
+
 				const auto freqHz = xen.noteToFreqHzWithWrap(pitch.load());
 				osc.setFreqHz(freqHz);
 
 				for (auto s = 0; s < numSamples; ++s)
-					buf[s] = std::tanh(4.f * osc()) * .25f;
+					buf[s] = std::tanh(4.f * osc()) * g;
 
 				for (auto ch = 0; ch < numChannels; ++ch)
 					SIMD::add(samples[ch], buf, numSamples);
 			}
 		}
 
-		std::atomic<float> pitch;
+		std::atomic<float> pitch, gain;
 		std::atomic<bool> noteOn;
 	protected:
 		const XenManager& xen;
 		OscSine<float> osc;
 		std::vector<float> buffer;
+
+		static String getIDString()
+		{
+			return "tuningEditor";
+		}
 	};
 }

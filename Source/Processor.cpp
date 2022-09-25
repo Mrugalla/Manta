@@ -122,12 +122,14 @@ namespace audio
     {
         params.savePatch(props);
         midiManager.savePatch();
+        tuningEditorSynth.savePatch(state);
     }
 
     void ProcessorBackEnd::loadPatch()
     {
         params.loadPatch(props);
         midiManager.loadPatch();
+        tuningEditorSynth.loadPatch(state);
         forcePrepareToPlay();
     }
 

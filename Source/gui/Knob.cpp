@@ -351,6 +351,30 @@ namespace gui
 
                 const auto col = Colours::c(ColourID::Interact);
 
+                // METER
+                if (vals[Meter] != 0.f)
+                {
+                    g.setColour(Colours::c(ColourID::Txt));
+                    Path meterArc;
+
+                    const auto metr = vals[Meter] > 1.f ? 1.f : vals[Meter];
+
+                    const auto meterAngle = AngleRange * metr - AngleWidth;
+
+                    meterArc.addCentredArc
+                    (
+                        centre.x, centre.y,
+                        radiusBetween, radiusBetween,
+                        0.f,
+                        -AngleWidth, meterAngle,
+                        true
+                    );
+
+                    strokeType.setStrokeThickness(radDif);
+                    g.strokePath(meterArc, strokeType);
+                    strokeType.setStrokeThickness(thicc);
+                }
+
                 pl(g, col, centre, radius, radiusInner, radDif, strokeType);
 
                 const auto valNormAngle = vals[Value] * AngleRange;

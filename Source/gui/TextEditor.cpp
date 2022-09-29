@@ -43,6 +43,13 @@ namespace gui
 		setWantsKeyboardFocus(true);
 	}
 
+	void TextEditor::addText(const String& text)
+	{
+		txt = txt.substring(0, tickIdx) + text + txt.substring(tickIdx);
+		tickIdx += text.length();
+		updateLabel();
+	}
+
 	void TextEditor::setVisible(bool e)
 	{
 		if (e)
@@ -177,6 +184,20 @@ namespace gui
 
 	bool TextEditor::keyPressed(const KeyPress& key)
 	{
+		if (key == KeyPress::createFromDescription("ctrl+c"))
+		{
+			if (!txt.isEmpty())
+			{
+				SystemClipboard::copyTextToClipboard(txt);
+				return true;
+			}
+		}
+		if (key == KeyPress::createFromDescription("ctrl+v"))
+		{
+			addText(SystemClipboard::getTextFromClipboard());
+			onType();
+			return true;
+		}
 		if (key == key.escapeKey)
 		{
 			onEscape();

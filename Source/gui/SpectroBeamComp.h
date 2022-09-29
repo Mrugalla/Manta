@@ -14,7 +14,7 @@ namespace gui
 		public Timer
 	{
 		using SpecBeam = audio::SpectroBeam<Order>;
-		static constexpr int Size = 1 << Order;
+		static constexpr int Size = SpecBeam::Size;
 		static constexpr float SizeF = static_cast<float>(Size);
 		static constexpr float SizeInv = 1.f / SizeF;
 		static constexpr float SizeFHalf = SizeF * .5f;
@@ -34,9 +34,6 @@ namespace gui
 			g.setImageResamplingQuality(Graphics::lowResamplingQuality);
 			g.drawImage(img, getLocalBounds().toFloat());
 		}
-		
-		void resized() override
-		{}
 
 		void timerCallback() override
 		{
@@ -45,6 +42,7 @@ namespace gui
 				return;
 			
 			const auto Fs = static_cast<float>(utils.audioProcessor.getSampleRate());
+			const auto fsInv = 1.f / Fs;
 			const auto colBase = Colours::c(ColourID::Bg).withAlpha(1.f);
 			const auto col = Colours::c(ColourID::Mod);
 			const auto buf = beam.buffer.data();
@@ -54,18 +52,18 @@ namespace gui
 			const auto rangeDb = highestDb - lowestDb;
 			const auto rangeDbInv = 1.f / rangeDb;
 			
-			for (auto i = 0; i < Size; ++i)
+			for (auto x = 0; x < Size; ++x)
 			{
-				const auto norm = static_cast<float>(i) * SizeInv;
+				const auto norm = static_cast<float>(x) * SizeInv;
 				const auto pitch = norm * 128.f;
 				const auto freqHz = xen.noteToFreqHzWithWrap(pitch);
-				const auto binIdx = freqHz / Fs * SizeF;
+				const auto binIdx = freqHz * fsInv * SizeF;
 				
 				const auto bin = interpolate::lerp(buf, binIdx);
 				const auto magDb = audio::gainToDecibel(bin);
 				const auto magMapped = juce::jlimit(0.f, 1.f, (magDb - lowestDb) * rangeDbInv);
 				const auto nCol = colBase.interpolatedWith(col, magMapped);
-				img.setPixelAt(i, 0, nCol);
+				img.setPixelAt(x, 0, nCol);
 			}
 			
 			beam.ready.store(false);

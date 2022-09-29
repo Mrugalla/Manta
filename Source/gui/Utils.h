@@ -35,6 +35,11 @@ namespace gui
 
 		Param* getParam(PID pID) noexcept;
 		const Param* getParam(PID pID) const noexcept;
+
+		/* pID, offset */
+		Param* getParam(PID pID, int) noexcept;
+		/* pID, offset */
+		const Param* getParam(PID pID, int) const noexcept;
 		
 		std::vector<Param*>& getAllParams() noexcept;
 		const std::vector<Param*>& getAllParams() const noexcept;

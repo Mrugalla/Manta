@@ -15,7 +15,8 @@ namespace audio
 		static constexpr float SizeInv = 1.f / SizeF;
 		
 		using FFT = juce::dsp::FFT;
-		using Fifo = std::array<float, Size2>;
+		using Fifo = std::array<float, Size>;
+		using Fifo2 = std::array<float, Size2>;
 
 		SpectroBeam() :
 			fft(Order),
@@ -65,7 +66,7 @@ namespace audio
 		FFT fft;
 		Fifo fifo, window;
 	public:
-		Fifo buffer;
+		Fifo2 buffer;
 		std::atomic<bool> ready;
 	protected:
 		int idx;

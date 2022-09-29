@@ -54,6 +54,8 @@ namespace gui
     using Time = juce::Time;
     using FileChooser = juce::FileChooser;
     using Component = juce::Component;
+    using SystemClipboard = juce::SystemClipboard;
+    using SIMD = juce::FloatVectorOperations;
     
     using Processor = audio::Processor;
     

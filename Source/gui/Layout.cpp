@@ -2,6 +2,11 @@
 
 namespace gui
 {
+	BoundsF smallestBoundsIn(const LineF& line) noexcept
+	{
+		return { line.getStart(), line.getEnd() };
+	}
+
 	BoundsF maxQuadIn(const BoundsF& b) noexcept
 	{
 		const auto minDimen = std::min(b.getWidth(), b.getHeight());

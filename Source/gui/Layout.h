@@ -3,8 +3,10 @@
 
 namespace gui
 {
+	BoundsF smallestBoundsIn(const LineF& line) noexcept;
+	
 	BoundsF maxQuadIn(const BoundsF&) noexcept;
-
+	
 	void repaintWithChildren(Component*);
 
 	std::unique_ptr<juce::XmlElement> loadXML(const char*, const int);

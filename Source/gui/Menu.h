@@ -180,7 +180,7 @@ namespace gui
 
 		TextEditor editor;
 		Label date;
-		Button manifest, inspire, reveal, clear;
+		Button manifest, inspire, reveal, clear, paste;
 
 	private:
 		String getFolder();

@@ -122,7 +122,8 @@ namespace gui
         const bool reversed = wheel.isReversed ? -1.f : 1.f;
         const bool isTrackPad = wheel.deltaY * wheel.deltaY < .0549316f;
         if (isTrackPad)
-            dragXY.setXY(
+            dragXY.setXY
+            (
                 reversed * wheel.deltaX,
                 reversed * wheel.deltaY
             );
@@ -130,7 +131,8 @@ namespace gui
         {
             const auto deltaXPos = wheel.deltaX > 0.f ? 1.f : -1.f;
             const auto deltaYPos = wheel.deltaY > 0.f ? 1.f : -1.f;
-            dragXY.setXY(
+            dragXY.setXY
+            (
                 reversed * WheelDefaultSpeed * deltaXPos,
                 reversed * WheelDefaultSpeed * deltaYPos
             );

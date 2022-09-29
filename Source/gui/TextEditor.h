@@ -16,6 +16,8 @@ namespace gui
 
 		void setVisible(bool) override;
 
+		void addText(const String&);
+
 		void enable();
 
 		bool isEnabled() const noexcept;

@@ -24,6 +24,16 @@ namespace gui
 		return params[pID];
 	}
 
+	Param* Utils::getParam(PID pID, int offset) noexcept
+	{
+		return params[static_cast<PID>(static_cast<int>(pID) + offset)];
+	}
+
+	const Param* Utils::getParam(PID pID, int offset) const noexcept
+	{
+		return params[static_cast<PID>(static_cast<int>(pID) + offset)];
+	}
+
 	Params& Utils::getParams() noexcept
 	{
 		return audioProcessor.params;

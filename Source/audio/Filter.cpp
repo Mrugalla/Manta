@@ -20,6 +20,14 @@ namespace audio
 	{
 
 	}
+
+	void FilterBandpass::clear() noexcept
+	{
+		x1 = 0.f;
+		x2 = 0.f;
+		y1 = 0.f;
+		y2 = 0.f;
+	}
 	
 	void FilterBandpass::setFc(float fc, float q) noexcept
 	{
@@ -88,6 +96,13 @@ namespace audio
 		filters(),
 		stage(1)
 	{}
+
+	template<size_t NumFilters>
+	void FilterBandpassSlope<NumFilters>::clear() noexcept
+	{
+		for (auto& filter : filters)
+			filter.clear();
+	}
 
 	template<size_t NumFilters>
 	void FilterBandpassSlope<NumFilters>::setStage(int s) noexcept

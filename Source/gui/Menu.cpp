@@ -97,7 +97,8 @@ namespace gui
 		manifest(u, "Click here to manifest wisdom to the manifest of wisdom!"),
 		inspire(u, "Click here to get inspired by past wisdom of the manifest of wisdom!"),
 		reveal(u, "Click here to reveal wisdom from the manifest of wisdom!"),
-		clear(u, "Click here to clear the wisdom editor to write more wisdom!")
+		clear(u, "Click here to clear the wisdom editor to write more wisdom!"),
+		paste(u, "Click here to paste wisdom from the clipboard to the wisdom editor!")
 	{
 		const File folder(getFolder());
 		if (!folder.exists())
@@ -105,7 +106,7 @@ namespace gui
 
 		layout.init
 		(
-			{ 1, 1, 1, 1 },
+			{ 1, 1, 1, 1, 1 },
 			{ 8, 1, 1 }
 		);
 
@@ -117,16 +118,19 @@ namespace gui
 		inspire.getLabel().mode = date.mode;
 		reveal.getLabel().mode = date.mode;
 		clear.getLabel().mode = date.mode;
+		paste.getLabel().mode = date.mode;
 
 		addAndMakeVisible(manifest);
 		addAndMakeVisible(inspire);
 		addAndMakeVisible(reveal);
 		addAndMakeVisible(clear);
+		addAndMakeVisible(paste);
 
 		makeTextButton(manifest, "Manifest");
 		makeTextButton(inspire, "Inspire");
 		makeTextButton(reveal, "Reveal");
 		makeTextButton(clear, "Clear");
+		makeTextButton(paste, "Paste");
 
 		editor.onReturn = [&]()
 		{
@@ -196,6 +200,14 @@ namespace gui
 				parse("");
 			});
 
+		paste.onClick.push_back([&](Button&)
+		{
+			auto cbTxt = SystemClipboard::getTextFromClipboard();
+			if (cbTxt.isEmpty())
+				return;
+			editor.addText(editor.getText() + cbTxt);
+		});
+
 		startTimerHz(4);
 	}
 
@@ -212,13 +224,14 @@ namespace gui
 	{
 		layout.resized();
 
-		layout.place(editor, 0, 0, 4, 1, false);
-		layout.place(date, 0, 1, 4, 1, false);
+		layout.place(editor, 0, 0, 5, 1, false);
+		layout.place(date, 0, 1, 5, 1, false);
 
 		layout.place(manifest, 0, 2, 1, 1, false);
 		layout.place(inspire, 1, 2, 1, 1, false);
 		layout.place(reveal, 2, 2, 1, 1, false);
 		layout.place(clear, 3, 2, 1, 1, false);
+		layout.place(paste, 4, 2, 1, 1, false);
 	}
 
 	void ErkenntnisseComp::paint(Graphics&)

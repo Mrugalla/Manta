@@ -1,7 +1,10 @@
 #pragma once
 #include "Knob.h"
 #include "../audio/Manta.h"
+#include "../audio/Filter.h"
 #include "SpectroBeamComp.h"
+#include "EQPad.h"
+#include "FilterResponseGraph.h"
 
 namespace gui
 {
@@ -19,7 +22,11 @@ namespace gui
 			drive{ Knob(u), Knob(u), Knob(u) },
 			delay{ Knob(u), Knob(u), Knob(u) },
 			gain{ Knob(u), Knob(u), Knob(u) },
-            spectroBeam(u, u.audioProcessor.spectroBeam)
+            eqPad(u, "Adjust the filters on the eq pad."),
+            spectroBeam(u, u.audioProcessor.spectroBeam),
+            filterResponseGraph(u),
+            
+            filterParams()
         {
             for (auto i = 0; i < NumLanes; ++i)
             {
@@ -40,14 +47,82 @@ namespace gui
 				addAndMakeVisible(drive[i]);
 				addAndMakeVisible(delay[i]);
 				addAndMakeVisible(gain[i]);
-
-                addAndMakeVisible(spectroBeam);
             }
+
+            addAndMakeVisible(spectroBeam);
+			
+            for (auto& f : filterParams)
+                f = 0.f;
+
+            addAndMakeVisible(filterResponseGraph);
+            filterResponseGraph.needsUpdate = [&]()
+            {
+				bool needsUpdate = false;
+
+                const auto Fs = utils.audioProcessor.getSampleRate();
+                const auto fsInv = 1.f / static_cast<float>(Fs);
+
+                for (auto l = 0; l < NumLanes; ++l)
+                {
+                    auto offset = l * 7;
+
+                    const auto nFc = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm() * fsInv;
+                    const auto nResonance = utils.getParam(PID::Lane1Resonance, offset)->getValModDenorm();
+                    const auto nSlope = std::rint(utils.getParam(PID::Lane1Slope, offset)->getValModDenorm());
+
+                    offset = l * 3;
+                    const auto i0 = offset;
+                    const auto i1 = 1 + offset;
+                    const auto i2 = 2 + offset;
+
+                    if (filterParams[i0] != nFc || filterParams[i1] != nResonance || filterParams[i2] != nSlope)
+                    {
+                        filterParams[i0] = nFc;
+                        filterParams[i1] = nResonance;
+                        filterParams[i2] = nSlope;
+
+                        needsUpdate = true;
+                    }
+                }
+
+                return needsUpdate;
+            };
+            filterResponseGraph.processFilters = [&](float* samples, FilterResponseGraph::Buffer& impulse, int numSamples)
+            {
+                for (auto l = 0; l < NumLanes; ++l)
+                {	
+                    const auto offset = l * 3;
+                    const auto i0 = offset;
+                    const auto i1 = 1 + offset;
+                    const auto i2 = 2 + offset;
+                    
+                    const auto fc = filterParams[i0];
+					const auto res = filterParams[i1];
+                    const auto slope = static_cast<int>(filterParams[i2]);
+					
+					audio::FilterBandpassSlope<4> fltr;
+                    fltr.setStage(slope);
+                    fltr.setFc(fc, res);
+
+                    for (auto s = 0; s < numSamples; ++s)
+                    {
+                        auto x = impulse[s];
+                        auto y = fltr(x);
+                        samples[s] += y;
+                    }					
+                }
+            };
+
+            addAndMakeVisible(eqPad);
+
+            eqPad.addNode(PID::Lane1Pitch, PID::Lane1Resonance, PID::Lane1Slope);
+			eqPad.addNode(PID::Lane2Pitch, PID::Lane2Resonance, PID::Lane2Slope);
+			eqPad.addNode(PID::Lane3Pitch, PID::Lane3Resonance, PID::Lane3Slope);
 
             layout.init
             (
                 { 3, 5, 5, 5, 5, 5, 5, 5, 3 },
-                { 3, 2, 5, 2, 5, 2, 5, 3, 3 }
+                { 3, 2, 5, 2, 5, 2, 5, 34, 3 }
             );
         }
 
@@ -96,12 +171,20 @@ namespace gui
                 //*/
             }
 
-			layout.place(spectroBeam, 1, 7, 7, 1, false);
+			layout.place(eqPad, 1, 7, 7, 1, false);
+            auto eqPadBounds = eqPad.bounds.toNearestInt();
+            eqPadBounds.setX(eqPadBounds.getX() + eqPad.getX());
+			eqPadBounds.setY(eqPadBounds.getY() + eqPad.getY());
+            filterResponseGraph.setBounds(eqPadBounds);
+            spectroBeam.setBounds(eqPadBounds);
         }
 
     protected:
         std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, delay, gain;
+        EQPad eqPad;
         SpectroBeamComp<11> spectroBeam;
-        
+        FilterResponseGraph filterResponseGraph;
+		
+        std::array<float, NumLanes * 3> filterParams;
     };
 }

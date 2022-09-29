@@ -9,6 +9,8 @@ namespace audio
 		/* startVal */
 		FilterBandpass(float = 0.f);
 
+		void clear() noexcept;
+
 		/* frequency fc [0, .5[, q-factor q [1, 160..] */
 		void setFc(float, float) noexcept;
 		
@@ -30,6 +32,8 @@ namespace audio
 	struct FilterBandpassSlope
 	{
 		FilterBandpassSlope();
+
+		void clear() noexcept;
 
 		void setStage(int) noexcept;
 

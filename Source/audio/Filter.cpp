@@ -11,6 +11,7 @@ namespace audio
 		a0(0.f),
 		a1(0.f),
 		a2(0.f),
+		b0(0.f),
 		b1(0.f),
 		b2(0.f),
 		x1(0.f),
@@ -44,6 +45,7 @@ namespace audio
 		a0 = other.a0;
 		a1 = other.a1;
 		a2 = other.a2;
+		b0 = other.b0;
 		b1 = other.b1;
 		b2 = other.b2;
 	}
@@ -79,14 +81,33 @@ namespace audio
 		b1 = cosOmega;
 		b2 = 1.f - alpha;
 
-		const auto b0 = 1.f + alpha;
+		b0 = 1.f + alpha;
 		const auto b0Inv = 1.f / b0;
 
 		a0 *= b0Inv;
-		//a1 *= b0Inv;
+		a1 *= b0Inv;
 		a2 *= b0Inv;
 		b1 *= -b0Inv;
 		b2 *= -b0Inv;
+	}
+
+	std::complex<float> FilterBandpass::response(float scaledFreq) const noexcept
+	{
+		auto w = scaledFreq * Tau;
+		std::complex<float> z = { std::cos(w), -std::sin(w) };
+		std::complex<float> z2 = z * z;
+		
+		//return (b0 + z * b1 + z2 * b2) / (1.f + z * a1 + z2 * a2);
+		return (a0 + z * a1 + z2 * a2) / (1.f + z * b1 + z2 * b2);
+	}
+	
+	float FilterBandpass::responseDb(float scaledFreq) const noexcept
+	{
+		auto w = scaledFreq * Tau;
+		std::complex<float> z = { std::cos(w), -std::sin(w) };
+		std::complex<float> z2 = z * z;
+		auto energy = std::norm(a0 + z * a1 + z2 * a2) / std::norm(1.f + z * b1 + z2 * b2);
+		return 10.f * std::log10(energy);
 	}
 
 	// FilterBandpassSlope
@@ -132,6 +153,15 @@ namespace audio
 		for (auto i = 0; i < stage; ++i)
 			x = filters[i](x);
 		return x;
+	}
+
+	template<size_t NumFilters>
+	std::complex<float> FilterBandpassSlope<NumFilters>::response(float scaledFreq) const noexcept
+	{
+		std::complex<float> response = { 1.f, 0.f };
+		for (auto i = 0; i < stage; ++i)
+			response *= filters[i].response(scaledFreq);
+		return response;
 	}
 	
 	template struct FilterBandpassSlope<1>;

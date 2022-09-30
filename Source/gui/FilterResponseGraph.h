@@ -3,6 +3,7 @@
 #include <functional>
 #include <array>
 #include <complex>
+#include "../audio/XenManager.h"
 
 namespace gui
 {
@@ -12,7 +13,11 @@ namespace gui
 	{
 		using Complex = std::complex<float>;
 		
-		static constexpr int Size = 1 << 11;
+#if JUCE_DEBUG
+		static constexpr int Size = 1 << 10;
+#else
+		static constexpr int Size = 1 << 12;
+#endif
 		static constexpr float SizeF = static_cast<float>(Size);
 		static constexpr float SizeInv = 1.f / SizeF;
 
@@ -124,26 +129,72 @@ namespace gui
 			const auto thicc = utils.thicc;
 			const auto w = static_cast<float>(getWidth());
 			const auto h = static_cast<float>(getHeight());
-			const auto h2 = h * .5f;
 			const auto wInv = 1.f / w;
 			const auto buf = processBuffer.data();
-
+			const auto& xen = utils.audioProcessor.xenManager;
+			const auto fsInv = 1.f / static_cast<float>(utils.audioProcessor.getSampleRate());
+			
 			responseCurve.clear();
 			{
-				const auto y = h2 - h2 * buf[0];
+				const auto y = h - h * buf[0];
 				responseCurve.startNewSubPath(0.f, y);
 			}
-			for (auto x = thicc; x < w; x += thicc)
+			for (auto x = thicc; x < w; x += 1.f)
 			{
 				const auto r = x * wInv;
-				const auto i = static_cast<int>(r * Size);
+				const auto pitch = r * 128.f;
+				const auto freqHz = xen.noteToFreqHzWithWrap(pitch + xen.getXen());
+				const auto fc = freqHz * fsInv;
+				const auto idx = fc * SizeF;
 				
-				auto y = h2 - h2 * buf[i];
+				auto y = h - h * interpolate::lerp(buf, idx);
 				y = juce::jlimit(0.f, h, y);
 
 				responseCurve.lineTo(x, y);
 			}
+			responseCurve.lineTo(w, h - h * buf[Size - 1]);
 		}
 
+	};
+
+	struct FilterResponseGraph2 :
+		public Comp,
+		public Timer
+	{
+		FilterResponseGraph2(Utils& u) :
+			Comp(u, "", CursorType::Default),
+			responseCurveCID(ColourID::Hover),
+			update(),
+			responseCurve()
+		{
+			setInterceptsMouseClicks(false, false);
+			startTimerHz(4);
+		}
+
+		void paint(Graphics& g) override
+		{
+			if (responseCurve.isEmpty())
+				return;
+			const auto thicc = utils.thicc;
+			const Stroke stroke(thicc, Stroke::PathStrokeType::JointStyle::curved, Stroke::PathStrokeType::EndCapStyle::rounded);
+
+			g.setColour(Colours::c(responseCurveCID));
+			g.strokePath(responseCurve, stroke);
+		}
+
+		void timerCallback()
+		{
+			const auto w = static_cast<float>(getWidth());
+			const auto h = static_cast<float>(getHeight());
+
+			if (update(responseCurve, w, h))
+				repaint();
+		}
+
+		ColourID responseCurveCID;
+		/* responseCurve, width, height */
+		std::function<bool(Path&, float, float)> update;
+	protected:
+		Path responseCurve;
 	};
 }

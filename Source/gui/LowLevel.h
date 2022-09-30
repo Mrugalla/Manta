@@ -5,6 +5,7 @@
 #include "SpectroBeamComp.h"
 #include "EQPad.h"
 #include "FilterResponseGraph.h"
+#include "../audio/XenManager.h"
 
 namespace gui
 {
@@ -55,6 +56,73 @@ namespace gui
                 f = 0.f;
 
             addAndMakeVisible(filterResponseGraph);
+            filterResponseGraph.update = [&](Path& responseCurve, float w, float h)
+            {
+                bool needsUpdate = false;
+
+                const auto Fs = utils.audioProcessor.getSampleRate();
+                const auto fsInv = 1.f / static_cast<float>(Fs);
+
+                for (auto l = 0; l < NumLanes; ++l)
+                {
+                    auto offset = l * 7;
+
+                    const auto nPitch = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm();
+                    const auto nFc = utils.audioProcessor.xenManager.noteToFreqHzWithWrap(nPitch) * fsInv;
+                    const auto nResonance = utils.getParam(PID::Lane1Resonance, offset)->getValModDenorm();
+                    const auto nSlope = std::rint(utils.getParam(PID::Lane1Slope, offset)->getValModDenorm());
+
+                    offset = l * 3;
+                    const auto i0 = offset;
+                    const auto i1 = 1 + offset;
+                    const auto i2 = 2 + offset;
+
+                    if (filterParams[i0] != nFc || filterParams[i1] != nResonance || filterParams[i2] != nSlope)
+                    {
+                        filterParams[i0] = nFc;
+                        filterParams[i1] = nResonance;
+                        filterParams[i2] = nSlope;
+
+                        needsUpdate = true;
+                    }
+                }
+
+                if (needsUpdate)
+                {
+                    audio::FilterBandpassSlope<4> fltr;
+                    responseCurve.clear();
+                    responseCurve.startNewSubPath(0.f, h);
+                    for (auto x = 0.f; x < w; ++x)
+                    {
+                        auto f = x / w;
+                        auto mag = 0.f;
+						
+                        for (auto l = 0; l < NumLanes; ++l)
+                        {
+                            auto offset = l * 3;
+                            const auto i0 = offset;
+                            const auto i1 = 1 + offset;
+                            const auto i2 = 2 + offset;
+
+                            const auto nFc = filterParams[i0];
+                            const auto nQ = filterParams[i1];
+                            const auto nSlope = filterParams[i2];
+							
+                            fltr.setStage(static_cast<int>(nSlope));
+                            fltr.setFc(nFc, nQ);
+                            mag += std::abs(fltr.response(f));
+                        }
+
+                        const auto y = h - h * mag;
+
+                        responseCurve.lineTo(x, y);
+                    }
+                    responseCurve.lineTo(w, h);
+                }
+				
+                return needsUpdate;
+            };
+			/*
             filterResponseGraph.needsUpdate = [&]()
             {
 				bool needsUpdate = false;
@@ -66,7 +134,8 @@ namespace gui
                 {
                     auto offset = l * 7;
 
-                    const auto nFc = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm() * fsInv;
+                    const auto nPitch = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm();
+                    const auto nFc = utils.audioProcessor.xenManager.noteToFreqHzWithWrap(nPitch) * fsInv;
                     const auto nResonance = utils.getParam(PID::Lane1Resonance, offset)->getValModDenorm();
                     const auto nSlope = std::rint(utils.getParam(PID::Lane1Slope, offset)->getValModDenorm());
 
@@ -112,6 +181,7 @@ namespace gui
                     }					
                 }
             };
+            */
 
             addAndMakeVisible(eqPad);
 
@@ -183,7 +253,7 @@ namespace gui
         std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, delay, gain;
         EQPad eqPad;
         SpectroBeamComp<11> spectroBeam;
-        FilterResponseGraph filterResponseGraph;
+        FilterResponseGraph2 filterResponseGraph;
 		
         std::array<float, NumLanes * 3> filterParams;
     };

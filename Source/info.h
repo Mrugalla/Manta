@@ -25,6 +25,13 @@ HOW TO USE:
 
 TO DO:
 
+filterResponseGraph
+	let it update from a seperate thread
+	it needs to consider the enabled parameter too
+
+eqPad
+	scrollwheeling knot should immediatly jump to next legal value of slope param
+
 tuningeditor
 	button to play chromatic scale for preview
 

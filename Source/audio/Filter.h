@@ -1,6 +1,7 @@
 #pragma once
 #include "../arch/Conversion.h"
 #include <cmath>
+#include <complex>
 
 namespace audio
 {
@@ -20,10 +21,15 @@ namespace audio
 
 		float processSample(float) noexcept;
 
+		/* scaledFreq */
+		std::complex<float> response(float) const noexcept;
+		/* scaledFreq */
+		float responseDb(float) const noexcept;
+
 	protected:
 		float alpha, cosOmega;
-		float a0, a1, a2, b1, b2;
-		float     x1, x2, y1, y2;
+		float a0, a1, a2, b0, b1, b2;
+		float     x1, x2,     y1, y2;
 
 		void updateCoefficients() noexcept;
 	};
@@ -43,6 +49,9 @@ namespace audio
 		void copy(FilterBandpassSlope<NumFilters>&) noexcept;
 
 		float operator()(float) noexcept;
+
+		/* scaledFreq [0, 22050[ */
+		std::complex<float> response(float) const noexcept;
 
 	protected:
 		std::array<FilterBandpass, NumFilters> filters;

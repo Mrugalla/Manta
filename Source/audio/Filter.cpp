@@ -60,8 +60,8 @@ namespace audio
 		auto y0 =
 			x0 * a0 +
 			x1 * a1 +
-			x2 * a2 +
-			y1 * b1 +
+			x2 * a2 -
+			y1 * b1 -
 			y2 * b2;
 
 		x2 = x1;
@@ -87,8 +87,8 @@ namespace audio
 		a0 *= b0Inv;
 		a1 *= b0Inv;
 		a2 *= b0Inv;
-		b1 *= -b0Inv;
-		b2 *= -b0Inv;
+		b1 *= b0Inv;
+		b2 *= b0Inv;
 	}
 
 	std::complex<float> FilterBandpass::response(float scaledFreq) const noexcept

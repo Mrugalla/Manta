@@ -94,7 +94,7 @@ namespace gui
                     responseCurve.startNewSubPath(0.f, h);
                     for (auto x = 0.f; x < w; ++x)
                     {
-                        auto f = x / w;
+                        auto f = .5f * x / w;
                         auto mag = 0.f;
 						
                         for (auto l = 0; l < NumLanes; ++l)

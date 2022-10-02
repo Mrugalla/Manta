@@ -69,7 +69,10 @@ namespace param
 		case PID::Lane1Resonance: return "Lane 1 Resonance";
 		case PID::Lane1Slope: return "Lane 1 Slope";
 		case PID::Lane1Drive: return "Lane 1 Drive";
-		case PID::Lane1Delay: return "Lane 1 Delay";
+		case PID::Lane1Feedback: return "Lane 1 Feedback";
+		case PID::Lane1DelayOct: return "Lane 1 Oct";
+		case PID::Lane1DelaySemi: return "Lane 1 Semi";
+		case PID::Lane1RMDepth: return "Lane 1 RM Depth";
 		case PID::Lane1Gain: return "Lane 1 Gain";
 
 		case PID::Lane2Enabled: return "Lane 2 Enabled";
@@ -77,7 +80,10 @@ namespace param
 		case PID::Lane2Resonance: return "Lane 2 Resonance";
 		case PID::Lane2Slope: return "Lane 2 Slope";
 		case PID::Lane2Drive: return "Lane 2 Drive";
-		case PID::Lane2Delay: return "Lane 2 Delay";
+		case PID::Lane2Feedback: return "Lane 2 Feedback";
+		case PID::Lane2DelayOct: return "Lane 2 Oct";
+		case PID::Lane2DelaySemi: return "Lane 2 Semi";
+		case PID::Lane2RMDepth: return "Lane 2 RM Depth";
 		case PID::Lane2Gain: return "Lane 2 Gain";
 
 		case PID::Lane3Enabled: return "Lane 3 Enabled";
@@ -85,7 +91,10 @@ namespace param
 		case PID::Lane3Resonance: return "Lane 3 Resonance";
 		case PID::Lane3Slope: return "Lane 3 Slope";
 		case PID::Lane3Drive: return "Lane 3 Drive";
-		case PID::Lane3Delay: return "Lane 3 Delay";
+		case PID::Lane3Feedback: return "Lane 3 Feedback";
+		case PID::Lane3DelayOct: return "Lane 3 Oct";
+		case PID::Lane3DelaySemi: return "Lane 3 Semi";
+		case PID::Lane3RMDepth: return "Lane 3 RM Depth";
 		case PID::Lane3Gain: return "Lane 3 Gain";
 
 		default: return "Invalid Parameter Name";
@@ -152,7 +161,10 @@ namespace param
 		case PID::Lane1Resonance: return "Define the resonance of this lane's bandpass filter.";
 		case PID::Lane1Slope: return "Define the slope of this lane's bandpass filter.";
 		case PID::Lane1Drive: return "Define this lane's drive.";
-		case PID::Lane1Delay: return "Define this lane's delay in ms.";
+		case PID::Lane1Feedback: return "Adjust this lane's feedback.";
+		case PID::Lane1DelayOct: return "Define an octave-offset of this lane's delay.";
+		case PID::Lane1DelaySemi: return "Define a semitone-offset of this lane's delay.";
+		case PID::Lane1RMDepth: return "Define the depth of this lane's ring modulation.";
 		case PID::Lane1Gain: return "Define this lane's output gain.";
 
 		case PID::Lane2Enabled: return "Turn on or off the second lane.";
@@ -160,7 +172,10 @@ namespace param
 		case PID::Lane2Resonance: return "Define the resonance of this lane's bandpass filter.";
 		case PID::Lane2Slope: return "Define the slope of this lane's bandpass filter.";
 		case PID::Lane2Drive: return "Define this lane's drive.";
-		case PID::Lane2Delay: return "Define this lane's delay in ms.";
+		case PID::Lane2Feedback: return "Adjust this lane's feedback.";
+		case PID::Lane2DelayOct: return "Define an octave-offset of this lane's delay.";
+		case PID::Lane2DelaySemi: return "Define a semitone-offset of this lane's delay.";
+		case PID::Lane2RMDepth: return "Define the depth of this lane's ring modulation.";
 		case PID::Lane2Gain: return "Define this lane's output gain.";
 
 		case PID::Lane3Enabled: return "Turn on or off the third lane.";
@@ -168,7 +183,10 @@ namespace param
 		case PID::Lane3Resonance: return "Define the resonance of this lane's bandpass filter.";
 		case PID::Lane3Slope: return "Define the slope of this lane's bandpass filter.";
 		case PID::Lane3Drive: return "Define this lane's drive.";
-		case PID::Lane3Delay: return "Define this lane's delay in ms.";
+		case PID::Lane3Feedback: return "Adjust this lane's feedback.";
+		case PID::Lane3DelayOct: return "Define an octave-offset of this lane's delay.";
+		case PID::Lane3DelaySemi: return "Define a semitone-offset of this lane's delay.";
+		case PID::Lane3RMDepth: return "Define the depth of this lane's ring modulation.";
 		case PID::Lane3Gain: return "Define this lane's output gain.";
 
 		default: return "Invalid Tooltip.";
@@ -578,16 +596,6 @@ namespace param::strToVal
 		};
 	}
 
-	StrToValFunc oct2()
-	{
-		return[p = parse()](const String& txt)
-		{
-			const auto text = txt.trimCharactersAtEnd(toString(Unit::Octaves));
-			const auto val = p(text, 0.f);
-			return val / 12.f;
-		};
-	}
-
 	StrToValFunc semi()
 	{
 		return[p = parse()](const String& txt)
@@ -865,11 +873,6 @@ namespace param::valToStr
 	ValToStrFunc oct()
 	{
 		return [](float v) { return String(std::rint(v)) + " " + toString(Unit::Octaves); };
-	}
-
-	ValToStrFunc oct2()
-	{
-		return [](float v) { return String(std::rint(v / 12.f)) + " " + toString(Unit::Octaves); };
 	}
 
 	ValToStrFunc semi()
@@ -1183,24 +1186,33 @@ namespace param
 		params.push_back(makeParamPitch(PID::Lane1Pitch, state, b1, makeRange::lin(0.f, 127.f), xen));
 		params.push_back(makeParam(PID::Lane1Resonance, state, 40.f, makeRange::withCentre(1.f, 80.f, 12.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane1Slope, state, 1.f, makeRange::stepped(1.f, 4.f), Unit::Slope));
+		params.push_back(makeParam(PID::Lane1Feedback, state, 0.f));
+		params.push_back(makeParam(PID::Lane1DelayOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
+		params.push_back(makeParam(PID::Lane1DelaySemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane1Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane1Delay, state, 20.f, makeRange::lin(0.f, 40.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane1RMDepth, state, 0.f));
 		params.push_back(makeParam(PID::Lane1Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
 		params.push_back(makeParam(PID::Lane2Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
 		params.push_back(makeParamPitch(PID::Lane2Pitch, state, g5, makeRange::lin(0.f, 127.f), xen));
 		params.push_back(makeParam(PID::Lane2Resonance, state, 40.f, makeRange::withCentre(1.f, 80.f, 12.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane2Slope, state, 1.f, makeRange::stepped(1.f, 4.f), Unit::Slope));
+		params.push_back(makeParam(PID::Lane2Feedback, state, 0.f));
+		params.push_back(makeParam(PID::Lane2DelayOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
+		params.push_back(makeParam(PID::Lane2DelaySemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane2Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane2Delay, state, 20.f, makeRange::lin(0.f, 40.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane2RMDepth, state, 0.f));
 		params.push_back(makeParam(PID::Lane2Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
 		params.push_back(makeParam(PID::Lane3Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
 		params.push_back(makeParamPitch(PID::Lane3Pitch, state, g7, makeRange::lin(0.f, 127.f), xen));
 		params.push_back(makeParam(PID::Lane3Resonance, state, 40.f, makeRange::withCentre(1.f, 80.f, 12.f), Unit::Q));
 		params.push_back(makeParam(PID::Lane3Slope, state, 1.f, makeRange::stepped(1.f, 4.f), Unit::Slope));
+		params.push_back(makeParam(PID::Lane3Feedback, state, 0.f));
+		params.push_back(makeParam(PID::Lane3DelayOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
+		params.push_back(makeParam(PID::Lane3DelaySemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane3Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
-		params.push_back(makeParam(PID::Lane3Delay, state, 20.f, makeRange::lin(0.f, 40.f), Unit::Ms));
+		params.push_back(makeParam(PID::Lane3RMDepth, state, 0.f));
 		params.push_back(makeParam(PID::Lane3Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
 		// LOW LEVEL PARAMS END

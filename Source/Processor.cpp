@@ -231,7 +231,9 @@ namespace audio
 		tuningEditorSynth.prepare(sampleRateF, maxBlockSize);
 
         manta.prepare(sampleRateUpF, blockSizeUp);
+#if PPDHasLookahead
         latency += lookaheadEnabled ? manta.delaySize / 2 : 0;
+#endif
 
         dryWetMix.prepare(sampleRateF, maxBlockSize, latency);
 
@@ -423,7 +425,10 @@ namespace audio
         const auto l1Resonance = params[PID::Lane1Resonance]->getValModDenorm();
 		const auto l1Slope = params[PID::Lane1Slope]->getValModDenorm();
         const auto l1Drive = params[PID::Lane1Drive]->getValMod();
-        const auto l1Delay = params[PID::Lane1Delay]->getValModDenorm();
+        const auto l1Feedback = params[PID::Lane1Feedback]->getValMod();
+		const auto l1Oct = params[PID::Lane1DelayOct]->getValModDenorm();
+		const auto l1Semi = params[PID::Lane1DelaySemi]->getValModDenorm();
+		const auto l1RMDepth = params[PID::Lane1RMDepth]->getValMod();
         const auto l1Gain = params[PID::Lane1Gain]->getValModDenorm();
 		
 		const auto l2Enabled = params[PID::Lane2Enabled]->getValMod() > .5f;
@@ -431,7 +436,10 @@ namespace audio
 		const auto l2Resonance = params[PID::Lane2Resonance]->getValModDenorm();
 		const auto l2Slope = params[PID::Lane2Slope]->getValModDenorm();
 		const auto l2Drive = params[PID::Lane2Drive]->getValMod();
-		const auto l2Delay = params[PID::Lane2Delay]->getValModDenorm();
+		const auto l2Feedback = params[PID::Lane2Feedback]->getValMod();
+		const auto l2Oct = params[PID::Lane2DelayOct]->getValModDenorm();
+		const auto l2Semi = params[PID::Lane2DelaySemi]->getValModDenorm();
+		const auto l2RMDepth = params[PID::Lane2RMDepth]->getValMod();
 		const auto l2Gain = params[PID::Lane2Gain]->getValModDenorm();
 
 		const auto l3Enabled = params[PID::Lane3Enabled]->getValMod() > .5f;
@@ -439,7 +447,10 @@ namespace audio
 		const auto l3Resonance = params[PID::Lane3Resonance]->getValModDenorm();
 		const auto l3Slope = params[PID::Lane3Slope]->getValModDenorm();
 		const auto l3Drive = params[PID::Lane3Drive]->getValMod();
-		const auto l3Delay = params[PID::Lane3Delay]->getValModDenorm();
+		const auto l3Feedback = params[PID::Lane3Feedback]->getValMod();
+		const auto l3Oct = params[PID::Lane3DelayOct]->getValModDenorm();
+		const auto l3Semi = params[PID::Lane3DelaySemi]->getValModDenorm();
+		const auto l3RMDepth = params[PID::Lane3RMDepth]->getValMod();
 		const auto l3Gain = params[PID::Lane3Gain]->getValModDenorm();
 
         manta
@@ -453,7 +464,10 @@ namespace audio
 			l1Resonance,
 			static_cast<int>(std::rint(l1Slope)),
 			l1Drive,
-			l1Delay,
+			l1Feedback,
+			std::rint(l1Oct),
+            std::rint(l1Semi),
+			l1RMDepth,
 			l1Gain,
 
 			l2Enabled,
@@ -461,7 +475,10 @@ namespace audio
 			l2Resonance,
 			static_cast<int>(std::rint(l2Slope)),
 			l2Drive,
-			l2Delay,
+			l2Feedback,
+			std::rint(l2Oct),
+			std::rint(l2Semi),
+			l2RMDepth,
 			l2Gain,
 
 			l3Enabled,
@@ -469,7 +486,10 @@ namespace audio
 			l3Resonance,
 			static_cast<int>(std::rint(l3Slope)),
 			l3Drive,
-			l3Delay,
+			l3Feedback,
+			std::rint(l3Oct),
+			std::rint(l3Semi),
+			l3RMDepth,
 			l3Gain
         );
     }

@@ -54,8 +54,8 @@ namespace audio
 						const auto r = rHead[s];
 						const auto fb = fbBuf[s];
 
-						auto sOut = lp(interpolate::cubicHermiteSpline(ring, r, size));
-						const auto sIn = smpls[s] + sOut * fb;
+						const auto sOut = lp(interpolate::cubicHermiteSpline(ring, r, size)) * fb + smpls[s];
+						const auto sIn = sOut;
 						
 						ring[w] = sIn;
 						smpls[s] = sOut;

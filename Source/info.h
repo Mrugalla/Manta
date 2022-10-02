@@ -25,13 +25,16 @@ HOW TO USE:
 
 TO DO:
 
+manta
+	ringmod
+		depth doesn't have any effect yet, why
+		oct, semi?
+		waveform?
+
 filterResponseGraph
 	in decibels
 		then with automatic range
 			like [-3, 3]db or [-12, 12]db
-
-eqPad
-	scrollwheeling knot should immediatly jump to next legal value of slope param
 
 tuningeditor
 	button to play chromatic scale for preview

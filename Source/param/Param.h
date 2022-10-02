@@ -59,24 +59,33 @@ namespace param
 		Lane1Pitch,
 		Lane1Resonance,
 		Lane1Slope,
+		Lane1Feedback,
+		Lane1DelayOct,
+		Lane1DelaySemi,
 		Lane1Drive,
-		Lane1Delay,
+		Lane1RMDepth,
 		Lane1Gain,
 		
 		Lane2Enabled,
 		Lane2Pitch,
 		Lane2Resonance,
 		Lane2Slope,
+		Lane2Feedback,
+		Lane2DelayOct,
+		Lane2DelaySemi,
 		Lane2Drive,
-		Lane2Delay,
+		Lane2RMDepth,
 		Lane2Gain,
 
 		Lane3Enabled,
 		Lane3Pitch,
 		Lane3Resonance,
 		Lane3Slope,
+		Lane3Feedback,
+		Lane3DelayOct,
+		Lane3DelaySemi,
 		Lane3Drive,
-		Lane3Delay,
+		Lane3RMDepth,
 		Lane3Gain,
 
 		NumParams
@@ -277,7 +286,6 @@ namespace param
 		StrToValFunc hz();
 		StrToValFunc phase();
 		StrToValFunc oct();
-		StrToValFunc oct2();
 		StrToValFunc semi();
 		StrToValFunc fine();
 		StrToValFunc ratio();
@@ -304,7 +312,6 @@ namespace param
 		ValToStrFunc phase();
 		ValToStrFunc phase360();
 		ValToStrFunc oct();
-		ValToStrFunc oct2();
 		ValToStrFunc semi();
 		ValToStrFunc fine();
 		ValToStrFunc ratio();

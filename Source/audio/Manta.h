@@ -1,19 +1,22 @@
 #pragma once
+
+#include "../arch/Interpolation.h"
+
 #include "Filter.h"
 #include "PRM.h"
-#include "LatencyCompensation.h"
-#include "../arch/Interpolation.h"
+#include "Phasor.h"
+#include "XenManager.h"
 #include <functional>
 
 namespace audio
 {
 	struct Manta
 	{
+		// enabled, cutoff, resonance, slope, feedback, oct, semi, drive, rm-depth, gain
+		static constexpr int NumParametersPerLane = 10;
+
 		static constexpr int NumLanes = 3;
 		static constexpr int MaxSlopeStage = 4; //4*12db/oct
-		static constexpr int DelayLength = 40; //ms
-		
-		static constexpr float DelayLengthHalf = static_cast<float>(DelayLength / 2);
 
 	private:
 		class Filter
@@ -59,9 +62,9 @@ namespace audio
 			std::array<Fltr, 2> filta;
 		};
 		
-		struct Delay
+		struct DelayFeedback
 		{
-			Delay() :
+			DelayFeedback() :
 				ringBuffer(),
 				size(0)
 			{}
@@ -72,7 +75,8 @@ namespace audio
 				ringBuffer.setSize(2, size, false, true, false);
 			}
 
-			void operator()(float** samples, int numChannels, int numSamples, const int* wHead, const float* rHead) noexcept
+			void operator()(float** samples, int numChannels, int numSamples, const int* wHead, const float* rHead,
+				const float* feedback) noexcept
 			{
 				auto ringBuffr = ringBuffer.getArrayOfWritePointers();
 
@@ -85,9 +89,13 @@ namespace audio
 					{
 						const auto w = wHead[s];
 						const auto r = rHead[s];
+						const auto fb = feedback[s];
 
-						ring[w] = smpls[s];
-						smpls[s] = interpolate::lerp(ring, r, size);
+						const auto sOut = interpolate::lerp(ring, r, size) * fb + smpls[s];
+						const auto sIn = sOut;
+
+						ring[w] = sIn;
+						smpls[s] = sOut;
 					}
 				}
 			}
@@ -96,6 +104,51 @@ namespace audio
 			int size;
 		};
 		
+		struct RingMod
+		{
+			RingMod() :
+				phasor(),
+				oscBuffer()
+			{}
+
+			void prepare(float Fs, int blockSize)
+			{
+				phasor.prepare(1.f / Fs);
+				oscBuffer.resize(blockSize);
+			}
+
+			void operator()(float** samples, int numChannels, int numSamples,
+				float* _rmDepth, float* _freqHz) noexcept
+			{
+				for (auto s = 0; s < numSamples; ++s)
+				{
+					const auto freqHz = _freqHz[s];
+					phasor.setFrequencyHz(freqHz);
+					phasor();
+					oscBuffer[s] = std::cos(phasor.phase.phase * Tau);
+				}
+
+				for (auto ch = 0; ch < numChannels; ++ch)
+				{
+					auto smpls = samples[ch];
+
+					for (auto s = 0; s < numSamples; ++s)
+					{
+						const auto rmd = _rmDepth[s];
+						const auto dry = smpls[s];
+						const auto wet = dry * oscBuffer[s];
+
+						smpls[s] += rmd * (wet - dry);
+					}
+				}
+						
+			}
+
+		protected:
+			Phasor<float> phasor;
+			std::vector<float> oscBuffer;
+		};
+
 		struct Lane
 		{
 			Lane() :
@@ -106,10 +159,14 @@ namespace audio
 				frequency(.5f),
 				resonance(40.f),
 				drive(0.f),
-				delay(0.f),
+				feedback(0.f),
+				delayRate(0.f),
+				rmDepth(0.f),
+				rmFreqHz(1.f),
 				gain(1.f),
 				
-				delayFF(),
+				delayFB(),
+				ringMod(),
 
 				Fs(1.f),
 				delaySizeF(1.f)
@@ -119,22 +176,28 @@ namespace audio
 			{
 				Fs = sampleRate;
 
+				ringMod.prepare(Fs, blockSize);
+
 				laneBuffer.setSize(2, blockSize, false, true, false);
 
 				frequency.prepare(Fs, blockSize, 10.f);
 				resonance.prepare(Fs, blockSize, 10.f);
 				drive.prepare(Fs, blockSize, 10.f);
-				delay.prepare(Fs, blockSize, 10.f);
+				feedback.prepare(Fs, blockSize, 10.f);
+				delayRate.prepare(Fs, blockSize, 10.f);
 				gain.prepare(Fs, blockSize, 10.f);
+				rmDepth.prepare(Fs, blockSize, 10.f);
+				rmFreqHz.prepare(Fs, blockSize, 10.f);
 
-				delayFF.prepare(delaySize);
+				delayFB.prepare(delaySize);
 				readHead.resize(blockSize, 0.f);
 
 				delaySizeF = static_cast<float>(delaySize);
 			}
 
 			void operator()(float** samples, int numChannels, int numSamples,
-				bool enabled, float _pitch, float _resonance, int _slope, float _drive, float _delay, float _gain,
+				bool enabled, float _pitch, float _resonance, int _slope, float _drive, float _feedback,
+				float _oct, float _semi, float _rmDepth, float _gain,
 				const int* wHead, const XenManager& xen) noexcept
 			{
 				auto lane = laneBuffer.getArrayOfWritePointers();
@@ -149,26 +212,33 @@ namespace audio
 				for (auto ch = 0; ch < numChannels; ++ch)
 					SIMD::copy(lane[ch], samples[ch], numSamples);
 
-				const auto freqHz = xen.noteToFreqHzWithWrap(_pitch);
-				const auto freqFc = freqHzInFc(freqHz, Fs);
+				const auto freqHz = xen.noteToFreqHzWithWrap(_pitch, 20.f);
 
-				const auto fcBuf = frequency(freqFc, numSamples);
+				const auto fcBuf = frequency(freqHzInFc(freqHz, Fs), numSamples);
 				const auto resoBuf = resonance(_resonance, numSamples);
-				const auto driveBuf = drive(_drive, numSamples);
-				const auto delayBuf = delay(std::rint(msInSamples(_delay, Fs)), numSamples);
-				const auto gainBuf = gain(decibelToGain(_gain), numSamples);
 				
 				filter
 				(
 					lane, samples, numChannels, numSamples,
 					fcBuf, resoBuf, _slope
 				);
+				
+				const auto feedbackBuf = feedback(_feedback, numSamples);
+				const auto delayPitch = _pitch + _oct * xen.getXen() + _semi;
+				const auto delayFreqHz = xen.noteToFreqHzWithWrap(delayPitch, 5.f);
+				const auto delaySamples = freqHzInSamples(delayFreqHz, Fs);
+				const auto delayRateBuf = delayRate(delaySamples, numSamples);
+				const auto rHead = getRHead(numSamples, wHead, delayRateBuf);
+				delayFB(lane, numChannels, numSamples, wHead, rHead, feedbackBuf);
 
+				const auto driveBuf = drive(_drive, numSamples);
 				distort(lane, numChannels, numSamples, driveBuf);
 
-				const auto rHead = getRHead(numSamples, wHead, delayBuf);
-				delayFF(lane, numChannels, numSamples, wHead, rHead);
+				const auto rmDepthBuf = rmDepth(_rmDepth, numSamples);
+				const auto rmFreqHzBuf = rmFreqHz(delayFreqHz, numSamples);
+				ringMod(samples, numChannels, numSamples, rmDepthBuf, rmFreqHzBuf);
 
+				const auto gainBuf = gain(decibelToGain(_gain), numSamples);
 				applyGain(lane, numChannels, numSamples, gainBuf);
 			}
 
@@ -184,8 +254,9 @@ namespace audio
 			AudioBuffer laneBuffer;
 			std::vector<float> readHead;
 			Filter filter;
-			PRM frequency, resonance, drive, delay, gain;
-			Delay delayFF;
+			PRM frequency, resonance, drive, feedback, delayRate, rmDepth, rmFreqHz, gain;
+			DelayFeedback delayFB;
+			RingMod ringMod;
 			float Fs, delaySizeF;
 
 			const float* getRHead(int numSamples, const int* wHead, const float* delayBuf) noexcept
@@ -203,9 +274,9 @@ namespace audio
 				return rHead;
 			}
 
-			float distort(float x, float d) noexcept
+			float distort(float x, float d) const noexcept
 			{
-				auto w = std::tanh(128.f * x) / 128.f;
+				auto w = std::tanh(256.f * x) / 256.f;
 				return x + d * (w - x);
 			}
 
@@ -237,7 +308,7 @@ namespace audio
 
 		void prepare(float sampleRate, int blockSize)
 		{
-			delaySize = static_cast<int>(std::rint(msInSamples(static_cast<float>(DelayLength), sampleRate)));
+			delaySize = static_cast<int>(std::ceil(freqHzInSamples(static_cast<float>(5.f), sampleRate)) + 3.f);
 			if (delaySize % 2 != 0)
 				++delaySize;
 
@@ -248,21 +319,24 @@ namespace audio
 		}
 
 		/* samples, numChannels, numSamples,
-		* l1Enabled [0, 1], l1Pitch [12, N]note, l1Resonance [1, N]q, l1Slope [1, 4]db/oct, l1Drive [0, 1]%, l1Delay [-0, DelayLength]ms, l1Gain [-60, 60]db
-		* l2Enabled [0, 1], l2Pitch [12, N]note, l2Resonance [1, N]q, l2Slope [1, 4]db/oct, l2Drive [0, 1]%, l2Delay [-0, DelayLength]ms, l2Gain [-60, 60]db
-		* l3Enabled [0, 1], l3Pitch [12, N]note, l3Resonance [1, N]q, l3Slope [1, 4]db/oct, l3Drive [0, 1]%, l3Delay [-0, DelayLength]ms, l3Gain [-60, 60]db
+		* l1Enabled [0, 1], l1Pitch [12, N]note, l1Resonance [1, N]q, l1Slope [1, 4]db/oct, l1Drive [0, 1]%, l1Feedback [0, 1]%, l1Gain [-60, 60]db
+		* l2Enabled [0, 1], l2Pitch [12, N]note, l2Resonance [1, N]q, l2Slope [1, 4]db/oct, l2Drive [0, 1]%, l2Feedback [0, 1]%, l2Gain [-60, 60]db
+		* l3Enabled [0, 1], l3Pitch [12, N]note, l3Resonance [1, N]q, l3Slope [1, 4]db/oct, l3Drive [0, 1]%, l3Feedback [0, 1]%, l3Gain [-60, 60]db
 		*/
 		void operator()(float** samples, int numChannels, int numSamples,
-			bool l1Enabled, float l1Pitch, float l1Resonance, int l1Slope, float l1Drive, float l1Delay, float l1Gain,
-			bool l2Enabled, float l2Pitch, float l2Resonance, int l2Slope, float l2Drive, float l2Delay, float l2Gain,
-			bool l3Enabled, float l3Pitch, float l3Resonance, int l3Slope, float l3Drive, float l3Delay, float l3Gain) noexcept
+			bool l1Enabled, float l1Pitch, float l1Resonance, int l1Slope, float l1Drive, float l1Feedback, float l1Oct, float l1Semi, float l1RMDepth, float l1Gain,
+			bool l2Enabled, float l2Pitch, float l2Resonance, int l2Slope, float l2Drive, float l2Feedback, float l2Oct, float l2Semi, float l2RMDepth, float l2Gain,
+			bool l3Enabled, float l3Pitch, float l3Resonance, int l3Slope, float l3Drive, float l3Feedback, float l3Oct, float l3Semi, float l3RMDepth, float l3Gain) noexcept
 		{
 			bool enabled[NumLanes] = { l1Enabled, l2Enabled, l3Enabled };
 			float pitch[NumLanes] = { l1Pitch, l2Pitch, l3Pitch };
 			float resonance[NumLanes] = { l1Resonance, l2Resonance, l3Resonance };
 			int slope[NumLanes] = { l1Slope, l2Slope, l3Slope };
 			float drive[NumLanes] = { l1Drive, l2Drive, l3Drive };
-			float delay[NumLanes] = { l1Delay, l2Delay, l3Delay };
+			float feedback[NumLanes] = { l1Feedback, l2Feedback, l3Feedback };
+			float oct[NumLanes] = { l1Oct, l2Oct, l3Oct };
+			float semi[NumLanes] = { l1Semi, l2Semi, l3Semi };
+			float rmDepth[NumLanes] = { l1RMDepth, l2RMDepth, l3RMDepth };
 			float gain[NumLanes] = { l1Gain, l2Gain, l3Gain };
 
 			writeHead(numSamples);
@@ -283,7 +357,10 @@ namespace audio
 					resonance[i],
 					slope[i],
 					drive[i],
-					delay[i],
+					feedback[i],
+					oct[i],
+					semi[i],
+					rmDepth[i],
 					gain[i],
 					
 					wHead,

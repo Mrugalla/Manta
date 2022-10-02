@@ -13,6 +13,7 @@ namespace gui
         public Comp
     {
         static constexpr int NumLanes = audio::Manta::NumLanes;
+		static constexpr int ParamsPerLane = audio::Manta::NumParametersPerLane;
 
         LowLevel(Utils& u) :
             Comp(u, "", CursorType::Default),
@@ -21,7 +22,10 @@ namespace gui
 			resonance{ Knob(u), Knob(u), Knob(u) },
 			slope{ Knob(u), Knob(u), Knob(u) },
 			drive{ Knob(u), Knob(u), Knob(u) },
-			delay{ Knob(u), Knob(u), Knob(u) },
+			feedback{ Knob(u), Knob(u), Knob(u) },
+			oct{ Knob(u), Knob(u), Knob(u) },
+			semi{ Knob(u), Knob(u), Knob(u) },
+			rmDepth{ Knob(u), Knob(u), Knob(u) },
 			gain{ Knob(u), Knob(u), Knob(u) },
             eqPad(u, "Adjust the filters on the eq pad."),
             spectroBeam(u, u.audioProcessor.spectroBeam),
@@ -31,14 +35,17 @@ namespace gui
         {
             for (auto i = 0; i < NumLanes; ++i)
             {
-                const auto offset = i * 7;
+                const auto offset = i * ParamsPerLane;
 
                 makeParameter(enabled[i], param::offset(PID::Lane1Enabled, offset), "Enabled");
                 makeParameter(frequency[i], param::offset(PID::Lane1Pitch, offset), "Pitch");
 				makeParameter(resonance[i], param::offset(PID::Lane1Resonance, offset), "Resonance");
 				makeParameter(slope[i], param::offset(PID::Lane1Slope, offset), "Slope");
 				makeParameter(drive[i], param::offset(PID::Lane1Drive, offset), "Drive");
-				makeParameter(delay[i], param::offset(PID::Lane1Delay, offset), "Delay");
+				makeParameter(feedback[i], param::offset(PID::Lane1Feedback, offset), "Feedback");
+				makeParameter(oct[i], param::offset(PID::Lane1DelayOct, offset), "Oct");
+				makeParameter(semi[i], param::offset(PID::Lane1DelaySemi, offset), "Semi");
+				makeParameter(rmDepth[i], param::offset(PID::Lane1RMDepth, offset), "Rm Depth");
 				makeParameter(gain[i], param::offset(PID::Lane1Gain, offset), "Gain");
 
                 addAndMakeVisible(enabled[i]);
@@ -46,7 +53,10 @@ namespace gui
 				addAndMakeVisible(resonance[i]);
 				addAndMakeVisible(slope[i]);
 				addAndMakeVisible(drive[i]);
-				addAndMakeVisible(delay[i]);
+				addAndMakeVisible(feedback[i]);
+				addAndMakeVisible(oct[i]);
+				addAndMakeVisible(semi[i]);
+				addAndMakeVisible(rmDepth[i]);
 				addAndMakeVisible(gain[i]);
             }
 
@@ -65,7 +75,7 @@ namespace gui
 
                 for (auto l = 0; l < NumLanes; ++l)
                 {
-                    auto offset = l * 7;
+                    auto offset = l * ParamsPerLane;
 
                     const auto nEnabled = utils.getParam(PID::Lane1Enabled, offset)->getValMod();
                     const auto nPitch = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm();
@@ -153,7 +163,7 @@ namespace gui
 
             layout.init
             (
-                { 3, 5, 5, 5, 5, 5, 5, 5, 3 },
+                { 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3 },
                 { 3, 2, 5, 2, 5, 2, 5, 34, 3 }
             );
         }
@@ -168,17 +178,17 @@ namespace gui
             
 			///*
             {
-                const auto laneArea = layout(1, 1, 7, 2);
+                const auto laneArea = layout(1, 1, ParamsPerLane, 2);
                 g.drawFittedText("Lane 1", laneArea.toNearestInt(), Just::centredTop, 1);
                 drawRectEdges(g, laneArea, thicc2, stroke);
             }
             {
-                const auto laneArea = layout(1, 3, 7, 2);
+                const auto laneArea = layout(1, 3, ParamsPerLane, 2);
                 g.drawFittedText("Lane 2", laneArea.toNearestInt(), Just::centredTop, 1);
                 drawRectEdges(g, laneArea, thicc2, stroke);
             }
 			{
-				const auto laneArea = layout(1, 5, 7, 2);
+				const auto laneArea = layout(1, 5, ParamsPerLane, 2);
 				g.drawFittedText("Lane 3", laneArea.toNearestInt(), Just::centredTop, 1);
 				drawRectEdges(g, laneArea, thicc2, stroke);
 			}
@@ -197,13 +207,16 @@ namespace gui
 				layout.place(frequency[i], 2, y, 1, 1, false);
 				layout.place(resonance[i], 3, y, 1, 1, false);
 				layout.place(slope[i], 4, y, 1, 1, false);
-				layout.place(drive[i], 5, y, 1, 1, false);
-				layout.place(delay[i], 6, y, 1, 1, false);
-				layout.place(gain[i], 7, y, 1, 1, false);
+                layout.place(feedback[i], 5, y, 1, 1, false);
+				layout.place(oct[i], 6, y, 1, 1, false);
+                layout.place(semi[i], 7, y, 1, 1, false);
+				layout.place(drive[i], 8, y, 1, 1, false);
+                layout.place(rmDepth[i], 9, y, 1, 1, false);
+				layout.place(gain[i], 10, y, 1, 1, false);
                 //*/
             }
 
-			layout.place(eqPad, 1, 7, 7, 1, false);
+			layout.place(eqPad, 1, 7, ParamsPerLane, 1, false);
             auto eqPadBounds = eqPad.bounds.toNearestInt();
             eqPadBounds.setX(eqPadBounds.getX() + eqPad.getX());
 			eqPadBounds.setY(eqPadBounds.getY() + eqPad.getY());
@@ -212,7 +225,7 @@ namespace gui
         }
 
     protected:
-        std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, delay, gain;
+        std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, feedback, oct, semi, rmDepth, gain;
         EQPad eqPad;
         SpectroBeamComp<11> spectroBeam;
         FilterResponseGraph2 filterResponseGraph;

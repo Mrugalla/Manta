@@ -26,8 +26,9 @@ HOW TO USE:
 TO DO:
 
 filterResponseGraph
-	let it update from a seperate thread
-	it needs to consider the enabled parameter too
+	in decibels
+		then with automatic range
+			like [-3, 3]db or [-12, 12]db
 
 eqPad
 	scrollwheeling knot should immediatly jump to next legal value of slope param

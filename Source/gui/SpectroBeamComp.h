@@ -21,6 +21,7 @@ namespace gui
 
 		SpectroBeamComp(Utils& u, SpecBeam& _beam) :
 			Comp(u, "Spectro Beam", CursorType::Default),
+			mainColCID(ColourID::Hover),
 			xen(u.audioProcessor.xenManager),
 			beam(_beam),
 			img(Image::RGB, Size, 1, true)
@@ -44,7 +45,7 @@ namespace gui
 			const auto Fs = static_cast<float>(utils.audioProcessor.getSampleRate());
 			const auto fsInv = 1.f / Fs;
 			const auto colBase = Colours::c(ColourID::Bg).withAlpha(1.f);
-			const auto col = Colours::c(ColourID::Mod);
+			const auto col = Colours::c(mainColCID);
 			const auto buf = beam.buffer.data();
 
 			const auto lowestDb = -12.f;
@@ -56,7 +57,7 @@ namespace gui
 			{
 				const auto norm = static_cast<float>(x) * SizeInv;
 				const auto pitch = norm * 128.f;
-				const auto freqHz = xen.noteToFreqHzWithWrap(pitch);
+				const auto freqHz = xen.noteToFreqHzWithWrap(pitch + xen.getXen());
 				const auto binIdx = freqHz * fsInv * SizeF;
 				
 				const auto bin = interpolate::lerp(buf, binIdx);
@@ -70,6 +71,7 @@ namespace gui
 			repaint();
 		}
 		
+		ColourID mainColCID;
 	protected:
 		const audio::XenManager& xen;
 		SpecBeam& beam;

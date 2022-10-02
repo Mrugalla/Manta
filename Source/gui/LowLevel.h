@@ -67,21 +67,31 @@ namespace gui
                 {
                     auto offset = l * 7;
 
+                    const auto nEnabled = utils.getParam(PID::Lane1Enabled, offset)->getValMod();
                     const auto nPitch = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm();
                     const auto nFc = utils.audioProcessor.xenManager.noteToFreqHzWithWrap(nPitch) * fsInv;
                     const auto nResonance = utils.getParam(PID::Lane1Resonance, offset)->getValModDenorm();
                     const auto nSlope = std::rint(utils.getParam(PID::Lane1Slope, offset)->getValModDenorm());
+					const auto nGain = audio::decibelToGain(utils.getParam(PID::Lane1Gain, offset)->getValModDenorm());
 
-                    offset = l * 3;
+                    offset = l * 5;
                     const auto i0 = offset;
                     const auto i1 = 1 + offset;
                     const auto i2 = 2 + offset;
+                    const auto i3 = 3 + offset;
+					const auto i4 = 4 + offset;
 
-                    if (filterParams[i0] != nFc || filterParams[i1] != nResonance || filterParams[i2] != nSlope)
+                    if (filterParams[i0] != nEnabled
+                        || filterParams[i1] != nFc
+                        || filterParams[i2] != nResonance
+                        || filterParams[i3] != nSlope
+						|| filterParams[i4] != nGain)
                     {
-                        filterParams[i0] = nFc;
-                        filterParams[i1] = nResonance;
-                        filterParams[i2] = nSlope;
+                        filterParams[i0] = nEnabled;
+                        filterParams[i1] = nFc;
+                        filterParams[i2] = nResonance;
+                        filterParams[i3] = nSlope;
+						filterParams[i4] = nGain;
 
                         needsUpdate = true;
                     }
@@ -89,28 +99,40 @@ namespace gui
 
                 if (needsUpdate)
                 {
+					auto& xen = utils.audioProcessor.xenManager;
+
                     audio::FilterBandpassSlope<4> fltr;
                     responseCurve.clear();
                     responseCurve.startNewSubPath(0.f, h);
                     for (auto x = 0.f; x < w; ++x)
                     {
-                        auto f = .5f * x / w;
-                        auto mag = 0.f;
+                        const auto f = x / w;
 						
+                        const auto pitch = f * 128.f;
+                        const auto freqHz = xen.noteToFreqHzWithWrap(pitch);
+                        const auto rIdx = freqHz * fsInv;
+                        
+                        auto mag = 0.f;
                         for (auto l = 0; l < NumLanes; ++l)
                         {
-                            auto offset = l * 3;
+                            auto offset = l * 5;
                             const auto i0 = offset;
                             const auto i1 = 1 + offset;
                             const auto i2 = 2 + offset;
+                            const auto i3 = 3 + offset;
+							const auto i4 = 4 + offset;
 
-                            const auto nFc = filterParams[i0];
-                            const auto nQ = filterParams[i1];
-                            const auto nSlope = filterParams[i2];
+                            const auto nEnabled = filterParams[i0];
+                            const auto nFc = filterParams[i1];
+                            const auto nQ = filterParams[i2];
+                            const auto nSlope = filterParams[i3];
+							const auto nGain = filterParams[i4];
 							
+                            const auto g = std::rint(nEnabled) * nGain;
+
                             fltr.setStage(static_cast<int>(nSlope));
                             fltr.setFc(nFc, nQ);
-                            mag += std::abs(fltr.response(f));
+                            mag += std::abs(fltr.response(rIdx)) * g;
                         }
 
                         const auto y = h - h * mag;
@@ -122,72 +144,12 @@ namespace gui
 				
                 return needsUpdate;
             };
-			/*
-            filterResponseGraph.needsUpdate = [&]()
-            {
-				bool needsUpdate = false;
-
-                const auto Fs = utils.audioProcessor.getSampleRate();
-                const auto fsInv = 1.f / static_cast<float>(Fs);
-
-                for (auto l = 0; l < NumLanes; ++l)
-                {
-                    auto offset = l * 7;
-
-                    const auto nPitch = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm();
-                    const auto nFc = utils.audioProcessor.xenManager.noteToFreqHzWithWrap(nPitch) * fsInv;
-                    const auto nResonance = utils.getParam(PID::Lane1Resonance, offset)->getValModDenorm();
-                    const auto nSlope = std::rint(utils.getParam(PID::Lane1Slope, offset)->getValModDenorm());
-
-                    offset = l * 3;
-                    const auto i0 = offset;
-                    const auto i1 = 1 + offset;
-                    const auto i2 = 2 + offset;
-
-                    if (filterParams[i0] != nFc || filterParams[i1] != nResonance || filterParams[i2] != nSlope)
-                    {
-                        filterParams[i0] = nFc;
-                        filterParams[i1] = nResonance;
-                        filterParams[i2] = nSlope;
-
-                        needsUpdate = true;
-                    }
-                }
-
-                return needsUpdate;
-            };
-            filterResponseGraph.processFilters = [&](float* samples, FilterResponseGraph::Buffer& impulse, int numSamples)
-            {
-                for (auto l = 0; l < NumLanes; ++l)
-                {	
-                    const auto offset = l * 3;
-                    const auto i0 = offset;
-                    const auto i1 = 1 + offset;
-                    const auto i2 = 2 + offset;
-                    
-                    const auto fc = filterParams[i0];
-					const auto res = filterParams[i1];
-                    const auto slope = static_cast<int>(filterParams[i2]);
-					
-					audio::FilterBandpassSlope<4> fltr;
-                    fltr.setStage(slope);
-                    fltr.setFc(fc, res);
-
-                    for (auto s = 0; s < numSamples; ++s)
-                    {
-                        auto x = impulse[s];
-                        auto y = fltr(x);
-                        samples[s] += y;
-                    }					
-                }
-            };
-            */
-
+			
             addAndMakeVisible(eqPad);
 
-            eqPad.addNode(PID::Lane1Pitch, PID::Lane1Resonance, PID::Lane1Slope);
-			eqPad.addNode(PID::Lane2Pitch, PID::Lane2Resonance, PID::Lane2Slope);
-			eqPad.addNode(PID::Lane3Pitch, PID::Lane3Resonance, PID::Lane3Slope);
+            eqPad.addNode(PID::Lane1Pitch, PID::Lane1Resonance, PID::Lane1Slope, PID::Lane1Enabled);
+			eqPad.addNode(PID::Lane2Pitch, PID::Lane2Resonance, PID::Lane2Slope, PID::Lane2Enabled);
+			eqPad.addNode(PID::Lane3Pitch, PID::Lane3Resonance, PID::Lane3Slope, PID::Lane3Enabled);
 
             layout.init
             (
@@ -255,6 +217,6 @@ namespace gui
         SpectroBeamComp<11> spectroBeam;
         FilterResponseGraph2 filterResponseGraph;
 		
-        std::array<float, NumLanes * 3> filterParams;
+        std::array<float, NumLanes * 5> filterParams;
     };
 }

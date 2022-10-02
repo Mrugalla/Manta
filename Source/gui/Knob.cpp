@@ -597,6 +597,13 @@ namespace gui
 
         knob.onWheel = [param](Knob& k)
         {
+            const auto interval = param->range.interval;
+            if (interval > 0.f)
+            {
+                const auto nStep = interval / param->range.getRange().getLength();
+                k.dragXY.setY(k.dragXY.y > 0.f ? nStep : -nStep);
+            }
+			
             const auto newValue = juce::jlimit(0.f, 1.f, param->getValue() + k.dragXY.y);
             param->setValueWithGesture(newValue);
 

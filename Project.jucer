@@ -53,6 +53,8 @@
         <FILE id="Uad8Jv" name="State.h" compile="0" resource="0" file="Source/arch/State.h"/>
       </GROUP>
       <GROUP id="{DA435779-5001-4379-F809-3E7C21D55DC0}" name="gui">
+        <FILE id="bQdOQs" name="FilterResponseGraph.cpp" compile="1" resource="0"
+              file="Source/gui/FilterResponseGraph.cpp"/>
         <FILE id="uFTRCK" name="FilterResponseGraph.h" compile="0" resource="0"
               file="Source/gui/FilterResponseGraph.h"/>
         <FILE id="vv9d5C" name="EQPad.h" compile="0" resource="0" file="Source/gui/EQPad.h"/>

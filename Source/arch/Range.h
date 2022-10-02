@@ -42,44 +42,14 @@ namespace makeRange
 		else return { start, end };
 	}
 
-	inline Range toggle() noexcept
-	{
-		return
-		{
-			0.f, 1.f,
-			[](float, float, float x)
-			{
-				return x;
-			},
-			[](float, float, float x)
-			{
-				return x;
-			},
-			[](float, float, float x)
-			{
-				return x > .5 ? 1.f : 0.f;
-			}
-		};
-	}
-
 	inline Range stepped(float start, float end, float steps = 1.f) noexcept
 	{
-		return
-		{
-				start, end,
-				[range = end - start](float min, float, float normalized)
-				{
-					return min + normalized * range;
-				},
-				[rangeInv = 1.f / (end - start)](float min, float, float denormalized)
-				{
-					return (denormalized - min) * rangeInv;
-				},
-				[steps, stepsInv = 1.f / steps](float min, float max, float x)
-				{
-					return juce::jlimit(min, max, std::rint(x * stepsInv) * steps);
-				}
-		};
+		return { start, end, steps };
+	}
+	
+	inline Range toggle() noexcept
+	{
+		return stepped(0.f, 1.f);
 	}
 
 	inline Range lin(float start, float end) noexcept

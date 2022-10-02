@@ -14,9 +14,10 @@ namespace gui
 
 		struct Node
 		{
-			Node(Utils& u, PID xPID, PID yPID, PID scrollPID) :
+			Node(Utils& u, PID xPID, PID yPID, PID scrollPID, PID rightClickPID) :
 				xyParam{ u.getParam(xPID), u.getParam(yPID) },
 				scrollParam(u.getParam(scrollPID)),
+				rightClickParam(u.getParam(rightClickPID)),
 				bounds(0.f, 0.f, 0.f, 0.f) ,
 				x(getValue(X)),
 				y(1.f - getValue(Y)),
@@ -105,13 +106,24 @@ namespace gui
 					dragY *= SensitiveDrag;
 				
 				auto param = scrollParam;
+				const auto interval = param->range.interval;
+				if (interval > 0.f)
+				{
+					const auto nStep = interval / param->range.getRange().getLength();
+					dragY = dragY > 0.f ? nStep : -nStep;
+				}
 
 				const auto newValue = juce::jlimit(0.f, 1.f, param->getValue() + dragY);
 				param->setValueWithGesture(newValue);
 			}
 
+			void onRightClick()
+			{
+				rightClickParam->setValueWithGesture(rightClickParam->getValue() > .5f ? 0.f : 1.f);
+			}
+
 			std::array<Param*, NumDimensions> xyParam;
-			Param* scrollParam;
+			Param *scrollParam, *rightClickParam;
 			BoundsF bounds;
 			float x, y;
 		protected:
@@ -126,19 +138,21 @@ namespace gui
 			dragXY(),
 			selectionLine(),
 			selectionBounds(),
-			tool(Tool::Select)
+			tool(Tool::Select),
+			hovered(nullptr)
 		{
 			startTimerHz(PPDFPSKnobs);
 		}
 
-		void addNode(PID xParam, PID yParam, PID scrollParam)
+		void addNode(PID xParam, PID yParam, PID scrollParam, PID rightClickParam)
 		{
-			nodes.push_back(
-			{
+			nodes.push_back
+			({
 				utils,
 				xParam,
 				yParam,
-				scrollParam
+				scrollParam,
+				rightClickParam
 			});
 		}
 
@@ -146,18 +160,57 @@ namespace gui
 		{
 			const auto thicc = utils.thicc;
 
+			paintHovered(g);
+
+			paintSelectionBounds(g, thicc);
+
 			g.setColour(Colours::c(ColourID::Txt));
 			g.drawRoundedRectangle(bounds, thicc, thicc);
 
 			for (const auto& node : nodes)
 				node.paint(g);
+			
+			paintHighlightSelected(g, thicc);
+			
+		}
+		
+		void paintHovered(Graphics& g)
+		{
+			if (hovered != nullptr)
+			{
+				g.setColour(Colours::c(ColourID::Hover));
+				g.fillEllipse(hovered->bounds);
+				PointF hCentre
+				(
+					hovered->bounds.getX() + hovered->bounds.getWidth() * .5f,
+					hovered->bounds.getY() + hovered->bounds.getHeight() * .5f
+				);
+				auto nodeSize = getNodeSize() * 7.f;
+				auto nodeSizeHalf = nodeSize * .5f;
+				BoundsF infoBounds
+				(
+					hCentre.x - nodeSizeHalf,
+					hCentre.y - nodeSizeHalf,
+					nodeSize,
+					nodeSizeHalf
+				);
+				g.setColour(Colours::c(ColourID::Txt));
+				g.drawFittedText(hovered->xyParam[X]->getCurrentValueAsText(), infoBounds.toNearestInt(), Just::centred, 1);
+			}
+		}
 
+		void paintSelectionBounds(Graphics& g, float thicc)
+		{
 			if (!selectionBounds.isEmpty())
 			{
 				g.setColour(Colours::c(ColourID::Hover));
-				g.drawRoundedRectangle(denormalize(selectionBounds), thicc, thicc);
+				auto dBounds = denormalize(selectionBounds);
+				g.drawRoundedRectangle(dBounds.getIntersection(bounds), thicc, thicc);
 			}
-			
+		}
+
+		void paintHighlightSelected(Graphics& g, float thicc)
+		{
 			if (!selected.empty())
 			{
 				Stroke stroke(thicc, Stroke::PathStrokeType::JointStyle::curved, Stroke::PathStrokeType::EndCapStyle::butt);
@@ -171,7 +224,7 @@ namespace gui
 				}
 			}
 		}
-		
+			
 		void resized() override
 		{
 			bounds = getLocalBounds().toFloat().reduced(getNodeSize() * .5f);
@@ -247,38 +300,52 @@ namespace gui
 					return true;
 			return false;
 		}
+		
+		bool notSelectedYet(const Node& node) const noexcept
+		{
+			return !alreadySelected(node);
+		}
+
+		void mouseMove(const Mouse& mouse) override
+		{
+			auto h = getNode(mouse.position);
+			if (hovered != h)
+			{
+				hovered = h;
+				repaint();
+			}
+		}
 
 		void mouseDown(const Mouse& mouse) override
 		{
-			auto node = getNode(mouse.position);
-			bool clickedOnNode = node != nullptr;
+			bool clickedOnNode = hovered != nullptr;
 			
 			if (clickedOnNode)
 			{
 				tool = Tool::Move;
 				dragXY = mouse.position;
 				
-				if (!alreadySelected(*node))
+				if (notSelectedYet(*hovered))
 				{
 					selected.clear();
-					selected.push_back(node);
+					selected.push_back(hovered);
 				}
 				
-				for (auto i = 0; i < selected.size(); ++i)
-				{
-					const auto& sel = *selected[i];
-					sel.beginGesture();
-				}
+				if(!mouse.mods.isRightButtonDown())
+					for (auto i = 0; i < selected.size(); ++i)
+					{
+						const auto& sel = *selected[i];
+						sel.beginGesture();
+					}
 			}
 			else
 			{
-				tool = Tool::Select;
-				selected.clear();
-				selectionLine.setStart
-				(
-					normalizeX(mouse.position.x),
-					normalizeY(mouse.position.y)
-				);
+				if (!mouse.mods.isRightButtonDown())
+				{
+					tool = Tool::Select;
+					selected.clear();
+					selectionLine.setStart(normalize(mouse.position));
+				}
 			}
 
 			repaint();
@@ -286,6 +353,9 @@ namespace gui
 
 		void mouseDrag(const Mouse& mouse) override
 		{
+			if (mouse.mods.isRightButtonDown())
+				return;
+			
 			if (tool == Tool::Select)
 			{
 				selectionLine.setEnd
@@ -330,6 +400,15 @@ namespace gui
 
 		void mouseUp(const Mouse& mouse) override
 		{
+			if (mouse.mods.isRightButtonDown())
+			{
+				for (auto i = 0; i < selected.size(); ++i)
+				{
+					auto& sel = *selected[i];
+					sel.onRightClick();
+				}
+			}
+			
 			if (tool == Tool::Select)
 			{
 				selectionLine = { 0.f, 0.f, 0.f, 0.f };
@@ -339,16 +418,19 @@ namespace gui
 			}
 			else if (tool == Tool::Move)
 			{
-				bool wasDragged = mouse.mouseWasDraggedSinceMouseDown();
-
-				for (auto i = 0; i < selected.size(); ++i)
+				if (!mouse.mods.isRightButtonDown())
 				{
-					auto& sel = *selected[i];
-					sel.endGesture(wasDragged, mouse.mods.isAltDown());
-				}
+					bool wasDragged = mouse.mouseWasDraggedSinceMouseDown();
 
-				if (wasDragged)
-					showCursor(*this);
+					for (auto i = 0; i < selected.size(); ++i)
+					{
+						auto& sel = *selected[i];
+						sel.endGesture(wasDragged, mouse.mods.isAltDown());
+					}
+
+					if (wasDragged)
+						showCursor(*this);
+				}
 			}
 		}
 		
@@ -356,20 +438,18 @@ namespace gui
 		{
 			if (selected.empty())
 			{
-				auto node = getNode(mouse.position);
-				if (node != nullptr)
+				if (hovered != nullptr)
 				{
-					selected.push_back(node);
+					selected.push_back(hovered);
 					repaint();
 				}
 			}
 			else if (selected.size() == 1)
 			{
-				auto node = getNode(mouse.position);
-				if(node != nullptr)
-					if (!alreadySelected(*node))
+				if(hovered != nullptr)
+					if (!alreadySelected(*hovered))
 					{
-						selected[0] = node;
+						selected[0] = hovered;
 						repaint();
 					}
 			}
@@ -420,6 +500,7 @@ namespace gui
 		LineF selectionLine;
 		BoundsF selectionBounds;
 		Tool tool;
+		Node* hovered;
 		
 		float normalizeX(float value) const noexcept
 		{
@@ -478,6 +559,15 @@ namespace gui
 				denormalizeY(b.getY()),
 				denormalizeX(b.getWidth()),
 				denormalizeY(b.getHeight())
+			};
+		}
+		
+		PointF limit(PointF pt) const noexcept
+		{
+			return
+			{
+				juce::jlimit(0.f, 1.f, pt.x),
+				juce::jlimit(0.f, 1.f, pt.y)
 			};
 		}
 	};

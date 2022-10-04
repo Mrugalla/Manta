@@ -81,7 +81,7 @@ namespace gui
                     const auto nPitch = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm();
                     const auto nFc = utils.audioProcessor.xenManager.noteToFreqHzWithWrap(nPitch) * fsInv;
                     const auto nResonance = utils.getParam(PID::Lane1Resonance, offset)->getValModDenorm();
-                    const auto nSlope = std::rint(utils.getParam(PID::Lane1Slope, offset)->getValModDenorm());
+                    const auto nSlope = std::round(utils.getParam(PID::Lane1Slope, offset)->getValModDenorm());
 					const auto nGain = audio::decibelToGain(utils.getParam(PID::Lane1Gain, offset)->getValModDenorm());
 
                     offset = l * 5;
@@ -138,14 +138,14 @@ namespace gui
                             const auto nSlope = filterParams[i3];
 							const auto nGain = filterParams[i4];
 							
-                            const auto g = std::rint(nEnabled) * nGain;
+                            const auto g = std::round(nEnabled) * nGain;
 
                             fltr.setStage(static_cast<int>(nSlope));
                             fltr.setFc(nFc, nQ);
                             mag += std::abs(fltr.response(rIdx)) * g;
                         }
 
-                        const auto y = h - h * mag;
+                        const auto y = h - h * juce::jlimit(0.f, 1.f, std::isnan(mag) ? 0.f : mag);
 
                         responseCurve.lineTo(x, y);
                     }

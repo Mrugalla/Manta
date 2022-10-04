@@ -5,6 +5,7 @@
 #include "Filter.h"
 #include "PRM.h"
 #include "Phasor.h"
+#include "WaveTable.h"
 #include "XenManager.h"
 #include <functional>
 
@@ -106,15 +107,27 @@ namespace audio
 		
 		struct RingMod
 		{
+			static constexpr int WaveTableSize = 1 << 13; // around min 5hz
+			using WT = WaveTable<WaveTableSize>;
+			using WTFunc = WT::Func;
+
 			RingMod() :
 				phasor(),
+				waveTable(),
 				oscBuffer()
-			{}
+			{
+				createWavetable([](float x) { return std::cos(x * Pi); });
+			}
+
+			void createWavetable(const WTFunc& func) noexcept
+			{
+				waveTable.create(func);
+			}
 
 			void prepare(float Fs, int blockSize)
 			{
 				phasor.prepare(1.f / Fs);
-				oscBuffer.resize(blockSize);
+				oscBuffer.resize(blockSize, 0.f);
 			}
 
 			void operator()(float** samples, int numChannels, int numSamples,
@@ -124,8 +137,8 @@ namespace audio
 				{
 					const auto freqHz = _freqHz[s];
 					phasor.setFrequencyHz(freqHz);
-					phasor();
-					oscBuffer[s] = std::cos(phasor.phase.phase * Tau);
+					auto p = phasor().phase;
+					oscBuffer[s] = waveTable(p);
 				}
 
 				for (auto ch = 0; ch < numChannels; ++ch)
@@ -136,9 +149,10 @@ namespace audio
 					{
 						const auto rmd = _rmDepth[s];
 						const auto dry = smpls[s];
-						const auto wet = dry * oscBuffer[s];
+						const auto osc = oscBuffer[s];
+						const auto wet = dry * osc;
 
-						smpls[s] += rmd * (wet - dry);
+						smpls[s] = dry + rmd * (wet - dry);
 					}
 				}
 						
@@ -146,6 +160,7 @@ namespace audio
 
 		protected:
 			Phasor<float> phasor;
+			WT waveTable;
 			std::vector<float> oscBuffer;
 		};
 
@@ -236,7 +251,7 @@ namespace audio
 
 				const auto rmDepthBuf = rmDepth(_rmDepth, numSamples);
 				const auto rmFreqHzBuf = rmFreqHz(delayFreqHz, numSamples);
-				ringMod(samples, numChannels, numSamples, rmDepthBuf, rmFreqHzBuf);
+				ringMod(lane, numChannels, numSamples, rmDepthBuf, rmFreqHzBuf);
 
 				const auto gainBuf = gain(decibelToGain(_gain), numSamples);
 				applyGain(lane, numChannels, numSamples, gainBuf);
@@ -386,6 +401,6 @@ namespace audio
 /*
 
 todo:
-
+wavetable based ringmod with formularparser
 
 */

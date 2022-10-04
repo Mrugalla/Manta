@@ -132,7 +132,7 @@ namespace gui
 				auto xRatio = xShifted / strWidth;
 				auto xMapped = xRatio * strLen;
 				auto xLimited = juce::jlimit(0.f, strLen, xMapped);
-				tickIdx = static_cast<int>(std::rint(xLimited));
+				tickIdx = static_cast<int>(std::round(xLimited));
 			}
 			//else
 			//	return; // not implemented yet cause not needed lol

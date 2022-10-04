@@ -119,7 +119,7 @@ namespace gui
 					shallRepaint = true;
 				}
 
-				const auto pVal = std::rint(param->getValueDenorm());
+				const auto pVal = std::round(param->getValueDenorm());
 				const auto nTs = static_cast<int>(pVal);
 				if (toggleState != nTs)
 				{

@@ -38,7 +38,7 @@ namespace gui
 		XenWheel(Utils& u) :
 			Knob(u),
 			xen(*u.getParam(PID::Xen)),
-			xenModLabel(u, String(std::rint(xen.getValModDenorm())) + " Xen")
+			xenModLabel(u, String(std::round(xen.getValModDenorm())) + " Xen")
 		{
 			enum { Value, MaxModDepth, ValMod, ModBias, Meter, NumValues };
 			enum { ModDial, NumComps };
@@ -50,9 +50,9 @@ namespace gui
 				Stroke stroke(thicc, Stroke::JointStyle::curved, Stroke::EndCapStyle::butt);
 
 				const auto valNorm = knob.values[Value];
-				const auto valDenorm = std::rint(xenP.range.convertFrom0to1(valNorm));
+				const auto valDenorm = std::round(xenP.range.convertFrom0to1(valNorm));
 				const auto valMod = knob.values[ValMod];
-				const auto valModDenorm = std::rint(xenP.range.convertFrom0to1(valMod));
+				const auto valModDenorm = std::round(xenP.range.convertFrom0to1(valMod));
 
 				const auto maxModDepth = knob.values[MaxModDepth];
 				
@@ -162,7 +162,7 @@ namespace gui
 				bool shouldRepaint = ot(k);
 
 				if (shouldRepaint)
-					xenModLabel.setText(String(std::rint(xen.getValModDenorm())) + " Xen");
+					xenModLabel.setText(String(std::round(xen.getValModDenorm())) + " Xen");
 
 				return shouldRepaint;
 			};

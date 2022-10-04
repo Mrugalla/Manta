@@ -59,7 +59,7 @@ namespace audio
                     const auto mainInvSc = main / sc;
 
                     C = std::tanh(mainInvSc) * sc * shaprBuf[s];
-                    D = std::rint(mainInvSc) * sc * crushrBuf[s];
+                    D = std::round(mainInvSc) * sc * crushrBuf[s];
 
                     E = std::fmod(main, sc) * sc * foldrBuf[s];
                 }

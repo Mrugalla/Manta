@@ -5,6 +5,7 @@ namespace audio
 {
     static constexpr float Tau = 6.28318530718f;
     static constexpr float Pi = 3.14159265359f;
+	static constexpr float PiInv = 1.f / Pi;
     static constexpr float PiHalf = Pi * .5f;
     static constexpr float PiHalfInv = 1.f / PiHalf;
     using Char = juce::juce_wchar;
@@ -92,7 +93,7 @@ namespace audio
     template<typename Float>
     inline Float getRetuneValue(Float oct, Float semi, Float fine) noexcept
     {
-        return static_cast<Float>(12) * std::rint(oct) + std::rint(semi) + fine;
+        return static_cast<Float>(12) * std::round(oct) + std::round(semi) + fine;
     }
 
 	/* x, a [0, 1[ */

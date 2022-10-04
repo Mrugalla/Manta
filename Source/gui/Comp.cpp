@@ -154,7 +154,7 @@ namespace gui
 		if (widgetEnvelope < 0.f || widgetEnvelope > 1.f)
 		{
 			stopTimer();
-			widgetEnvelope = std::rint(widgetEnvelope);
+			widgetEnvelope = std::round(widgetEnvelope);
 		}
 
 		updateBounds();

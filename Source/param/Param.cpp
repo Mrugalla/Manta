@@ -592,7 +592,7 @@ namespace param::strToVal
 		{
 			const auto text = txt.trimCharactersAtEnd(toString(Unit::Octaves));
 			const auto val = p(text, 0.f);
-			return std::rint(val);
+			return std::round(val);
 		};
 	}
 
@@ -602,7 +602,7 @@ namespace param::strToVal
 		{
 			const auto text = txt.trimCharactersAtEnd(toString(Unit::Semi));
 			const auto val = p(text, 0.f);
-			return std::rint(val);
+			return std::round(val);
 		};
 	}
 
@@ -844,7 +844,7 @@ namespace param::valToStr
 
 	ValToStrFunc percent()
 	{
-		return [](float v) { return String(std::rint(v * 100.f)) + " " + toString(Unit::Percent); };
+		return [](float v) { return String(std::round(v * 100.f)) + " " + toString(Unit::Percent); };
 	}
 
 	ValToStrFunc hz()
@@ -862,34 +862,34 @@ namespace param::valToStr
 
 	ValToStrFunc phase()
 	{
-		return [](float v) { return String(std::rint(v * 180.f)) + " " + toString(Unit::Degree); };
+		return [](float v) { return String(std::round(v * 180.f)) + " " + toString(Unit::Degree); };
 	}
 
 	ValToStrFunc phase360()
 	{
-		return [](float v) { return String(std::rint(v * 360.f)) + " " + toString(Unit::Degree); };
+		return [](float v) { return String(std::round(v * 360.f)) + " " + toString(Unit::Degree); };
 	}
 
 	ValToStrFunc oct()
 	{
-		return [](float v) { return String(std::rint(v)) + " " + toString(Unit::Octaves); };
+		return [](float v) { return String(std::round(v)) + " " + toString(Unit::Octaves); };
 	}
 
 	ValToStrFunc semi()
 	{
-		return [](float v) { return String(std::rint(v)) + " " + toString(Unit::Semi); };
+		return [](float v) { return String(std::round(v)) + " " + toString(Unit::Semi); };
 	}
 
 	ValToStrFunc fine()
 	{
-		return [](float v) { return String(std::rint(v * 100.f)) + " " + toString(Unit::Fine); };
+		return [](float v) { return String(std::round(v * 100.f)) + " " + toString(Unit::Fine); };
 	}
 
 	ValToStrFunc ratio()
 	{
 		return [](float v)
 		{
-			const auto y = static_cast<int>(std::rint(v * 100.f));
+			const auto y = static_cast<int>(std::round(v * 100.f));
 			return String(100 - y) + " : " + String(y);
 		};
 	}
@@ -911,12 +911,12 @@ namespace param::valToStr
 
 	ValToStrFunc ms()
 	{
-		return [](float v) { return String(std::rint(v * 10.f) * .1f) + " " + toString(Unit::Ms); };
+		return [](float v) { return String(std::round(v * 10.f) * .1f) + " " + toString(Unit::Ms); };
 	}
 
 	ValToStrFunc db()
 	{
-		return [](float v) { return String(std::rint(v * 100.f) * .01f) + " " + toString(Unit::Decibel); };
+		return [](float v) { return String(std::round(v * 100.f) * .01f) + " " + toString(Unit::Decibel); };
 	}
 
 	ValToStrFunc empty()
@@ -928,7 +928,7 @@ namespace param::valToStr
 	{
 		return [](float v)
 		{
-			return String(std::rint(v)) + toString(Unit::Voices);
+			return String(std::round(v)) + toString(Unit::Voices);
 		};
 	}
 
@@ -952,7 +952,7 @@ namespace param::valToStr
 				else if (v == 1.f)
 					return String("Right");
 				else
-					return String(std::rint(v * 100.f)) + (v < 0.f ? " L" : " R");
+					return String(std::round(v * 100.f)) + (v < 0.f ? " L" : " R");
 			}
 #if PPDHasStereoConfig
 			else
@@ -962,7 +962,7 @@ namespace param::valToStr
 				else if (v == 1.f)
 					return String("Side");
 				else
-					return String(std::rint(v * 100.f)) + (v < 0.f ? " M" : " S");
+					return String(std::round(v * 100.f)) + (v < 0.f ? " M" : " S");
 			}
 #endif
 		};
@@ -972,7 +972,7 @@ namespace param::valToStr
 	{
 		return [](float v)
 		{
-			return String(std::rint(v)) + " " + toString(Unit::Xen);
+			return String(std::round(v)) + " " + toString(Unit::Xen);
 		};
 	}
 
@@ -984,7 +984,7 @@ namespace param::valToStr
 			{
 				enum pitchclass { C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B, Num };
 
-				const auto note = static_cast<int>(std::rint(v));
+				const auto note = static_cast<int>(std::round(v));
 				const auto octave = note / 12 - 1;
 				const auto noteName = note % 12;
 				return audio::pitchclassToString(noteName) + String(octave);
@@ -1005,7 +1005,7 @@ namespace param::valToStr
 	{
 		return [](float v)
 		{
-			v = std::rint(v * 100.f) * .01f;
+			v = std::round(v * 100.f) * .01f;
 			return String(v) + " " + toString(Unit::Q);
 		};
 	}
@@ -1014,7 +1014,7 @@ namespace param::valToStr
 	{
 		return [](float v)
 		{
-			v = std::rint(v) * 12.f;
+			v = std::round(v) * 12.f;
 			return String(v) + " " + toString(Unit::Slope);
 		};
 	}

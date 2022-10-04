@@ -55,6 +55,7 @@ namespace gui
         this->operator()();
         setTooltip(makeTooltip());
         Button::mouseUp(mouse);
+        Comp::mouseEnter(mouse);
     }
 
     void ButtonParameterRandomizer::mouseExit(const Mouse&)
@@ -66,8 +67,8 @@ namespace gui
     String ButtonParameterRandomizer::makeTooltip()
     {
         Random rand;
-        static constexpr float count = 217.f;
-        const auto v = static_cast<int>(std::rint(rand.nextFloat() * count));
+        static constexpr float count = 222.f;
+        const auto v = static_cast<int>(std::round(rand.nextFloat() * count));
         switch (v)
         {
         case 0: return "Do it!";
@@ -288,6 +289,11 @@ namespace gui
         case 215: return "Beware! This button causes quantum entanglement.";
         case 216: return "Pink is the craziest colour, because it's a mix between the lowest and highest perceivable frequencies of light.";
         case 217: return "You can't see mirrors. You can only see what mirrors show. What does a mirror look like?";
+		case 218: return "If I was you, I would try to make a beat that sounds like a randomizer.";
+		case 219: return "I am a computer. I am not a human. I am not a human. I am not a human. I am not a human. I am not a";
+		case 220: return "In the future there will be more tooltip messages.";
+		case 221: return "Refresh yourself with a cold shower!";
+		case 222: return "This is the last tooltip message. I promise.";
         default: "Are you sure?";
         }
         return "You are not supposed to read this message!";

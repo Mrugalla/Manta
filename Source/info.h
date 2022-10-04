@@ -25,11 +25,13 @@ HOW TO USE:
 
 TO DO:
 
+WaveTable
+	implement spline editor
+	implement formular parser
+
 manta
 	ringmod
-		depth doesn't have any effect yet, why
-		oct, semi?
-		waveform?
+		oct, semi
 
 filterResponseGraph
 	in decibels

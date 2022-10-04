@@ -262,12 +262,12 @@ namespace audio
 
         xenManager
         (
-            std::rint(params[PID::Xen]->getValModDenorm()),
+            std::round(params[PID::Xen]->getValModDenorm()),
             params[PID::MasterTune]->getValModDenorm(),
-            std::rint(params[PID::BaseNote]->getValModDenorm())
+            std::round(params[PID::BaseNote]->getValModDenorm())
         );
 
-        midiVoices.pitchbendRange = std::rint(params[PID::PitchbendRange]->getValModDenorm());
+        midiVoices.pitchbendRange = std::round(params[PID::PitchbendRange]->getValModDenorm());
 		
         midiManager(midi, numSamples);
 
@@ -460,35 +460,35 @@ namespace audio
             numSamples,
 
 			l1Enabled,
-            std::rint(l1Pitch),
+            std::round(l1Pitch),
 			l1Resonance,
-			static_cast<int>(std::rint(l1Slope)),
+			static_cast<int>(std::round(l1Slope)),
 			l1Drive,
 			l1Feedback,
-			std::rint(l1Oct),
-            std::rint(l1Semi),
+			std::round(l1Oct),
+            std::round(l1Semi),
 			l1RMDepth,
 			l1Gain,
 
 			l2Enabled,
-            std::rint(l2Pitch),
+            std::round(l2Pitch),
 			l2Resonance,
-			static_cast<int>(std::rint(l2Slope)),
+			static_cast<int>(std::round(l2Slope)),
 			l2Drive,
 			l2Feedback,
-			std::rint(l2Oct),
-			std::rint(l2Semi),
+			std::round(l2Oct),
+			std::round(l2Semi),
 			l2RMDepth,
 			l2Gain,
 
 			l3Enabled,
-            std::rint(l3Pitch),
+            std::round(l3Pitch),
 			l3Resonance,
-			static_cast<int>(std::rint(l3Slope)),
+			static_cast<int>(std::round(l3Slope)),
 			l3Drive,
 			l3Feedback,
-			std::rint(l3Oct),
-			std::rint(l3Semi),
+			std::round(l3Oct),
+			std::round(l3Semi),
 			l3RMDepth,
 			l3Gain
         );

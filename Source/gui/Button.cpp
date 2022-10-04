@@ -89,6 +89,60 @@ namespace gui
 					repaintWithChildren(this);
 			});
 
+		setTooltip(param::toTooltip(pID));
+
+		startTimerHz(24);
+	}
+
+	void Button::enableParameterSwitch(const std::vector<PID>& _pIDs)
+	{
+		stopTimer();
+
+		pID = _pIDs[0];
+
+		const auto numParams = _pIDs.size();
+		for (auto p = 0; p < numParams; ++p)
+		{
+			const auto _pID = _pIDs[p];
+			
+			onClick.push_back([param = utils.getParam(_pID)](Button&)
+			{
+				const auto ts = param->getValue() > .5f ? 0.f : 1.f;
+				param->setValueWithGesture(ts);
+			});
+		}
+		
+		onTimer.push_back([this](Button&)
+			{
+				bool shallRepaint = false;
+
+				const auto param = utils.getParam(pID);
+
+				const auto lckd = param->isLocked();
+				if (locked != lckd)
+				{
+					locked = lckd;
+					label.textCID = locked ? ColourID::Inactive : ColourID::Interact;
+					shallRepaint = true;
+				}
+
+				const auto nTs = param->getValue() > .5f ? 1 : 0;
+				if (toggleState != nTs)
+				{
+					toggleState = nTs;
+
+					if (toggleTexts.size() > toggleState)
+						label.setText(toggleTexts[toggleState]);
+
+					shallRepaint = true;
+				}
+
+				if (shallRepaint)
+					repaintWithChildren(this);
+			});
+
+		setTooltip(param::toTooltip(pID));
+
 		startTimerHz(24);
 	}
 
@@ -134,6 +188,8 @@ namespace gui
 				if (shallRepaint)
 					repaintWithChildren(this);
 			});
+
+		setTooltip(param::toTooltip(pID));
 
 		startTimerHz(24);
 	}
@@ -804,6 +860,12 @@ namespace gui
 	{
 		makeSymbolButton(b, symbol);
 		b.enableParameterSwitch(pID);
+	}
+
+	void makeParameterSwitchButton(Button& b, const std::vector<PID>& pIDs, ButtonSymbol symbol)
+	{
+		makeSymbolButton(b, symbol);
+		b.enableParameterSwitch(pIDs);
 	}
 
 	template<size_t NumButtons>

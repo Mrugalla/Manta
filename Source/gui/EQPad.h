@@ -1,6 +1,5 @@
 #pragma once
-#include "Knob.h"
-
+#include "Comp.h"
 #include <array>
 
 namespace gui
@@ -9,9 +8,10 @@ namespace gui
 		public Comp,
 		public Timer
 	{
-		enum Dimension { X, Y, NumDimensions };
 		enum Tool { Select, Move, NumTools };
-
+	public:
+		enum Dimension { X, Y, NumDimensions };
+		
 		struct Node
 		{
 			Node(Utils& u, PID xPID, PID yPID, PID scrollPID, PID rightClickPID) :
@@ -130,9 +130,17 @@ namespace gui
 			Utils& utils;
 		};
 
-	public:
+		using Nodes = std::vector<Node>;
+		using NodePtrs = std::vector<Node*>;
+		using OnSelectionChanged = std::function<void(const NodePtrs&)>;
+		using OnSelectionChangeds = std::vector<OnSelectionChanged>;
+
+	
 		EQPad(Utils& u, String&& _tooltip) :
 			Comp(u, _tooltip, CursorType::Interact),
+			bounds(),
+			onSelectionChanged(),
+			
 			nodes(),
 			selected(),
 			dragXY(),
@@ -329,6 +337,7 @@ namespace gui
 				{
 					selected.clear();
 					selected.push_back(hovered);
+					selectionChanged();
 				}
 				
 				if(!mouse.mods.isRightButtonDown())
@@ -343,8 +352,11 @@ namespace gui
 				if (!mouse.mods.isRightButtonDown())
 				{
 					tool = Tool::Select;
+					auto numSelected = selected.size();
 					selected.clear();
 					selectionLine.setStart(normalize(mouse.position));
+					if(numSelected != selected.size())
+						selectionChanged();
 				}
 			}
 
@@ -463,6 +475,8 @@ namespace gui
 
 		void updateSelected()
 		{
+			bool changed = false;
+			
 			for (auto& node : nodes)
 			{
 				const auto x = node.x;
@@ -472,13 +486,24 @@ namespace gui
 
 				if (nodeInSelection)
 				{
-					if (!alreadySelected(node))
+					if (notSelectedYet(node))
+					{
 						selected.push_back(&node);
+						changed = true;
+					}
 				}
 				else
-					removeNode(node);
-					
+				{
+					if (alreadySelected(node))
+					{
+						removeNode(node);
+						changed = true;
+					}
+				}
 			}
+
+			if (changed)
+				selectionChanged();
 		}
 
 		void removeNode(const Node& node)
@@ -490,18 +515,24 @@ namespace gui
 					return;
 				}
 		}
-		
 
 		BoundsF bounds;
+		OnSelectionChangeds onSelectionChanged;
 	protected:
-		std::vector<Node> nodes;
-		std::vector<Node*> selected;
+		Nodes nodes;
+		NodePtrs selected;
 		PointF dragXY;
 		LineF selectionLine;
 		BoundsF selectionBounds;
 		Tool tool;
 		Node* hovered;
 		
+		void selectionChanged()
+		{
+			for (const auto& func : onSelectionChanged)
+				func(selected);
+		}
+
 		float normalizeX(float value) const noexcept
 		{
 			return (value - bounds.getX()) / bounds.getWidth();

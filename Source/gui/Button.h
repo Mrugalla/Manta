@@ -34,6 +34,8 @@ namespace gui
 
 		void enableParameterSwitch(PID);
 
+		void enableParameterSwitch(const std::vector<PID>&);
+
 		void enableParameter(PID, int /*val*/);
 
 		/* utils, tooltip */
@@ -105,6 +107,8 @@ namespace gui
 	void makeParameterSwitchButton(Button&, PID, String&& /*text*/);
 
 	void makeParameterSwitchButton(Button&, PID, ButtonSymbol);
+
+	void makeParameterSwitchButton(Button&, const std::vector<PID>&, ButtonSymbol);
 
 	template<size_t NumButtons>
 	void makeParameterButtonsGroup(std::array<Button, NumButtons>&, PID, const char* /*txt*/, bool /*onlyText*/);

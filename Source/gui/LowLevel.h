@@ -5,6 +5,7 @@
 #include "SpectroBeamComp.h"
 #include "EQPad.h"
 #include "FilterResponseGraph.h"
+#include "MantaComp.h"
 #include "../audio/XenManager.h"
 
 namespace gui
@@ -17,6 +18,7 @@ namespace gui
 
         LowLevel(Utils& u) :
             Comp(u, "", CursorType::Default),
+			/*
 			enabled{Knob(u), Knob(u), Knob(u) },
 			frequency{ Knob(u), Knob(u), Knob(u) },
 			resonance{ Knob(u), Knob(u), Knob(u) },
@@ -27,12 +29,15 @@ namespace gui
 			semi{ Knob(u), Knob(u), Knob(u) },
 			rmDepth{ Knob(u), Knob(u), Knob(u) },
 			gain{ Knob(u), Knob(u), Knob(u) },
+			*/
             eqPad(u, "Adjust the filters on the eq pad."),
             spectroBeam(u, u.audioProcessor.spectroBeam),
             filterResponseGraph(u),
+			manta(u, eqPad.onSelectionChanged),
             
             filterParams()
         {
+            /*
             for (auto i = 0; i < NumLanes; ++i)
             {
                 const auto offset = i * ParamsPerLane;
@@ -59,6 +64,8 @@ namespace gui
 				addAndMakeVisible(rmDepth[i]);
 				addAndMakeVisible(gain[i]);
             }
+            */
+            
 
             addAndMakeVisible(spectroBeam);
 			
@@ -161,74 +168,37 @@ namespace gui
 			eqPad.addNode(PID::Lane2Pitch, PID::Lane2Resonance, PID::Lane2Slope, PID::Lane2Enabled);
 			eqPad.addNode(PID::Lane3Pitch, PID::Lane3Resonance, PID::Lane3Slope, PID::Lane3Enabled);
 
+            addChildComponent(manta);
+
             layout.init
             (
-                { 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3 },
-                { 3, 2, 5, 2, 5, 2, 5, 34, 3 }
+                { 1, 13, 1 },
+                { 1, 13, 5, 1 }
             );
         }
 
-        void paint(Graphics& g) override
-        {
-            auto thicc = utils.thicc;
-            auto thicc2 = thicc * 2.f;
-            const Stroke stroke(thicc, Stroke::JointStyle::curved, Stroke::EndCapStyle::rounded);
-
-            g.setColour(Colours::c(ColourID::Txt));
-            
-			///*
-            {
-                const auto laneArea = layout(1, 1, ParamsPerLane, 2);
-                g.drawFittedText("Lane 1", laneArea.toNearestInt(), Just::centredTop, 1);
-                drawRectEdges(g, laneArea, thicc2, stroke);
-            }
-            {
-                const auto laneArea = layout(1, 3, ParamsPerLane, 2);
-                g.drawFittedText("Lane 2", laneArea.toNearestInt(), Just::centredTop, 1);
-                drawRectEdges(g, laneArea, thicc2, stroke);
-            }
-			{
-				const auto laneArea = layout(1, 5, ParamsPerLane, 2);
-				g.drawFittedText("Lane 3", laneArea.toNearestInt(), Just::centredTop, 1);
-				drawRectEdges(g, laneArea, thicc2, stroke);
-			}
-            //*/
-            
-        }
+        void paint(Graphics&) override {}
 
         void resized() override
         {
             layout.resized();
-            for (auto i = 0; i < NumLanes; ++i)
-            {
-                auto y = 2 + i * 2;
-                ///*
-                layout.place(enabled[i], 1, y, 1, 1, false);
-				layout.place(frequency[i], 2, y, 1, 1, false);
-				layout.place(resonance[i], 3, y, 1, 1, false);
-				layout.place(slope[i], 4, y, 1, 1, false);
-                layout.place(feedback[i], 5, y, 1, 1, false);
-				layout.place(oct[i], 6, y, 1, 1, false);
-                layout.place(semi[i], 7, y, 1, 1, false);
-				layout.place(drive[i], 8, y, 1, 1, false);
-                layout.place(rmDepth[i], 9, y, 1, 1, false);
-				layout.place(gain[i], 10, y, 1, 1, false);
-                //*/
-            }
-
-			layout.place(eqPad, 1, 7, ParamsPerLane, 1, false);
+			
+			layout.place(eqPad, 1, 1, 1, 1, false);
             auto eqPadBounds = eqPad.bounds.toNearestInt();
             eqPadBounds.setX(eqPadBounds.getX() + eqPad.getX());
 			eqPadBounds.setY(eqPadBounds.getY() + eqPad.getY());
             filterResponseGraph.setBounds(eqPadBounds);
             spectroBeam.setBounds(eqPadBounds);
+
+            layout.place(manta, 1, 2, 1, 1, false);
         }
 
     protected:
-        std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, feedback, oct, semi, rmDepth, gain;
+        //std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, feedback, oct, semi, rmDepth, gain;
         EQPad eqPad;
         SpectroBeamComp<11> spectroBeam;
         FilterResponseGraph2 filterResponseGraph;
+        MantaComp manta;
 		
         std::array<float, NumLanes * 5> filterParams;
     };

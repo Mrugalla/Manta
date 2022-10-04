@@ -12,11 +12,14 @@ namespace gui
 		using NodePtrs = EQPad::NodePtrs;
 
 		using FlexButton = std::unique_ptr<Button>;
-		using FlexButtons = std::vector<FlexButton>;
+		using FlexKnob = std::unique_ptr<Knob>;
 
 		MantaComp(Utils& u, OnSelectionChangeds& onSelectionChanged) :
 			Comp(u, "", CursorType::Default),
-			enabled()
+			enabled(),
+			pitch(),
+			resonance(),
+			slope()
 		{
 			onSelectionChanged.push_back([&](const NodePtrs& selected)
 			{
@@ -25,6 +28,16 @@ namespace gui
 				{
 					removeChildComponent(enabled.get());
 					enabled.reset();
+					
+					removeChildComponent(pitch.get());
+					pitch.reset();
+
+					removeChildComponent(resonance.get());
+					resonance.reset();
+
+					removeChildComponent(slope.get());
+					slope.reset();
+					
 					setVisible(false);
 				}
 				else
@@ -38,6 +51,36 @@ namespace gui
 
 						makeParameterSwitchButton(*enabled, pIDs, ButtonSymbol::Power);
 					}
+					
+					pitch = std::make_unique<Knob>(u);
+					addAndMakeVisible(*pitch);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->xyParam[EQPad::X]->id);
+
+						makeParameter(*pitch, pIDs, "Pitch");
+					}
+
+					resonance = std::make_unique<Knob>(u);
+					addAndMakeVisible(*resonance);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->xyParam[EQPad::Y]->id);
+
+						makeParameter(*resonance, pIDs, "Reso");
+					}
+
+					slope = std::make_unique<Knob>(u);
+					addAndMakeVisible(*slope);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->scrollParam->id);
+
+						makeParameter(*slope, pIDs, "Slope");
+					}
 
 					setVisible(true);
 				}
@@ -47,8 +90,8 @@ namespace gui
 
 			layout.init
 			(
-				{ 1, 1, 1 },
-				{ 1, 1, 1 }
+				{ 1, 8, 1, 5, 5, 1, 1 },
+				{ 1, 13, 8, 1 }
 			);
 		}
 
@@ -58,7 +101,8 @@ namespace gui
 			auto bounds = getLocalBounds().toFloat().reduced(thicc);
 
 			g.setColour(Colours::c(ColourID::Txt));
-			g.drawRoundedRectangle(bounds, thicc, thicc);
+			layout.paint(g);
+			//g.drawRoundedRectangle(bounds, thicc, thicc);
 		}
 
 		void resized() override
@@ -67,8 +111,15 @@ namespace gui
 
 			if(enabled)
 				layout.place(*enabled, 1, 1, 1, 1, true);
+			if(pitch)
+				layout.place(*pitch, 3, 1, 1, 1, false);
+			if (resonance)
+				layout.place(*resonance, 4, 1, 1, 1, false);
+			if (slope)
+				layout.place(*slope, 3, 2, 2, 1, false);
 		}
 		
 		FlexButton enabled;
+		FlexKnob pitch, resonance, slope;
 	};
 }

@@ -25,6 +25,10 @@ HOW TO USE:
 
 TO DO:
 
+Knob
+	if knob corresponds to multiple parameters at once
+		locking doesn't work for all of them
+
 WaveTable
 	implement spline editor
 	implement formular parser
@@ -92,6 +96,7 @@ sta::State
 
 MIDI Learn
 	1 cc to n parameters?
+		(especially if multiple parameters are controlled by one knob/button)
 	different midi channnels (16 * 128 CCs instead of 128)
 	possible to save and load default state of whole midi learn patch
 	ContextMenu

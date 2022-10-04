@@ -106,43 +106,66 @@ namespace gui
 			if (type == EvtType::ButtonRightClicked)
 			{
 				const auto& button = *static_cast<const Button*>(stuff);
-				bool isParameterButton = button.pID != PID::NumParams;
+				const auto& pIDs = button.pID;
+				bool isParameterButton = !pIDs.empty();
 				if (!isParameterButton)
 					return;
 
 				auto& utils = pop.getUtils();
 
-				pop.setButton([param = utils.getParam(button.pID)](Button&)
+				pop.setButton([&u = utils, pIDs](Button&)
 				{
 					juce::Random rand;
-					param->setValueWithGesture(rand.nextFloat());
+					for (auto pID : pIDs)
+					{
+						auto param = u.getParam(pID);
+						param->setValueWithGesture(rand.nextFloat());
+					}
 				}, 0);
-				pop.setButton([param = utils.getParam(button.pID)](Button&)
+				pop.setButton([&u = utils, pIDs](Button&)
 				{
-					const auto val = param->getDefaultValue();
-					param->setValueWithGesture(val);
+					for (auto pID : pIDs)
+					{
+						auto param = u.getParam(pID);
+						const auto val = param->getDefaultValue();
+						param->setValueWithGesture(val);
+					}
 				}, 1);
-				pop.setButton([param = utils.getParam(button.pID)](Button&)
+				pop.setButton([&u = utils, pIDs](Button&)
 				{
-					param->setDefaultValue(param->getValue());
+					for (auto pID : pIDs)
+					{
+						auto param = u.getParam(pID);
+						param->setDefaultValue(param->getValue());
+					}
 				}, 2);
-				pop.setButton([param = utils.getParam(button.pID)](Button&)
+				pop.setButton([&u = utils, pIDs](Button&)
 				{
-					param->switchLock();
+					for (auto pID : pIDs)
+					{
+						auto param = u.getParam(pID);
+						param->switchLock();
+					}
 				}, 3);
-				pop.setButton([&u = utils, pID = button.pID](Button&)
+				pop.setButton([&u = utils, pIDs](Button&)
 				{
-					u.assignMIDILearn(pID);
+					for (auto pID : pIDs)
+					{
+						u.assignMIDILearn(pID);
+					}
 				}, 4);
-				pop.setButton([&u = utils, pID = button.pID](Button&)
+				pop.setButton([&u = utils, pIDs](Button&)
 				{
-					u.removeMIDILearn(pID);
+					for (auto pID : pIDs)
+					{
+						u.removeMIDILearn(pID);
+					}
 				}, 5);
 				pop.setButton([&u = utils, &btn = button](Button&)
-					{
-						u.getEventSystem().notify(EvtType::EnterParametrValue, &btn);
-						// this probably doesn't work yet
-					}, 6);
+				{
+					//u.getEventSystem().notify(EvtType::EnterParametrValue, &btn);
+					// idk yet if this works
+				}, 6);
 
 				pop.place(&button);
 			}

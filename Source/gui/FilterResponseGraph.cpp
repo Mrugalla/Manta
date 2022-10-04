@@ -133,7 +133,7 @@ namespace gui
 		responseCurve()
 	{
 		setInterceptsMouseClicks(false, false);
-		startTimerHz(4);
+		startTimerHz(12);
 	}
 
 	void FilterResponseGraph2::paint(Graphics& g)

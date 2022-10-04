@@ -66,8 +66,14 @@ namespace gui
 	/* knob, pID, name, modulatable, meter */
     void makeParameter(Knob&, PID, const String&, bool = true, const std::atomic<float>* = nullptr);
 
-    /* knob, pID, name, onPaint modulatable, meter */
+    /* knob, pID, name, onPaint, modulatable, meter */
     void makeParameter(Knob&, PID, const String&, const Knob::OnPaint&, bool = true, const std::atomic<float>* = nullptr);
+
+    /* knob, pIDs, name, onPaint, modulatable */
+    void makeParameter(Knob&, const std::vector<PID>&, const String&, const Knob::OnPaint&, bool);
+
+    /* knob, pIDs, name, modulatable */
+    void makeParameter(Knob&, const std::vector<PID>&, const String&, bool = true);
 
 	struct ContextMenuKnobs :
 		public ContextMenu

@@ -32,11 +32,9 @@ namespace gui
 
 		void enableLabel(std::vector<String>&&);
 
-		void enableParameterSwitch(PID);
-
 		void enableParameterSwitch(const std::vector<PID>&);
 
-		void enableParameter(PID, int /*val*/);
+		void enableParameter(const std::vector<PID>&, int /*val*/);
 
 		/* utils, tooltip */
 		Button(Utils&, String&& = "");
@@ -50,7 +48,7 @@ namespace gui
 		std::vector<OnMouseWheel> onMouseWheel;
 		BlinkyBoy blinkyBoy;
 		int toggleState;
-		PID pID;
+		std::vector<PID> pID;
 		bool locked;
 	protected:
 		Label label;

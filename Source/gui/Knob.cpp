@@ -838,10 +838,16 @@ namespace gui
 
     void makeParameter(Knob& knob, const std::vector<PID>& pIDs, const String& name, const Knob::OnPaint& onPaint, bool modulatable)
     {
-        knob.getInfo = [pID = pIDs[0]](int i)
+        knob.getInfo = [pIDs](int i)
         {
             if (i == 0)
-                return toString(pID);
+            {
+                String idsStr;
+				for (auto pid : pIDs)
+					idsStr += toString(pid) + "\n";
+                return idsStr;
+            }
+                
             return String();
         };
 
@@ -1203,48 +1209,63 @@ namespace gui
             if (type == EvtType::ParametrRightClicked)
             {
                 const auto& knob = *static_cast<const Knob*>(stuff);
-                auto& utils = pop.getUtils();
                 
-                const auto pIDStr = knob.getInfo(0);
-                const PID pID = param::toPID(pIDStr);
-                auto& param = *utils.getParam(pID);
+                const auto pIDsStr = knob.getInfo(0);
+                std::vector<PID> pIDs;
+                param::toPIDs(pIDs, pIDsStr, "\n");
 
-                pop.setButton([&p = param](Button&)
+                pop.setButton([pIDs](Button& btn)
                 {
                     Random rand;
-                    p.setValueWithGesture(rand.nextFloat());
+                    for(auto pID: pIDs)
+                        btn.getUtils().getParam(pID)->setValueWithGesture(rand.nextFloat());
                 }, 0);
-                pop.setButton([&p = param](Button&)
+                pop.setButton([pIDs](Button& btn)
                 {
                     juce::Random rand;
-                    auto val = p.getValue();
-                    val += .05f * (rand.nextFloat() - .5f);
-                    p.setValueWithGesture(juce::jlimit(0.f, 1.f, val));
+                    for (auto pID : pIDs)
+                    {
+						auto param = btn.getUtils().getParam(pID);
+                        auto val = param->getValue();
+                        val += .05f * (rand.nextFloat() - .5f);
+                        param->setValueWithGesture(juce::jlimit(0.f, 1.f, val));
+                    }
                 }, 1);
-                pop.setButton([&p = param](Button&)
+                pop.setButton([pIDs](Button& btn)
                 {
-                    const auto val = p.getDefaultValue();
-                    p.setValueWithGesture(val);
+                    for (auto pID : pIDs)
+                    {
+						auto param = btn.getUtils().getParam(pID);
+                        const auto val = param->getDefaultValue();
+                        param->setValueWithGesture(val);
+                    }
                 }, 2);
-                pop.setButton([&p = param](Button&)
+                pop.setButton([pIDs](Button& btn)
                 {
-                    p.setDefaultValue(p.getValue());
+                    for (auto pID : pIDs)
+                    {
+                        auto param = btn.getUtils().getParam(pID);
+                        param->setDefaultValue(param->getValue());
+                    }
                 }, 3);
-                pop.setButton([&p = param](Button&)
+                pop.setButton([pIDs](Button& btn)
                 {
-                    p.switchLock();
+                    for (auto pID : pIDs)
+                        btn.getUtils().getParam(pID)->switchLock();
                 }, 4);
-                pop.setButton([&u = utils, pID = pID](Button&)
+                pop.setButton([pIDs](Button& btn)
                 {
-                    u.assignMIDILearn(pID);
+                    for (auto pID : pIDs)
+                        btn.getUtils().assignMIDILearn(pID);
                 }, 5);
-                pop.setButton([&u = utils, pID = pID](Button&)
+                pop.setButton([pIDs](Button& btn)
                 {
-                    u.removeMIDILearn(pID);
+                    for (auto pID : pIDs)
+                        btn.getUtils().removeMIDILearn(pID);
                 }, 6);
-                pop.setButton([&u = utils, &k = knob](Button&)
+                pop.setButton([&k = knob](Button& btn)
                 {
-                    u.getEventSystem().notify(EvtType::EnterParametrValue, &k);
+                    btn.getUtils().getEventSystem().notify(EvtType::EnterParametrValue, &k);
                 }, 7);
 
                 pop.place(&knob);
@@ -1287,21 +1308,26 @@ namespace gui
                 editor.txt.clear();
 
                 const auto& knob = *static_cast<const Knob*>(stuff);
-                const auto pID = param::toPID(knob.getInfo(0));
+                const auto pIDsStr = knob.getInfo(0);
+                std::vector<PID> pIDs;
+                param::toPIDs(pIDs, pIDsStr, "\n");
                 auto& utils = editor.getUtils();
-                auto& param = *utils.getParam(pID);
 
                 editor.onEscape = [&tek = editor]()
                 {
                     tek.disable();
                 };
 
-                editor.onReturn = [&tek = editor, &prm = param]()
+                editor.onReturn = [&tek = editor, pIDs]()
                 {
                     if (tek.txt.isNotEmpty())
                     {
-                        const auto val = juce::jlimit(0.f, 1.f, prm.getValueForText(tek.txt));
-                        prm.setValueWithGesture(val);
+                        for (auto pID : pIDs)
+                        {
+							auto param = tek.getUtils().getParam(pID);
+                            const auto val = juce::jlimit(0.f, 1.f, param->getValueForText(tek.txt));
+                            param->setValueWithGesture(val);
+                        }
                     }
                     tek.disable();
                 };
@@ -1310,7 +1336,8 @@ namespace gui
                 const auto screenPos = utils.getScreenPosition();
                 const auto parametrScreenPos = knob.getScreenPosition();
                 const auto parametrPos = parametrScreenPos - screenPos;
-                const Point parametrCentre(
+                const Point parametrCentre
+                (
                     knob.getWidth() / 2,
                     knob.getHeight() / 2
                 );

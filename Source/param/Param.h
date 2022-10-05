@@ -105,6 +105,9 @@ namespace param
 
 	PID toPID(const String&);
 
+	/* pIDs, text, seperatorChr */
+	void toPIDs(std::vector<PID>&, const String&, const String&);
+
 	String toTooltip(PID);
 
 	enum class Unit

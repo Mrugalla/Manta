@@ -25,9 +25,9 @@ HOW TO USE:
 
 TO DO:
 
-Knob
-	if knob corresponds to multiple parameters at once
-		locking doesn't work for all of them
+knob drop down doesnt always go away when should
+
+gain out doesnt show locked state
 
 WaveTable
 	implement spline editor

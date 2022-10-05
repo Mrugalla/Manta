@@ -113,6 +113,17 @@ namespace param
 		return PID::NumParams;
 	}
 
+	void toPIDs(std::vector<PID>& pIDs, const String& text, const String& seperator)
+	{
+		auto tokens = juce::StringArray::fromTokens(text, seperator, "");
+		for (auto& token : tokens)
+		{
+			auto pID = toPID(token);
+			if (pID != PID::NumParams)
+				pIDs.push_back(pID);
+		}
+	}
+
 	String toTooltip(PID pID)
 	{
 		switch (pID)

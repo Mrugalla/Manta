@@ -25,7 +25,8 @@ namespace gui
 			xen(u.audioProcessor.xenManager),
 			beam(_beam),
 			img(Image::RGB, Size, 1, true)
-		{			
+		{
+			setInterceptsMouseClicks(false, false);
 			startTimerHz(60);
 			setOpaque(true);
 		}

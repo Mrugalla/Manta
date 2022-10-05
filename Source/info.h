@@ -25,10 +25,6 @@ HOW TO USE:
 
 TO DO:
 
-knob drop down doesnt always go away when should
-
-gain out doesnt show locked state
-
 WaveTable
 	implement spline editor
 	implement formular parser

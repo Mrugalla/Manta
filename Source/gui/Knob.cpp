@@ -533,7 +533,7 @@ namespace gui
         auto& utils = knob.getUtils();
         auto param = utils.getParam(pID);
 
-        knob.locked = param->isLocked();
+        knob.setLocked(param->isLocked());
 
         knob.onEnter = [param](Knob& k)
         {
@@ -645,7 +645,7 @@ namespace gui
         {
             const auto lckd = param->isLocked();
             if (k.locked != lckd)
-                k.locked = lckd;
+                k.setLocked(lckd);
 
             const auto vn = param->getValue();
             const auto mmd = param->getMaxModDepth();
@@ -860,7 +860,7 @@ namespace gui
         auto& utils = knob.getUtils();
         auto mainParam = utils.getParam(mainPID);
 
-        knob.locked = mainParam->isLocked();
+        knob.setLocked(mainParam->isLocked());
 
         knob.onEnter = [mainParam](Knob& k)
         {

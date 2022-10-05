@@ -414,11 +414,12 @@ namespace gui
 		{
 			if (mouse.mods.isRightButtonDown())
 			{
-				for (auto i = 0; i < selected.size(); ++i)
-				{
-					auto& sel = *selected[i];
-					sel.onRightClick();
-				}
+				if(!mouse.mouseWasDraggedSinceMouseDown())
+					for (auto i = 0; i < selected.size(); ++i)
+					{
+						auto& sel = *selected[i];
+						sel.onRightClick();
+					}
 			}
 			
 			if (tool == Tool::Select)
@@ -444,6 +445,7 @@ namespace gui
 						showCursor(*this);
 				}
 			}
+			notify(EvtType::ClickedEmpty);
 		}
 		
 		void mouseWheelMove(const Mouse& mouse, const MouseWheel& wheel) override

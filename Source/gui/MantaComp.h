@@ -18,23 +18,36 @@ namespace gui
 			Comp(u, "", CursorType::Default),
 			mainLabel(u, "Main"),
 			filterLabel(u, "Filter"),
+			feedbackLabel(u, "Feedback"),
+			ringModLabel(u, "Ring Mod"),
 			enabled(),
 			gain(),
 			pitch(),
 			resonance(),
-			slope()
+			slope(),
+			delayOct(),
+			delaySemi(),
+			delayFeedback()
 		{
 			addAndMakeVisible(mainLabel);
 			addAndMakeVisible(filterLabel);
+			addAndMakeVisible(feedbackLabel);
+			addAndMakeVisible(ringModLabel);
 
 			mainLabel.textCID = ColourID::Txt;
 			filterLabel.textCID = mainLabel.textCID;
+			feedbackLabel.textCID = mainLabel.textCID;
+			ringModLabel.textCID = mainLabel.textCID;
 			
 			mainLabel.font = getFontLobster();
 			filterLabel.font = mainLabel.font;
+			feedbackLabel.font = mainLabel.font;
+			ringModLabel.font = mainLabel.font;
 
 			mainLabel.mode = Label::Mode::TextToLabelBounds;
 			filterLabel.mode = mainLabel.mode;
+			feedbackLabel.mode = mainLabel.mode;
+			ringModLabel.mode = mainLabel.mode;
 
 			onSelectionChanged.push_back([&](const NodePtrs& selected)
 			{
@@ -55,6 +68,15 @@ namespace gui
 
 					removeChildComponent(slope.get());
 					slope.reset();
+
+					removeChildComponent(delayOct.get());
+					delayOct.reset();
+
+					removeChildComponent(delaySemi.get());
+					delaySemi.reset();
+
+					removeChildComponent(delayFeedback.get());
+					delayFeedback.reset();
 					
 					setVisible(false);
 				}
@@ -110,6 +132,36 @@ namespace gui
 						makeParameter(*slope, pIDs);
 					}
 
+					delayOct = std::make_unique<Knob>(u);
+					addAndMakeVisible(*delayOct);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[1]);
+
+						makeParameter(*delayOct, pIDs, "Oct");
+					}
+
+					delaySemi = std::make_unique<Knob>(u);
+					addAndMakeVisible(*delaySemi);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[2]);
+
+						makeParameter(*delaySemi, pIDs, "Semi");
+					}
+
+					delayFeedback = std::make_unique<Knob>(u);
+					addAndMakeVisible(*delayFeedback);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[3]);
+
+						makeParameter(*delayFeedback, pIDs, "Feedback");
+					}
+
 					setVisible(true);
 				}
 				
@@ -118,7 +170,7 @@ namespace gui
 
 			layout.init
 			(
-				{ 1, 8, 1, 5, 5, 1 },
+				{ 1, 8, 1, 5, 5, 1, 2, 2, 5, 1, 2, 2, 8, 1 },
 				{ 1, 3, 8, 5, 1 }
 			);
 		}
@@ -142,6 +194,14 @@ namespace gui
 				auto filterBounds = layout(3, 1, 2, 3);
 				drawRectEdges(g, filterBounds, thicc, stroke);
 			}
+			{
+				auto feedbackBounds = layout(6, 1, 3, 3);
+				drawRectEdges(g, feedbackBounds, thicc, stroke);
+			}
+			{
+				auto ringmodBounds = layout(10, 1, 3, 3);
+				drawRectEdges(g, ringmodBounds, thicc, stroke);
+			}
 		}
 
 		void resized() override
@@ -162,18 +222,33 @@ namespace gui
 			if (resonance)
 				layout.place(*resonance, 4, 2, 1, 1, false);
 			if (slope)
-				layout.place(*slope, 3, 3, 2, 1, true);
+				layout.place(*slope, 3, 3, 2, 1, false);
+
+			// delay
+			layout.place(feedbackLabel, 6, 1, 3, 1, false);
+			if (delayOct)
+				layout.place(*delayOct, 6, 2, 1, 2, false);
+			if (delaySemi)
+				layout.place(*delaySemi, 7, 2, 1, 2, false);
+			if (delayFeedback)
+				layout.place(*delayFeedback, 8, 2, 1, 1, false);
+
+			// ringmod
+			layout.place(ringModLabel, 10, 1, 3, 1, false);
 		}
 		
 	protected:
 		// labels
-		Label mainLabel, filterLabel;
+		Label mainLabel, filterLabel, feedbackLabel, ringModLabel;
 		// main
 		FlexButton enabled;
 		FlexKnob gain;
 		// filter
 		FlexKnob pitch, resonance;
 		FlexButton slope;
-		//
+		// delay
+		FlexKnob delayOct, delaySemi, delayFeedback;
+
+		JUCE_HEAVYWEIGHT_LEAK_DETECTOR(MantaComp)
 	};
 }

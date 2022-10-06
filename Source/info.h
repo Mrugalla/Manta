@@ -25,6 +25,9 @@ HOW TO USE:
 
 TO DO:
 
+Knob & Button
+	make sort of a lookAndFeel thing, so that onPaints are not copied n times
+
 WaveTable
 	implement spline editor
 	implement formular parser

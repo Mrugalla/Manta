@@ -122,9 +122,9 @@ namespace gui
 			
             addAndMakeVisible(eqPad);
 
-            eqPad.addNode(PID::Lane1Pitch, PID::Lane1Resonance, PID::Lane1Slope, PID::Lane1Enabled, { PID::Lane1Gain });
-			eqPad.addNode(PID::Lane2Pitch, PID::Lane2Resonance, PID::Lane2Slope, PID::Lane2Enabled, { PID::Lane2Gain });
-			eqPad.addNode(PID::Lane3Pitch, PID::Lane3Resonance, PID::Lane3Slope, PID::Lane3Enabled, { PID::Lane3Gain });
+            eqPad.addNode(PID::Lane1Pitch, PID::Lane1Resonance, PID::Lane1Slope, PID::Lane1Enabled, { PID::Lane1Gain, PID::Lane1DelayOct, PID::Lane1DelaySemi, PID::Lane1Feedback });
+			eqPad.addNode(PID::Lane2Pitch, PID::Lane2Resonance, PID::Lane2Slope, PID::Lane2Enabled, { PID::Lane2Gain, PID::Lane2DelayOct, PID::Lane2DelaySemi, PID::Lane2Feedback });
+			eqPad.addNode(PID::Lane3Pitch, PID::Lane3Resonance, PID::Lane3Slope, PID::Lane3Enabled, { PID::Lane3Gain, PID::Lane3DelayOct, PID::Lane3DelaySemi, PID::Lane3Feedback });
 
             addChildComponent(manta);
 

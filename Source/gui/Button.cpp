@@ -39,7 +39,7 @@ namespace gui
 		addAndMakeVisible(label);
 	}
 
-	void Button::enableLabel(std::vector<String>&& txt)
+	void Button::enableLabel(const std::vector<String>& txt)
 	{
 		toggleTexts = txt;
 		label.setText("");
@@ -98,22 +98,29 @@ namespace gui
 		startTimerHz(24);
 	}
 
-	void Button::enableParameter(const std::vector<PID>& _pID, int val)
+	void Button::enableParameter(const std::vector<PID>& _pIDs)
 	{
-		pID = _pID;
+		pID = _pIDs;
 
 		stopTimer();
 
-		const auto numParams = pID.size();
-		for (auto p = 0; p < numParams; ++p)
-			onClick.push_back([param = utils.getParam(pID[p]), v = static_cast<float>(val)](Button&)
+		onClick.push_back([](Button& btn)
+		{
+			const auto& pIDs = btn.pID;
+			for (auto pID : pIDs)
 			{
-				const auto pVal = std::rint(param->getValueDenorm());
-				const auto ts = pVal == v ? 0.f : v;
-				param->setValueWithGesture(param->range.convertTo0to1(ts));
-			});
+				auto param = btn.getUtils().getParam(pID);
+				auto& range = param->range;
+				auto interval = range.interval;
+				auto denorm = std::round(param->getValueDenorm());
+				auto val = denorm + interval;
+				if (val > range.end)
+					val = range.start;
+				param->setValueWithGesture(range.convertTo0to1(val));
+			}
+		});
 
-		onTimer.push_back([this, val](Button&)
+		onTimer.push_back([this](Button&)
 		{
 			bool shallRepaint = false;
 
@@ -127,7 +134,8 @@ namespace gui
 				shallRepaint = true;
 			}
 
-			const auto pVal = std::round(param->getValueDenorm());
+			const auto minVal = param->range.start;
+			const auto pVal = std::round(param->getValueDenorm() - minVal);
 			const auto nTs = static_cast<int>(pVal);
 			if (toggleState != nTs)
 			{
@@ -251,6 +259,41 @@ namespace gui
 	void makeTextButton(Button& b, const String& txt, bool withToggle, int targetToggleState)
 	{
 		b.enableLabel(txt);
+
+		b.onPaint.push_back([withToggle, targetToggleState](Graphics& g, Button& button)
+		{
+			const auto& utils = button.getUtils();
+			const auto& blinkyBoy = button.blinkyBoy;
+
+			auto thicc = utils.thicc;
+			const auto thiccHalf = thicc * .5f;
+			const bool isOver = button.isMouseOver();
+			const bool isDown = button.isMouseButtonDown();
+			thicc *= (isOver ? 1.1f : 1.f);
+
+			const auto area = button.getLocalBounds().toFloat().reduced(thiccHalf);
+
+			const auto col = blinkyBoy.getInterpolated(Colours::c(ColourID::Bg), juce::Colours::white);
+
+			g.setColour(col);
+			g.fillRoundedRectangle(area, thicc);
+
+			g.setColour(Colours::c(ColourID::Hover));
+			if (withToggle && button.toggleState == targetToggleState)
+				g.fillRoundedRectangle(area, thicc);
+
+			if (button.isMouseOver())
+			{
+				g.fillRoundedRectangle(area, thicc);
+				if (isDown)
+					g.fillRoundedRectangle(area, thicc);
+			}
+		});
+	}
+
+	void makeTextButton(Button& b, const std::vector<String>& txts, bool withToggle, int targetToggleState)
+	{
+		b.enableLabel(txts);
 
 		b.onPaint.push_back([withToggle, targetToggleState](Graphics& g, Button& button)
 		{
@@ -823,6 +866,22 @@ namespace gui
 	{
 		makeSymbolButton(b, symbol);
 		b.enableParameterSwitch(pIDs);
+	}
+
+	void makeParameter(Button& b, const std::vector<PID>& pIDs)
+	{
+		const auto mainParam = b.getUtils().getParam(pIDs[0]);
+		const auto numSteps = mainParam->getNumSteps();
+		const auto numStepsF = static_cast<float>(numSteps);
+		const auto numStepsInv = 1.f / numStepsF;
+		auto x = numStepsInv * .5f;
+		std::vector<String> strVec;
+		strVec.reserve(numSteps);
+		for (auto i = 0; i < numSteps; ++i, x += numStepsInv)
+			strVec.emplace_back(mainParam->getText(x, 420));
+
+		makeTextButton(b, strVec, false);
+		b.enableParameter(pIDs);
 	}
 
 	template<size_t NumButtons>

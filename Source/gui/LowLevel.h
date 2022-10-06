@@ -18,18 +18,6 @@ namespace gui
 
         LowLevel(Utils& u) :
             Comp(u, "", CursorType::Default),
-			/*
-			enabled{Knob(u), Knob(u), Knob(u) },
-			frequency{ Knob(u), Knob(u), Knob(u) },
-			resonance{ Knob(u), Knob(u), Knob(u) },
-			slope{ Knob(u), Knob(u), Knob(u) },
-			drive{ Knob(u), Knob(u), Knob(u) },
-			feedback{ Knob(u), Knob(u), Knob(u) },
-			oct{ Knob(u), Knob(u), Knob(u) },
-			semi{ Knob(u), Knob(u), Knob(u) },
-			rmDepth{ Knob(u), Knob(u), Knob(u) },
-			gain{ Knob(u), Knob(u), Knob(u) },
-			*/
             eqPad(u, "Adjust the filters on the eq pad."),
             spectroBeam(u, u.audioProcessor.spectroBeam),
             filterResponseGraph(u),
@@ -37,37 +25,7 @@ namespace gui
             
             filterParams()
         {
-            /*
-            for (auto i = 0; i < NumLanes; ++i)
-            {
-                const auto offset = i * ParamsPerLane;
-
-                makeParameter(enabled[i], param::offset(PID::Lane1Enabled, offset), "Enabled");
-                makeParameter(frequency[i], param::offset(PID::Lane1Pitch, offset), "Pitch");
-				makeParameter(resonance[i], param::offset(PID::Lane1Resonance, offset), "Resonance");
-				makeParameter(slope[i], param::offset(PID::Lane1Slope, offset), "Slope");
-				makeParameter(drive[i], param::offset(PID::Lane1Drive, offset), "Drive");
-				makeParameter(feedback[i], param::offset(PID::Lane1Feedback, offset), "Feedback");
-				makeParameter(oct[i], param::offset(PID::Lane1DelayOct, offset), "Oct");
-				makeParameter(semi[i], param::offset(PID::Lane1DelaySemi, offset), "Semi");
-				makeParameter(rmDepth[i], param::offset(PID::Lane1RMDepth, offset), "Rm Depth");
-				makeParameter(gain[i], param::offset(PID::Lane1Gain, offset), "Gain");
-
-                addAndMakeVisible(enabled[i]);
-				addAndMakeVisible(frequency[i]);
-				addAndMakeVisible(resonance[i]);
-				addAndMakeVisible(slope[i]);
-				addAndMakeVisible(drive[i]);
-				addAndMakeVisible(feedback[i]);
-				addAndMakeVisible(oct[i]);
-				addAndMakeVisible(semi[i]);
-				addAndMakeVisible(rmDepth[i]);
-				addAndMakeVisible(gain[i]);
-            }
-            */
-            
-
-            addAndMakeVisible(spectroBeam);
+           addAndMakeVisible(spectroBeam);
 			
             for (auto& f : filterParams)
                 f = 0.f;
@@ -164,9 +122,9 @@ namespace gui
 			
             addAndMakeVisible(eqPad);
 
-            eqPad.addNode(PID::Lane1Pitch, PID::Lane1Resonance, PID::Lane1Slope, PID::Lane1Enabled);
-			eqPad.addNode(PID::Lane2Pitch, PID::Lane2Resonance, PID::Lane2Slope, PID::Lane2Enabled);
-			eqPad.addNode(PID::Lane3Pitch, PID::Lane3Resonance, PID::Lane3Slope, PID::Lane3Enabled);
+            eqPad.addNode(PID::Lane1Pitch, PID::Lane1Resonance, PID::Lane1Slope, PID::Lane1Enabled, { PID::Lane1Gain });
+			eqPad.addNode(PID::Lane2Pitch, PID::Lane2Resonance, PID::Lane2Slope, PID::Lane2Enabled, { PID::Lane2Gain });
+			eqPad.addNode(PID::Lane3Pitch, PID::Lane3Resonance, PID::Lane3Slope, PID::Lane3Enabled, { PID::Lane3Gain });
 
             addChildComponent(manta);
 
@@ -194,7 +152,6 @@ namespace gui
         }
 
     protected:
-        //std::array<Knob, NumLanes> enabled, frequency, resonance, slope, drive, feedback, oct, semi, rmDepth, gain;
         EQPad eqPad;
         SpectroBeamComp<11> spectroBeam;
         FilterResponseGraph2 filterResponseGraph;

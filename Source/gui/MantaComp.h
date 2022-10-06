@@ -16,11 +16,26 @@ namespace gui
 
 		MantaComp(Utils& u, OnSelectionChangeds& onSelectionChanged) :
 			Comp(u, "", CursorType::Default),
+			mainLabel(u, "Main"),
+			filterLabel(u, "Filter"),
 			enabled(),
+			gain(),
 			pitch(),
 			resonance(),
 			slope()
 		{
+			addAndMakeVisible(mainLabel);
+			addAndMakeVisible(filterLabel);
+
+			mainLabel.textCID = ColourID::Txt;
+			filterLabel.textCID = mainLabel.textCID;
+			
+			mainLabel.font = getFontLobster();
+			filterLabel.font = mainLabel.font;
+
+			mainLabel.mode = Label::Mode::TextToLabelBounds;
+			filterLabel.mode = mainLabel.mode;
+
 			onSelectionChanged.push_back([&](const NodePtrs& selected)
 			{
 				const auto numSelected = selected.size();
@@ -28,6 +43,9 @@ namespace gui
 				{
 					removeChildComponent(enabled.get());
 					enabled.reset();
+					
+					removeChildComponent(gain.get());
+					gain.reset();
 					
 					removeChildComponent(pitch.get());
 					pitch.reset();
@@ -51,6 +69,16 @@ namespace gui
 
 						makeParameterSwitchButton(*enabled, pIDs, ButtonSymbol::Power);
 					}
+
+					gain = std::make_unique<Knob>(u);
+					addAndMakeVisible(*gain);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[0]);
+
+						makeParameter(*gain, pIDs, "Gain");
+					}
 					
 					pitch = std::make_unique<Knob>(u);
 					addAndMakeVisible(*pitch);
@@ -72,14 +100,14 @@ namespace gui
 						makeParameter(*resonance, pIDs, "Reso");
 					}
 
-					slope = std::make_unique<Knob>(u);
+					slope = std::make_unique<Button>(u);
 					addAndMakeVisible(*slope);
 					{
 						std::vector<PID> pIDs;
 						for (auto i = 0; i < numSelected; ++i)
 							pIDs.push_back(selected[i]->scrollParam->id);
-
-						makeParameter(*slope, pIDs, "Slope");
+						
+						makeParameter(*slope, pIDs);
 					}
 
 					setVisible(true);
@@ -90,8 +118,8 @@ namespace gui
 
 			layout.init
 			(
-				{ 1, 8, 1, 5, 5, 1, 1 },
-				{ 1, 13, 8, 1 }
+				{ 1, 8, 1, 5, 5, 1 },
+				{ 1, 3, 8, 5, 1 }
 			);
 		}
 
@@ -100,26 +128,52 @@ namespace gui
 			auto thicc = utils.thicc;
 			auto bounds = getLocalBounds().toFloat().reduced(thicc);
 
-			g.setColour(Colours::c(ColourID::Txt));
+			Stroke stroke(thicc, Stroke::JointStyle::curved, Stroke::EndCapStyle::rounded);
+
+			g.setColour(Colours::c(ColourID::Hover));
 			layout.paint(g);
-			//g.drawRoundedRectangle(bounds, thicc, thicc);
+			
+			g.setColour(Colours::c(ColourID::Txt));
+			{
+				auto mainBounds = layout(1, 1, 1, 3);
+				drawRectEdges(g, mainBounds, thicc, stroke);
+			}
+			{
+				auto filterBounds = layout(3, 1, 2, 3);
+				drawRectEdges(g, filterBounds, thicc, stroke);
+			}
 		}
 
 		void resized() override
 		{
 			layout.resized();
 
+			// main
+			layout.place(mainLabel, 1, 1, 1, 1, false);
+			if (gain)
+				layout.place(*gain, 1, 2, 1, 1, false);
 			if(enabled)
-				layout.place(*enabled, 1, 1, 1, 1, true);
+				layout.place(*enabled, 1, 3, 1, 1, true);
+			
+			// filter
+			layout.place(filterLabel, 3, 1, 2, 1, false);
 			if(pitch)
-				layout.place(*pitch, 3, 1, 1, 1, false);
+				layout.place(*pitch, 3, 2, 1, 1, false);
 			if (resonance)
-				layout.place(*resonance, 4, 1, 1, 1, false);
+				layout.place(*resonance, 4, 2, 1, 1, false);
 			if (slope)
-				layout.place(*slope, 3, 2, 2, 1, false);
+				layout.place(*slope, 3, 3, 2, 1, true);
 		}
 		
+	protected:
+		// labels
+		Label mainLabel, filterLabel;
+		// main
 		FlexButton enabled;
-		FlexKnob pitch, resonance, slope;
+		FlexKnob gain;
+		// filter
+		FlexKnob pitch, resonance;
+		FlexButton slope;
+		//
 	};
 }

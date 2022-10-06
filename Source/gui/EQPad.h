@@ -14,15 +14,17 @@ namespace gui
 		
 		struct Node
 		{
-			Node(Utils& u, PID xPID, PID yPID, PID scrollPID, PID rightClickPID) :
+			Node(Utils& u, PID xPID, PID yPID, PID scrollPID, PID rightClickPID, const std::vector<PID>& _morePIDs) :
 				xyParam{ u.getParam(xPID), u.getParam(yPID) },
 				scrollParam(u.getParam(scrollPID)),
 				rightClickParam(u.getParam(rightClickPID)),
+				morePIDs(_morePIDs),
 				bounds(0.f, 0.f, 0.f, 0.f) ,
 				x(getValue(X)),
 				y(1.f - getValue(Y)),
 				utils(u)
-			{}
+			{
+			}
 
 			void paint(Graphics& g) const
 			{
@@ -124,6 +126,7 @@ namespace gui
 
 			std::array<Param*, NumDimensions> xyParam;
 			Param *scrollParam, *rightClickParam;
+			std::vector<PID> morePIDs;
 			BoundsF bounds;
 			float x, y;
 		protected:
@@ -152,7 +155,7 @@ namespace gui
 			startTimerHz(PPDFPSKnobs);
 		}
 
-		void addNode(PID xParam, PID yParam, PID scrollParam, PID rightClickParam)
+		void addNode(PID xParam, PID yParam, PID scrollParam, PID rightClickParam, const std::vector<PID>& morePIDs = {})
 		{
 			nodes.push_back
 			({
@@ -160,7 +163,8 @@ namespace gui
 				xParam,
 				yParam,
 				scrollParam,
-				rightClickParam
+				rightClickParam,
+				morePIDs
 			});
 		}
 

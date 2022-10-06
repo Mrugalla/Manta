@@ -30,11 +30,12 @@ namespace gui
 
 		void enableLabel(const String&);
 
-		void enableLabel(std::vector<String>&&);
+		void enableLabel(const std::vector<String>&);
 
 		void enableParameterSwitch(const std::vector<PID>&);
 
-		void enableParameter(const std::vector<PID>&, int /*val*/);
+		/* pIDs */
+		void enableParameter(const std::vector<PID>&);
 
 		/* utils, tooltip */
 		Button(Utils&, String&& = "");
@@ -73,6 +74,9 @@ namespace gui
 
 	/* button; text/name; withToggle; targetToggleState */
 	void makeTextButton(Button&, const String&, bool = false, int = 1);
+	
+	/* button; toggletexts; withToggle; targetToggleState */
+	void makeTextButton(Button&, const std::vector<String>&, bool = false, int = 1);
 
 	enum class ButtonSymbol
 	{
@@ -107,6 +111,9 @@ namespace gui
 	void makeParameterSwitchButton(Button&, PID, ButtonSymbol);
 
 	void makeParameterSwitchButton(Button&, const std::vector<PID>&, ButtonSymbol);
+
+	/* button, pIDs, text */
+	void makeParameter(Button&, const std::vector<PID>&);
 
 	template<size_t NumButtons>
 	void makeParameterButtonsGroup(std::array<Button, NumButtons>&, PID, const char* /*txt*/, bool /*onlyText*/);

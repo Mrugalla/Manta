@@ -34,6 +34,7 @@ manta
 		oct, semi
 
 filterResponseGraph
+	resize funzt noch nicht
 	in decibels
 		then with automatic range
 			like [-3, 3]db or [-12, 12]db

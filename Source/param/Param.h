@@ -218,6 +218,8 @@ namespace param
 
 		String _toString();
 
+		int getNumSteps() const override;
+
 		bool isLocked() const noexcept;
 		void setLocked(bool) noexcept;
 		void switchLock() noexcept;

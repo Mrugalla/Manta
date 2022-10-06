@@ -482,6 +482,17 @@ namespace param
 		return getName(10) + ": " + String(v) + "; " + getText(v, 10);
 	}
 
+	int Param::getNumSteps() const
+	{
+		if (range.interval > 0.f)
+		{
+			const auto numSteps = (range.end - range.start) / range.interval;
+			return 1 + static_cast<int>(numSteps);
+		}
+		
+		return juce::AudioProcessor::getDefaultNumParameterSteps();
+	}
+
 	bool Param::isLocked() const noexcept
 	{
 		return locked.load();

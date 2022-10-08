@@ -27,7 +27,10 @@ namespace gui
 			slope(),
 			delayOct(),
 			delaySemi(),
-			delayFeedback()
+			delayFeedback(),
+			rmOct(),
+			rmSemi(),
+			rmDepth()
 		{
 			addAndMakeVisible(mainLabel);
 			addAndMakeVisible(filterLabel);
@@ -77,6 +80,15 @@ namespace gui
 
 					removeChildComponent(delayFeedback.get());
 					delayFeedback.reset();
+
+					removeChildComponent(rmOct.get());
+					rmOct.reset();
+
+					removeChildComponent(rmSemi.get());
+					rmSemi.reset();
+
+					removeChildComponent(rmDepth.get());
+					rmDepth.reset();
 					
 					setVisible(false);
 				}
@@ -162,6 +174,36 @@ namespace gui
 						makeParameter(*delayFeedback, pIDs, "Feedback");
 					}
 
+					rmOct = std::make_unique<Knob>(u);
+					addAndMakeVisible(*rmOct);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[4]);
+
+						makeParameter(*rmOct, pIDs, "Oct");
+					}
+
+					rmSemi = std::make_unique<Knob>(u);
+					addAndMakeVisible(*rmSemi);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[5]);
+
+						makeParameter(*rmSemi, pIDs, "Semi");
+					}
+
+					rmDepth = std::make_unique<Knob>(u);
+					addAndMakeVisible(*rmDepth);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[6]);
+
+						makeParameter(*rmDepth, pIDs, "Depth");
+					}
+
 					setVisible(true);
 				}
 				
@@ -235,6 +277,12 @@ namespace gui
 
 			// ringmod
 			layout.place(ringModLabel, 10, 1, 3, 1, false);
+			if (rmOct)
+				layout.place(*rmOct, 10, 2, 1, 2, false);
+			if (rmSemi)
+				layout.place(*rmSemi, 11, 2, 1, 2, false);
+			if (rmDepth)
+				layout.place(*rmDepth, 12, 2, 1, 1, false);
 		}
 		
 	protected:
@@ -248,6 +296,8 @@ namespace gui
 		FlexButton slope;
 		// delay
 		FlexKnob delayOct, delaySemi, delayFeedback;
+		// ring mod
+		FlexKnob rmOct, rmSemi, rmDepth;
 
 		JUCE_HEAVYWEIGHT_LEAK_DETECTOR(MantaComp)
 	};

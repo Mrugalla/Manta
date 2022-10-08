@@ -13,8 +13,8 @@ namespace audio
 {
 	struct Manta
 	{
-		// enabled, cutoff, resonance, slope, feedback, oct, semi, drive, rm-depth, gain
-		static constexpr int NumParametersPerLane = 10;
+		// enabled, cutoff, resonance, slope, feedback, oct, semi, drive, rm-oct, rm-semi, rm-depth, gain
+		static constexpr int NumParametersPerLane = 12;
 
 		static constexpr int NumLanes = 3;
 		static constexpr int MaxSlopeStage = 4; //4*12db/oct
@@ -177,7 +177,7 @@ namespace audio
 				feedback(0.f),
 				delayRate(0.f),
 				rmDepth(0.f),
-				rmFreqHz(1.f),
+				rmFreqHz(420.f),
 				gain(1.f),
 				
 				delayFB(),
@@ -212,7 +212,7 @@ namespace audio
 
 			void operator()(float** samples, int numChannels, int numSamples,
 				bool enabled, float _pitch, float _resonance, int _slope, float _drive, float _feedback,
-				float _oct, float _semi, float _rmDepth, float _gain,
+				float _oct, float _semi, float _rmOct, float _rmSemi, float _rmDepth, float _gain,
 				const int* wHead, const XenManager& xen) noexcept
 			{
 				auto lane = laneBuffer.getArrayOfWritePointers();
@@ -238,8 +238,10 @@ namespace audio
 					fcBuf, resoBuf, _slope
 				);
 				
+				const auto xenVal = xen.getXen();
+				
 				const auto feedbackBuf = feedback(_feedback, numSamples);
-				const auto delayPitch = _pitch + _oct * xen.getXen() + _semi;
+				const auto delayPitch = _pitch + _oct * xenVal + _semi;
 				const auto delayFreqHz = xen.noteToFreqHzWithWrap(delayPitch, 5.f);
 				const auto delaySamples = freqHzInSamples(delayFreqHz, Fs);
 				const auto delayRateBuf = delayRate(delaySamples, numSamples);
@@ -249,8 +251,10 @@ namespace audio
 				const auto driveBuf = drive(_drive, numSamples);
 				distort(lane, numChannels, numSamples, driveBuf);
 
+				const auto rmPitch = _pitch + _rmOct * xenVal + _rmSemi;
+				const auto rmFreq = xen.noteToFreqHzWithWrap(rmPitch, 5.f);
 				const auto rmDepthBuf = rmDepth(_rmDepth, numSamples);
-				const auto rmFreqHzBuf = rmFreqHz(delayFreqHz, numSamples);
+				const auto rmFreqHzBuf = rmFreqHz(rmFreq, numSamples);
 				ringMod(lane, numChannels, numSamples, rmDepthBuf, rmFreqHzBuf);
 
 				const auto gainBuf = gain(decibelToGain(_gain), numSamples);
@@ -339,9 +343,9 @@ namespace audio
 		* l3Enabled [0, 1], l3Pitch [12, N]note, l3Resonance [1, N]q, l3Slope [1, 4]db/oct, l3Drive [0, 1]%, l3Feedback [0, 1]%, l3Gain [-60, 60]db
 		*/
 		void operator()(float** samples, int numChannels, int numSamples,
-			bool l1Enabled, float l1Pitch, float l1Resonance, int l1Slope, float l1Drive, float l1Feedback, float l1Oct, float l1Semi, float l1RMDepth, float l1Gain,
-			bool l2Enabled, float l2Pitch, float l2Resonance, int l2Slope, float l2Drive, float l2Feedback, float l2Oct, float l2Semi, float l2RMDepth, float l2Gain,
-			bool l3Enabled, float l3Pitch, float l3Resonance, int l3Slope, float l3Drive, float l3Feedback, float l3Oct, float l3Semi, float l3RMDepth, float l3Gain) noexcept
+			bool l1Enabled, float l1Pitch, float l1Resonance, int l1Slope, float l1Drive, float l1Feedback, float l1Oct, float l1Semi, float l1RMOct, float l1RMSemi, float l1RMDepth, float l1Gain,
+			bool l2Enabled, float l2Pitch, float l2Resonance, int l2Slope, float l2Drive, float l2Feedback, float l2Oct, float l2Semi, float l2RMOct, float l2RMSemi, float l2RMDepth, float l2Gain,
+			bool l3Enabled, float l3Pitch, float l3Resonance, int l3Slope, float l3Drive, float l3Feedback, float l3Oct, float l3Semi, float l3RMOct, float l3RMSemi, float l3RMDepth, float l3Gain) noexcept
 		{
 			bool enabled[NumLanes] = { l1Enabled, l2Enabled, l3Enabled };
 			float pitch[NumLanes] = { l1Pitch, l2Pitch, l3Pitch };
@@ -351,6 +355,8 @@ namespace audio
 			float feedback[NumLanes] = { l1Feedback, l2Feedback, l3Feedback };
 			float oct[NumLanes] = { l1Oct, l2Oct, l3Oct };
 			float semi[NumLanes] = { l1Semi, l2Semi, l3Semi };
+			float rmOct[NumLanes] = { l1RMOct, l2RMOct, l3RMOct };
+			float rmSemi[NumLanes] = { l1RMSemi, l2RMSemi, l3RMSemi };
 			float rmDepth[NumLanes] = { l1RMDepth, l2RMDepth, l3RMDepth };
 			float gain[NumLanes] = { l1Gain, l2Gain, l3Gain };
 
@@ -375,6 +381,8 @@ namespace audio
 					feedback[i],
 					oct[i],
 					semi[i],
+					rmOct[i],
+					rmSemi[i],
 					rmDepth[i],
 					gain[i],
 					
@@ -399,8 +407,5 @@ namespace audio
 }
 
 /*
-
-todo:
-wavetable based ringmod with formularparser
 
 */

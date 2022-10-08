@@ -129,6 +129,7 @@ namespace gui
 	FilterResponseGraph2::FilterResponseGraph2(Utils& u) :
 		Comp(u, "", CursorType::Default),
 		responseCurveCID(ColourID::Hover),
+		shallUpdate(),
 		update(),
 		responseCurve()
 	{
@@ -149,10 +150,16 @@ namespace gui
 
 	void FilterResponseGraph2::timerCallback()
 	{
+		if (shallUpdate())
+			resized();
+	}
+
+	void FilterResponseGraph2::resized()
+	{
 		const auto w = static_cast<float>(getWidth());
 		const auto h = static_cast<float>(getHeight());
 
-		if (update(responseCurve, w, h))
-			repaint();
+		update(responseCurve, w, h);
+		repaint();
 	}
 }

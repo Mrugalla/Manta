@@ -72,6 +72,8 @@ namespace param
 		case PID::Lane1Feedback: return "Lane 1 Feedback";
 		case PID::Lane1DelayOct: return "Lane 1 Oct";
 		case PID::Lane1DelaySemi: return "Lane 1 Semi";
+		case PID::Lane1RMOct: return "Lane 1 RM Oct";
+		case PID::Lane1RMSemi: return "Lane 1 RM Semi";
 		case PID::Lane1RMDepth: return "Lane 1 RM Depth";
 		case PID::Lane1Gain: return "Lane 1 Gain";
 
@@ -83,6 +85,8 @@ namespace param
 		case PID::Lane2Feedback: return "Lane 2 Feedback";
 		case PID::Lane2DelayOct: return "Lane 2 Oct";
 		case PID::Lane2DelaySemi: return "Lane 2 Semi";
+		case PID::Lane2RMOct: return "Lane 2 RM Oct";
+		case PID::Lane2RMSemi: return "Lane 2 RM Semi";
 		case PID::Lane2RMDepth: return "Lane 2 RM Depth";
 		case PID::Lane2Gain: return "Lane 2 Gain";
 
@@ -94,6 +98,8 @@ namespace param
 		case PID::Lane3Feedback: return "Lane 3 Feedback";
 		case PID::Lane3DelayOct: return "Lane 3 Oct";
 		case PID::Lane3DelaySemi: return "Lane 3 Semi";
+		case PID::Lane3RMOct: return "Lane 3 RM Oct";
+		case PID::Lane3RMSemi: return "Lane 3 RM Semi";
 		case PID::Lane3RMDepth: return "Lane 3 RM Depth";
 		case PID::Lane3Gain: return "Lane 3 Gain";
 
@@ -1212,6 +1218,8 @@ namespace param
 		params.push_back(makeParam(PID::Lane1DelayOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
 		params.push_back(makeParam(PID::Lane1DelaySemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane1Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
+		params.push_back(makeParam(PID::Lane1RMOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
+		params.push_back(makeParam(PID::Lane1RMSemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane1RMDepth, state, 0.f));
 		params.push_back(makeParam(PID::Lane1Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
@@ -1223,6 +1231,8 @@ namespace param
 		params.push_back(makeParam(PID::Lane2DelayOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
 		params.push_back(makeParam(PID::Lane2DelaySemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane2Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
+		params.push_back(makeParam(PID::Lane2RMOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
+		params.push_back(makeParam(PID::Lane2RMSemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane2RMDepth, state, 0.f));
 		params.push_back(makeParam(PID::Lane2Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
@@ -1234,6 +1244,8 @@ namespace param
 		params.push_back(makeParam(PID::Lane3DelayOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
 		params.push_back(makeParam(PID::Lane3DelaySemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane3Drive, state, 0.f, makeRange::lin(0.f, 1.f), Unit::Percent));
+		params.push_back(makeParam(PID::Lane3RMOct, state, 0.f, makeRange::stepped(-2.f, 2.f, 1.f), Unit::Octaves));
+		params.push_back(makeParam(PID::Lane3RMSemi, state, 0.f, makeRange::stepped(-24.f, 24.f, 1.f), Unit::Semi));
 		params.push_back(makeParam(PID::Lane3RMDepth, state, 0.f));
 		params.push_back(makeParam(PID::Lane3Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 

@@ -26,7 +26,7 @@ namespace gui
 	{
 		using OnClick = std::function<void(Button&)>;
 		using OnPaint = std::function<void(Graphics&, Button&)>;
-		using OnMouseWheel = std::function<void(const Mouse&, const MouseWheel&)>;
+		using OnMouseWheel = std::function<void(Button&, const Mouse&, const MouseWheel&)>;
 
 		void enableLabel(const String&);
 

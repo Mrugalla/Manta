@@ -25,19 +25,15 @@ HOW TO USE:
 
 TO DO:
 
-Knob & Button
-	make sort of a lookAndFeel thing, so that onPaints are not copied n times
+Reduce RAM-Usage
+	Knob & Button
+		make sort of a lookAndFeel thing, so that onPaints are not copied n times
 
 WaveTable
 	implement spline editor
 	implement formular parser
 
-manta
-	ringmod
-		oct, semi
-
 filterResponseGraph
-	resize funzt noch nicht
 	in decibels
 		then with automatic range
 			like [-3, 3]db or [-12, 12]db

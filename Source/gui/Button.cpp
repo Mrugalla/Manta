@@ -120,6 +120,27 @@ namespace gui
 			}
 		});
 
+		onMouseWheel.push_back([](Button& btn, const Mouse&, const MouseWheel& wheel)
+		{
+			auto move = wheel.deltaY > 0 ? 1.f : -1.f;
+			move *= wheel.isReversed ? -1.f : 1.f;
+			
+			const auto& pIDs = btn.pID;
+			for (auto pID : pIDs)
+			{
+				auto param = btn.getUtils().getParam(pID);
+				auto& range = param->range;
+				auto interval = range.interval * move;
+				auto denorm = std::round(param->getValueDenorm());
+				auto val = denorm + interval;
+				if (val > range.end)
+					val = range.start;
+				if (val < range.start)
+					val = range.end;
+				param->setValueWithGesture(range.convertTo0to1(val));
+			}
+		});
+
 		onTimer.push_back([this](Button&)
 		{
 			bool shallRepaint = false;
@@ -238,7 +259,7 @@ namespace gui
 	void Button::mouseWheelMove(const Mouse& mouse, const MouseWheel& mouseWheel)
 	{
 		for (auto& mw : onMouseWheel)
-			mw(mouse, mouseWheel);
+			mw(*this, mouse, mouseWheel);
 	}
 
 	void Button::timerCallback()

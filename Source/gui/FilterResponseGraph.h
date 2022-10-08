@@ -63,9 +63,12 @@ namespace gui
 
 		void timerCallback();
 
+		void resized() override;
+
 		ColourID responseCurveCID;
+		std::function<bool()> shallUpdate;
 		/* responseCurve, width, height */
-		std::function<bool(Path&, float, float)> update;
+		std::function<void(Path&, float, float)> update;
 	protected:
 		Path responseCurve;
 	};

@@ -63,6 +63,8 @@ namespace param
 		Lane1DelayOct,
 		Lane1DelaySemi,
 		Lane1Drive,
+		Lane1RMOct,
+		Lane1RMSemi,
 		Lane1RMDepth,
 		Lane1Gain,
 		
@@ -74,6 +76,8 @@ namespace param
 		Lane2DelayOct,
 		Lane2DelaySemi,
 		Lane2Drive,
+		Lane2RMOct,
+		Lane2RMSemi,
 		Lane2RMDepth,
 		Lane2Gain,
 
@@ -85,6 +89,8 @@ namespace param
 		Lane3DelayOct,
 		Lane3DelaySemi,
 		Lane3Drive,
+		Lane3RMOct,
+		Lane3RMSemi,
 		Lane3RMDepth,
 		Lane3Gain,
 

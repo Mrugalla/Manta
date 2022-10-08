@@ -205,7 +205,7 @@ namespace gui
 				notify(EvtType::PatchUpdated, nullptr);
 			});
 
-			patch.onMouseWheel.push_back([&](const Mouse& mouse, const MouseWheel& wheel)
+			patch.onMouseWheel.push_back([&](Button&, const Mouse& mouse, const MouseWheel& wheel)
 			{
 				mouseWheelMove(mouse, wheel);
 			});
@@ -246,7 +246,7 @@ namespace gui
 				notify(EvtType::PatchUpdated, nullptr);
 			});
 
-			patch.onMouseWheel.push_back([&](const Mouse& mouse, const MouseWheel& wheel)
+			patch.onMouseWheel.push_back([&](Button&, const Mouse& mouse, const MouseWheel& wheel)
 			{
 				mouseWheelMove(mouse, wheel);
 			});

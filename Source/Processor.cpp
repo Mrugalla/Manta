@@ -428,6 +428,8 @@ namespace audio
         const auto l1Feedback = params[PID::Lane1Feedback]->getValMod();
 		const auto l1Oct = params[PID::Lane1DelayOct]->getValModDenorm();
 		const auto l1Semi = params[PID::Lane1DelaySemi]->getValModDenorm();
+		const auto l1RMOct = params[PID::Lane1RMOct]->getValModDenorm();
+		const auto l1RMSemi = params[PID::Lane1RMSemi]->getValModDenorm();
 		const auto l1RMDepth = params[PID::Lane1RMDepth]->getValMod();
         const auto l1Gain = params[PID::Lane1Gain]->getValModDenorm();
 		
@@ -439,6 +441,8 @@ namespace audio
 		const auto l2Feedback = params[PID::Lane2Feedback]->getValMod();
 		const auto l2Oct = params[PID::Lane2DelayOct]->getValModDenorm();
 		const auto l2Semi = params[PID::Lane2DelaySemi]->getValModDenorm();
+		const auto l2RMOct = params[PID::Lane2RMOct]->getValModDenorm();
+		const auto l2RMSemi = params[PID::Lane2RMSemi]->getValModDenorm();
 		const auto l2RMDepth = params[PID::Lane2RMDepth]->getValMod();
 		const auto l2Gain = params[PID::Lane2Gain]->getValModDenorm();
 
@@ -450,6 +454,8 @@ namespace audio
 		const auto l3Feedback = params[PID::Lane3Feedback]->getValMod();
 		const auto l3Oct = params[PID::Lane3DelayOct]->getValModDenorm();
 		const auto l3Semi = params[PID::Lane3DelaySemi]->getValModDenorm();
+		const auto l3RMOct = params[PID::Lane3RMOct]->getValModDenorm();
+		const auto l3RMSemi = params[PID::Lane3RMSemi]->getValModDenorm();
 		const auto l3RMDepth = params[PID::Lane3RMDepth]->getValMod();
 		const auto l3Gain = params[PID::Lane3Gain]->getValModDenorm();
 
@@ -467,6 +473,8 @@ namespace audio
 			l1Feedback,
 			std::round(l1Oct),
             std::round(l1Semi),
+            std::round(l1RMOct),
+            std::round(l1RMSemi),
 			l1RMDepth,
 			l1Gain,
 
@@ -478,6 +486,8 @@ namespace audio
 			l2Feedback,
 			std::round(l2Oct),
 			std::round(l2Semi),
+			std::round(l2RMOct),
+			std::round(l2RMSemi),
 			l2RMDepth,
 			l2Gain,
 
@@ -489,6 +499,8 @@ namespace audio
 			l3Feedback,
 			std::round(l3Oct),
 			std::round(l3Semi),
+			std::round(l3RMOct),
+			std::round(l3RMSemi),
 			l3RMDepth,
 			l3Gain
         );

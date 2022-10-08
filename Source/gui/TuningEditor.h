@@ -134,7 +134,7 @@ namespace gui
 				}
 			};
 
-			makeParameter(*this, PID::Xen, "Xen", op);
+			makeParameter(*this, PID::Xen, "Xen");
 
 			onResize = [this](Knob& k)
 			{

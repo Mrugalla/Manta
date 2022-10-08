@@ -32,9 +32,9 @@ namespace gui
 
 		void notify(EvtType, const void* = nullptr);
 
-	protected:
 		Utils& utils;
 		Layout layout;
+	protected:
 		std::vector<Evt> evts;
 		String tooltip;
 		CursorType cursorType;

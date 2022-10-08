@@ -25,6 +25,11 @@ HOW TO USE:
 
 TO DO:
 
+Knob Looks
+	fix xenwheel looks
+	make free funcs for knob vs slider behaviour
+		for being called in makeParameter's Knob::Looks switch
+
 Reduce RAM-Usage
 	Knob & Button
 		make sort of a lookAndFeel thing, so that onPaints are not copied n times

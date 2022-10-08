@@ -151,7 +151,7 @@ namespace gui
 						for (auto i = 0; i < numSelected; ++i)
 							pIDs.push_back(selected[i]->morePIDs[1]);
 
-						makeParameter(*delayOct, pIDs, "Oct");
+						makeParameter(*delayOct, pIDs, "Oct", true, nullptr, Knob::LooksType::VerticalSlider);
 					}
 
 					delaySemi = std::make_unique<Knob>(u);
@@ -161,7 +161,7 @@ namespace gui
 						for (auto i = 0; i < numSelected; ++i)
 							pIDs.push_back(selected[i]->morePIDs[2]);
 
-						makeParameter(*delaySemi, pIDs, "Semi");
+						makeParameter(*delaySemi, pIDs, "Semi", true, nullptr, Knob::LooksType::VerticalSlider);
 					}
 
 					delayFeedback = std::make_unique<Knob>(u);
@@ -181,7 +181,7 @@ namespace gui
 						for (auto i = 0; i < numSelected; ++i)
 							pIDs.push_back(selected[i]->morePIDs[4]);
 
-						makeParameter(*rmOct, pIDs, "Oct");
+						makeParameter(*rmOct, pIDs, "Oct", true, nullptr, Knob::LooksType::VerticalSlider);
 					}
 
 					rmSemi = std::make_unique<Knob>(u);
@@ -191,7 +191,7 @@ namespace gui
 						for (auto i = 0; i < numSelected; ++i)
 							pIDs.push_back(selected[i]->morePIDs[5]);
 
-						makeParameter(*rmSemi, pIDs, "Semi");
+						makeParameter(*rmSemi, pIDs, "Semi", true, nullptr, Knob::LooksType::VerticalSlider);
 					}
 
 					rmDepth = std::make_unique<Knob>(u);
@@ -213,7 +213,7 @@ namespace gui
 			layout.init
 			(
 				{ 1, 8, 1, 5, 5, 1, 2, 2, 5, 1, 2, 2, 8, 1 },
-				{ 1, 3, 8, 5, 1 }
+				{ 1, 3, 13, 5, 1 }
 			);
 		}
 
@@ -282,7 +282,7 @@ namespace gui
 			if (rmSemi)
 				layout.place(*rmSemi, 11, 2, 1, 2, false);
 			if (rmDepth)
-				layout.place(*rmDepth, 12, 2, 1, 1, false);
+				layout.place(*rmDepth, 12, 3, 1, 1, false);
 		}
 		
 	protected:

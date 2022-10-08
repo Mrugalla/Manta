@@ -341,7 +341,75 @@ namespace gui
         {
             static void create(Knob& k, bool modulatable, bool hasMeter)
             {
-                //k.onPaint = paint(modulatable, hasMeter);
+                k.onPaint = [modulatable, hasMeter](Knob& k, Graphics& g)
+                {
+					// remember to implement hasMeter
+                    const auto& bounds = k.knobBounds;
+					const auto thicc = k.utils.thicc;
+					const auto thicc2 = thicc * 2.f;
+					const auto thicc4 = thicc * 4.f;
+                    const auto x = bounds.getX();
+					const auto y = bounds.getY();
+					const auto w = bounds.getWidth();
+					const auto h = bounds.getHeight();
+                    const auto btm = bounds.getBottom();
+                    const PointF centre
+                    (
+                        x + w * .5f,
+                        y + h * .5f
+                    );
+
+                    const auto values = k.values;
+                    const auto val = values[Value];
+                    const auto valHeight = val * h;
+					const auto valY = btm - valHeight;
+
+                    auto col = Colours::c(ColourID::Interact);
+                    g.setColour(col);
+					
+                    const auto line0X = centre.x - thicc;
+                    const auto line1X = centre.x + thicc2;
+                    { // paint lines
+                        const auto lineY0 = y;
+                        const auto lineY1 = btm;
+                        g.drawLine({ line0X, lineY0, line0X, lineY1 }, thicc);
+                        g.drawLine({ line1X, lineY0,  line1X, lineY1 }, thicc2);
+                    }
+					
+					if(modulatable)
+                    { // paint modulation
+                        const auto maxModDepth = values[MaxModDepth];
+						const auto mmdHeight = maxModDepth * h;
+						const auto mmdY = juce::jlimit(y, btm, valY - mmdHeight);
+						
+                        col = Colours::c(ColourID::Mod);
+                        g.setColour(col);
+						g.drawLine({ line0X, valY, line0X, mmdY }, thicc);
+
+						const auto valMod = values[ValMod];
+						const auto valModHeight = valMod * h;
+						const auto valModY = juce::jlimit(y, btm, btm - valModHeight);
+                        g.drawLine({ line0X, valModY, line1X, valModY }, thicc2);
+						
+						const auto bias = values[ModBias];
+						const auto biasHeight = bias * h;
+                        const auto biasX = line1X;
+                        const auto biasY0 = centre.y;
+						const auto biasY1 = btm - biasHeight;
+                        col = Colours::c(ColourID::Bias);
+                        g.setColour(col);
+						g.drawLine({ biasX, biasY0, biasX, biasY1 }, thicc2);
+                    }
+					
+                    { // paint tick
+                        col = Colours::c(ColourID::Bg);
+						g.setColour(col);
+                        g.drawLine({ line0X, valY, line1X, valY }, thicc4);
+                        col = Colours::c(ColourID::Interact);
+						g.setColour(col);
+						g.drawLine({ line0X, valY, line1X, valY }, thicc2);
+					}
+                };
 
                 k.onResize = [modulatable](Knob& k)
                 {

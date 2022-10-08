@@ -25,6 +25,9 @@ HOW TO USE:
 
 TO DO:
 
+Knobs in Manta
+	sometimes no access to Bias Mode
+
 Knob Looks
 	fix xenwheel looks
 	make free funcs for knob vs slider behaviour

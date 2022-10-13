@@ -819,19 +819,20 @@ namespace gui
                 {
                     if (!mouse.mouseWasDraggedSinceMouseDown())
                     {
-                        for (auto pID : pIDs)
-                        {
-                            auto param = k.getUtils().getParam(pID);
-                            if (mouse.mods.isCtrlDown())
+                        if (mouse.mods.isCtrlDown())
+                            for (auto pID : pIDs)
                             {
+                                auto param = k.getUtils().getParam(pID);
                                 param->setMaxModDepth(0.f);
                                 param->setModBias(.5f);
                             }
-                            else if (mouse.mods.isRightButtonDown())
+                        else if (mouse.mods.isRightButtonDown())
+                        {
+                            auto& state = k.states[0];
+                            state = (state + 1) % NumStates;
+							
+                            for (auto pID : pIDs)
                             {
-                                auto& state = k.states[0];
-                                state = (state + 1) % NumStates;
-
                                 switch (state)
                                 {
                                 case StateMaxModDepth:
@@ -849,7 +850,6 @@ namespace gui
                                 repaintWithChildren(&k);
                             }
                         }
-
                     }
                 };
 

@@ -6,11 +6,11 @@ namespace gui
 	TextEditor::TextEditor(Utils& u, const String& _tooltip, Notify&& _notify, const String& _emptyString) :
 		Comp(u, _tooltip, std::move(_notify)),
 		Timer(),
-		onEscape([]() {}),
-		onReturn([]() {}),
-		onType([]() {}),
-		onRemove([]() {}),
-		onClick([]() {}),
+		onEscape([]() { return true; }),
+		onReturn([]() { return true; }),
+		onType([]() { return true; }),
+		onRemove([]() { return true; }),
+		onClick([]() { return true; }),
 
 		label(u, ""),
 		emptyString(_emptyString), txt(""),
@@ -26,11 +26,11 @@ namespace gui
 	TextEditor::TextEditor(Utils& u, const String& _tooltip, const String& _emptyString) :
 		Comp(u, _tooltip),
 		Timer(),
-		onEscape([]() {}),
-		onReturn([]() {}),
-		onType([]() {}),
-		onRemove([]() {}),
-		onClick([]() {}),
+		onEscape([]() { return true; }),
+		onReturn([]() { return true; }),
+		onType([]() { return true; }),
+		onRemove([]() { return true; }),
+		onClick([]() { return true; }),
 
 		label(u, ""),
 		emptyString(_emptyString), txt(""),

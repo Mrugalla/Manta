@@ -34,7 +34,7 @@ namespace gui
 
 		void clear();
 
-		std::function<void()> onEscape, onReturn, onType, onRemove, onClick;
+		std::function<bool()> onEscape, onReturn, onType, onRemove, onClick;
 	protected:
 		Label label;
 		String emptyString, txt;

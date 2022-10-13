@@ -1,7 +1,9 @@
 #pragma once
 #include "../audio/Manta.h"
 #include "EQPad.h"
+#include "WaveTableDisplay.h"
 #include "Knob.h"
+#include "FormularParser.h"
 
 namespace gui
 {
@@ -13,6 +15,11 @@ namespace gui
 
 		using FlexButton = std::unique_ptr<Button>;
 		using FlexKnob = std::unique_ptr<Knob>;
+		
+		static constexpr int WTSize = audio::Manta::WaveTableSize;
+		using WTDisplay = WaveTableDisplay<WTSize>;
+		using FlexWTDisplay = std::unique_ptr<WTDisplay>;
+		using FlexParser = std::unique_ptr<FormularParser<WTSize>>;
 
 		MantaComp(Utils& u, OnSelectionChangeds& onSelectionChanged) :
 			Comp(u, "", CursorType::Default),
@@ -30,7 +37,9 @@ namespace gui
 			delayFeedback(),
 			rmOct(),
 			rmSemi(),
-			rmDepth()
+			rmDepth(),
+			wtDisplay(),
+			wtParser()
 		{
 			addAndMakeVisible(mainLabel);
 			addAndMakeVisible(filterLabel);
@@ -89,6 +98,12 @@ namespace gui
 
 					removeChildComponent(rmDepth.get());
 					rmDepth.reset();
+
+					removeChildComponent(wtDisplay.get());
+					wtDisplay.reset();
+
+					removeChildComponent(wtParser.get());
+					wtParser.reset();
 					
 					setVisible(false);
 				}
@@ -201,8 +216,36 @@ namespace gui
 						for (auto i = 0; i < numSelected; ++i)
 							pIDs.push_back(selected[i]->morePIDs[6]);
 
-						makeParameter(*rmDepth, pIDs, "Depth");
+						makeParameter(*rmDepth, pIDs, "Depth", true, nullptr, Knob::LooksType::VerticalSlider);
 					}
+
+					wtDisplay = std::make_unique<WTDisplay>(u, u.audioProcessor.manta.getWaveTable(0));
+					addAndMakeVisible(*wtDisplay);
+
+					{
+						std::vector<float*> tables;
+						for (auto i = 0; i < numSelected; ++i)
+							tables.push_back(u.audioProcessor.manta.getWaveTable(i).data());
+
+						wtParser = std::make_unique<FormularParser<WTSize>>
+						(
+							u,
+							"This wavetable's formular parser.",
+							tables
+						);
+						
+						auto oR = wtParser->onReturn;
+						wtParser->onReturn = [&, oR]()
+						{
+							if (!oR())
+								return false;
+
+							wtDisplay->repaint();
+							
+							return true;
+						};
+					}
+					addAndMakeVisible(*wtParser);
 
 					setVisible(true);
 				}
@@ -212,7 +255,7 @@ namespace gui
 
 			layout.init
 			(
-				{ 1, 8, 1, 5, 5, 1, 2, 2, 5, 1, 2, 2, 8, 1 },
+				{ 1, 8, 1, 5, 5, 1, 2, 2, 5, 1, 2, 2, 8, 2, 1 },
 				{ 1, 3, 13, 5, 1 }
 			);
 		}
@@ -224,8 +267,8 @@ namespace gui
 
 			Stroke stroke(thicc, Stroke::JointStyle::curved, Stroke::EndCapStyle::rounded);
 
-			g.setColour(Colours::c(ColourID::Hover));
-			layout.paint(g);
+			//g.setColour(Colours::c(ColourID::Hover));
+			//layout.paint(g);
 			
 			g.setColour(Colours::c(ColourID::Txt));
 			{
@@ -241,7 +284,7 @@ namespace gui
 				drawRectEdges(g, feedbackBounds, thicc, stroke);
 			}
 			{
-				auto ringmodBounds = layout(10, 1, 3, 3);
+				auto ringmodBounds = layout(10, 1, 4, 3);
 				drawRectEdges(g, ringmodBounds, thicc, stroke);
 			}
 		}
@@ -282,7 +325,11 @@ namespace gui
 			if (rmSemi)
 				layout.place(*rmSemi, 11, 2, 1, 2, false);
 			if (rmDepth)
-				layout.place(*rmDepth, 12, 3, 1, 1, false);
+				layout.place(*rmDepth, 13, 2, 1, 2, false);
+			if(wtDisplay)
+				layout.place(*wtDisplay, 12, 2, 1, 1, false);
+			if (wtParser)
+				layout.place(*wtParser, 12, 3, 1, 1, false);
 		}
 		
 	protected:
@@ -298,6 +345,8 @@ namespace gui
 		FlexKnob delayOct, delaySemi, delayFeedback;
 		// ring mod
 		FlexKnob rmOct, rmSemi, rmDepth;
+		FlexWTDisplay wtDisplay;
+		FlexParser wtParser;
 
 		JUCE_HEAVYWEIGHT_LEAK_DETECTOR(MantaComp)
 	};

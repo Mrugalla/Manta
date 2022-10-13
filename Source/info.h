@@ -25,8 +25,10 @@ HOW TO USE:
 
 TO DO:
 
+WaveTableDisplay
+	add mode of showing frequency response of that wavetable
+
 Knob Looks
-	fix xenwheel looks
 	make free funcs for knob vs slider behaviour
 		for being called in makeParameter's Knob::Looks switch
 

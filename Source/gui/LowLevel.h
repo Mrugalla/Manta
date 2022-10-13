@@ -76,8 +76,6 @@ namespace gui
             };
             filterResponseGraph.update = [&](Path& responseCurve, float w, float h)
             {
-                bool needsUpdate = false;
-
                 const auto Fs = utils.audioProcessor.getSampleRate();
                 const auto fsInv = 1.f / static_cast<float>(Fs);
 				

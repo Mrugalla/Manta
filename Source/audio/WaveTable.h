@@ -44,6 +44,16 @@ namespace audio
 			return interpolate::lerp(table.data(), idx);
 		}
 
+		float* data() noexcept
+		{
+			return table.data();
+		}
+
+		const float* data() const noexcept
+		{
+			return table.data();
+		}
+
 	protected:
 		Table table;
 	};

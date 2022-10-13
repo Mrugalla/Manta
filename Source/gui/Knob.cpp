@@ -987,6 +987,7 @@ namespace gui
                 editor.onEscape = [&tek = editor]()
                 {
                     tek.disable();
+                    return true;
                 };
 
                 editor.onReturn = [&tek = editor, pIDs]()
@@ -1001,6 +1002,7 @@ namespace gui
                         }
                     }
                     tek.disable();
+                    return true;
                 };
 
                 const auto mouse = juce::Desktop::getInstance().getMainMouseSource();

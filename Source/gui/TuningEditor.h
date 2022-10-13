@@ -43,7 +43,15 @@ namespace gui
 			enum { Value, MaxModDepth, ValMod, ModBias, Meter, NumValues };
 			enum { ModDial, NumComps };
 
-			OnPaint op = [&xenP = xen](Knob& knob, Graphics& g)
+			addAndMakeVisible(xenModLabel);
+			xenModLabel.textCID = ColourID::Mod;
+			xenModLabel.font = getFontLobster();
+			xenModLabel.mode = Label::Mode::TextToLabelBounds;
+			xenModLabel.just = Just::centred;
+
+			makeParameter(*this, PID::Xen, "Xen");
+			
+			onPaint = [&xenP = xen](Knob& knob, Graphics& g)
 			{
 				const auto& utils = knob.getUtils();
 				const auto thicc = utils.thicc;
@@ -55,7 +63,7 @@ namespace gui
 				const auto valModDenorm = std::round(xenP.range.convertFrom0to1(valMod));
 
 				const auto maxModDepth = knob.values[MaxModDepth];
-				
+
 				const auto bounds = knob.knobBounds.reduced(thicc);
 				const auto width = bounds.getWidth();
 				const auto rad = width * .5f;
@@ -92,7 +100,7 @@ namespace gui
 					);
 					g.strokePath(arc, stroke);
 				}
-				
+
 				const auto valModDenormInv = 1.f / valModDenorm;
 
 				for (auto i = 0.f; i < valModDenorm; ++i)
@@ -114,7 +122,7 @@ namespace gui
 					//g.setFont(getFontDosisExtraBold());
 					//g.drawFittedText(str + " edo", boundsInner.toNearestInt(), Just::centred, 1);
 				}
-				
+
 
 				const auto valDenormInv = 1.f / valDenorm;
 				g.setColour(Colours::c(ColourID::Interact));
@@ -134,8 +142,6 @@ namespace gui
 				}
 			};
 
-			makeParameter(*this, PID::Xen, "Xen");
-
 			onResize = [this](Knob& k)
 			{
 				const auto thicc = k.getUtils().thicc;
@@ -149,13 +155,7 @@ namespace gui
 				const auto rad = width * .5f;
 				xenModLabel.setBounds(k.knobBounds.reduced(rad * .7f).toNearestInt());
 			};
-
-			addAndMakeVisible(xenModLabel);
-			xenModLabel.textCID = ColourID::Mod;
-			xenModLabel.font = getFontLobster();
-			xenModLabel.mode = Label::Mode::TextToLabelBounds;
-			xenModLabel.just = Just::centred;
-
+			
 			const auto ot = onTimer;
 			onTimer = [this, ot](Knob& k)
 			{

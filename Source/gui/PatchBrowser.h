@@ -651,11 +651,13 @@ namespace gui
 			searchBar.onReturn = [&]()
 			{
 				savePatch();
+				return true;
 			};
 
 			searchBar.onType = [&]()
 			{
 				applyFilters();
+				return true;
 			};
 
 			authorEditor.onReturn = searchBar.onReturn;

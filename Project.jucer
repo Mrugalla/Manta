@@ -53,6 +53,10 @@
         <FILE id="Uad8Jv" name="State.h" compile="0" resource="0" file="Source/arch/State.h"/>
       </GROUP>
       <GROUP id="{DA435779-5001-4379-F809-3E7C21D55DC0}" name="gui">
+        <FILE id="EMWM6x" name="FormularParser.h" compile="0" resource="0"
+              file="Source/gui/FormularParser.h"/>
+        <FILE id="ZcE1oE" name="WaveTableDisplay.h" compile="0" resource="0"
+              file="Source/gui/WaveTableDisplay.h"/>
         <FILE id="yz905S" name="MantaComp.h" compile="0" resource="0" file="Source/gui/MantaComp.h"/>
         <FILE id="bQdOQs" name="FilterResponseGraph.cpp" compile="1" resource="0"
               file="Source/gui/FilterResponseGraph.cpp"/>

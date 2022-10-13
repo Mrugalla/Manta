@@ -135,11 +135,13 @@ namespace gui
 		editor.onReturn = [&]()
 		{
 			saveToDisk();
+			return true;
 		};
 
 		editor.onClick = [&]()
 		{
 			editor.enable();
+			return true;
 		};
 
 		manifest.onClick.push_back([&](Button&)

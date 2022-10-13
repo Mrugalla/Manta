@@ -15,10 +15,10 @@ namespace audio
 	{
 		// enabled, cutoff, resonance, slope, feedback, oct, semi, drive, rm-oct, rm-semi, rm-depth, gain
 		static constexpr int NumParametersPerLane = 12;
-
+		static constexpr int WaveTableSize = 1 << 13; // around min 5hz
 		static constexpr int NumLanes = 3;
 		static constexpr int MaxSlopeStage = 4; //4*12db/oct
-
+		using WT = WaveTable<WaveTableSize>;
 	private:
 		class Filter
 		{
@@ -107,13 +107,11 @@ namespace audio
 		
 		struct RingMod
 		{
-			static constexpr int WaveTableSize = 1 << 13; // around min 5hz
-			using WT = WaveTable<WaveTableSize>;
 			using WTFunc = WT::Func;
 
 			RingMod() :
-				phasor(),
 				waveTable(),
+				phasor(),
 				oscBuffer()
 			{
 				createWavetable([](float x) { return std::cos(x * Pi); });
@@ -158,15 +156,16 @@ namespace audio
 						
 			}
 
+			WT waveTable;
 		protected:
 			Phasor<float> phasor;
-			WT waveTable;
 			std::vector<float> oscBuffer;
 		};
 
 		struct Lane
 		{
 			Lane() :
+				ringMod(),
 				laneBuffer(),
 				readHead(),
 				filter(),
@@ -181,8 +180,7 @@ namespace audio
 				gain(1.f),
 				
 				delayFB(),
-				ringMod(),
-
+				
 				Fs(1.f),
 				delaySizeF(1.f)
 			{}
@@ -269,13 +267,13 @@ namespace audio
 					SIMD::add(samples[ch], lane[ch], numSamples);
 			}
 
+			RingMod ringMod;
 		protected:
 			AudioBuffer laneBuffer;
 			std::vector<float> readHead;
 			Filter filter;
 			PRM frequency, resonance, drive, feedback, delayRate, rmDepth, rmFreqHz, gain;
 			DelayFeedback delayFB;
-			RingMod ringMod;
 			float Fs, delaySizeF;
 
 			const float* getRHead(int numSamples, const int* wHead, const float* delayBuf) noexcept
@@ -395,6 +393,16 @@ namespace audio
 				SIMD::clear(samples[ch], numSamples);
 			for (auto& lane : lanes)
 				lane.addTo(samples, numChannels, numSamples);
+		}
+		
+		WT& getWaveTable(int laneIdx) noexcept
+		{
+			return lanes[laneIdx].ringMod.waveTable;
+		}
+
+		const WT& getWaveTable(int laneIdx) const noexcept
+		{
+			return lanes[laneIdx].ringMod.waveTable;
 		}
 		
 	protected:

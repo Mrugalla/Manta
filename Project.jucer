@@ -45,6 +45,8 @@
         <FILE id="Rwen3L" name="Conversion.h" compile="0" resource="0" file="Source/arch/Conversion.h"/>
         <FILE id="OiS45d" name="FormularParser.h" compile="0" resource="0"
               file="Source/arch/FormularParser.h"/>
+        <FILE id="s963BZ" name="FormularParser2.h" compile="0" resource="0"
+              file="Source/arch/FormularParser2.h"/>
         <FILE id="f4V9L3" name="Interpolation.h" compile="0" resource="0" file="Source/arch/Interpolation.h"/>
         <FILE id="bgyAlz" name="Range.h" compile="0" resource="0" file="Source/arch/Range.h"/>
         <FILE id="pjozVu" name="Smooth.cpp" compile="1" resource="0" file="Source/arch/Smooth.cpp"/>

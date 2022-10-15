@@ -1041,3 +1041,12 @@ namespace parser
 
     };
 }
+
+/*
+
+todo:
+    cos(cos(xtau)x)
+    doesn't work but
+    cos(cos(xtau)*x)
+
+*/

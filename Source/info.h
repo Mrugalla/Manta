@@ -25,6 +25,16 @@ HOW TO USE:
 
 TO DO:
 
+WaveTable(Formularparser)
+	setting to 0 sounds grainy (should result in perfectly clean)
+		make wt size larger?
+		better interpolation?
+	only drew positive values for
+		cos(cos(xtau)xtau))
+		cos(cos(xtau))
+	always replaced every wt instead of just the needed one
+	save state
+
 WaveTableDisplay
 	add mode of showing frequency response of that wavetable
 

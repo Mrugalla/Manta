@@ -1,5 +1,5 @@
 #pragma once
-#include "../arch/FormularParser.h"
+#include "../arch/FormularParser2.h"
 #include "TextEditor.h"
 
 namespace gui
@@ -8,29 +8,31 @@ namespace gui
 	struct FormularParser :
 		public TextEditor
 	{
-		using Parser = parser::Parser;
+		using Parser = fx::Parser;
 
 		FormularParser(Utils& u, String&& _tooltip, std::vector<float*>& tables) :
 			TextEditor(u, _tooltip, "enter some math"),
-			parser(Size)
+			fx()
 		{
 			onReturn = [&, tables]()
 			{
-				auto successful = parser(txt);
-				if (!successful)
+				if(!fx(txt))
 					return false;
 				
-				for (auto i = 0; i < Size; ++i)
-					tables[0][i] = parser[i];
+				auto x = -1.f;
+				const auto inc = 2.f / static_cast<float>(Size);
+				for (auto i = 0; i < Size; ++i, x += inc)
+					tables[0][i] = fx(x);
 
-				for (auto i = 1; i < tables.size(); ++i)
-					SIMD::copy(tables[i], tables[0], tables.size());
+				auto numTables = tables.size();
+				for (auto i = 1; i < numTables; ++i)
+					SIMD::copy(tables[i], tables[0], Size);
 
 				return true;
 			};
 		}
 		
 	protected:
-		Parser parser;
+		Parser fx;
 	};
 }

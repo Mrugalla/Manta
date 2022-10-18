@@ -212,6 +212,7 @@ namespace gui
 		label(utils, ""),
 		toggleTexts()
 	{
+		setInterceptsMouseClicks(true, true);
 	}
 
 	Label& Button::getLabel() noexcept

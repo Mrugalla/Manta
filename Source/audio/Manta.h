@@ -259,6 +259,16 @@ namespace audio
 				applyGain(lane, numChannels, numSamples, gainBuf);
 			}
 
+			void savePatch(sta::State& state, int i)
+			{
+				ringMod.waveTable.savePatch(state, "manta/lane" + String(i));
+			}
+
+			void loadPatch(sta::State& state, int i)
+			{
+				ringMod.waveTable.loadPatch(state, "manta/lane" + String(i));
+			}
+
 			void addTo(float** samples, int numChannels, int numSamples) noexcept
 			{
 				auto lane = laneBuffer.getArrayOfReadPointers();
@@ -395,6 +405,18 @@ namespace audio
 				lane.addTo(samples, numChannels, numSamples);
 		}
 		
+		void savePatch(sta::State& state)
+		{
+			for(auto l = 0; l < NumLanes; ++l)
+				lanes[l].savePatch(state, l);
+		}
+
+		void loadPatch(sta::State& state)
+		{
+			for (auto l = 0; l < NumLanes; ++l)
+				lanes[l].loadPatch(state, l);
+		}
+
 		WT& getWaveTable(int laneIdx) noexcept
 		{
 			return lanes[laneIdx].ringMod.waveTable;

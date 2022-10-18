@@ -128,6 +128,7 @@ namespace gui
     void Editor::mouseUp(const Mouse&)
     {
         utils.getEventSystem().notify(EvtType::ClickedEmpty, this);
+        giveAwayKeyboardFocus();
     }
 
     void Editor::mouseWheelMove(const Mouse&, const MouseWheel&)

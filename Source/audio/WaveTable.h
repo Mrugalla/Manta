@@ -4,6 +4,7 @@
 
 #include "AudioUtils.h"
 #include "../arch/Interpolation.h"
+#include "../arch/State.h"
 
 namespace audio
 {
@@ -12,8 +13,10 @@ namespace audio
 	{
 		static constexpr float SizeF = static_cast<float>(Size);
 		static constexpr float SizeInv = 1.f / SizeF;
+		static constexpr int NumExtraSamples = 4;
+		static constexpr int FullSize = Size + NumExtraSamples;
 
-		using Table = std::array<float, Size + 4>;
+		using Table = std::array<float, FullSize>;
 		using Func = std::function<float(float)>;
 
 		WaveTable() :
@@ -24,13 +27,36 @@ namespace audio
 
 		void create(const Func& func) noexcept
 		{
-			auto x = -1.f;
+			auto x = -1.f + SizeInv * .5f;
 			const auto inc = 2.f * SizeInv;
 			for (auto s = 0; s < Size; ++s, x += inc)
 				table[s] = func(x);
-
-			for (auto i = 0; i < 4; ++i)
+			for (auto i = 0; i < NumExtraSamples; ++i)
 				table[Size + i] = table[i];
+		}
+
+		void savePatch(sta::State& state, const String& key)
+		{
+			juce::MemoryBlock mb;
+			const auto dataSize = FullSize * sizeof(float);
+			mb.append(table.data(), dataSize);
+			const auto base64 = mb.toBase64Encoding();
+			state.set(key, "wt", base64, false);
+		}
+
+		void loadPatch(sta::State& state, const String& key)
+		{
+			auto var = state.get(key, "wt");
+			if (var != nullptr)
+			{
+				const auto base64 = var->toString();
+				juce::MemoryBlock mb;
+				mb.fromBase64Encoding(base64);
+				const auto mbSize = mb.getSize();
+				const auto dataSize = FullSize * sizeof(float);
+				jassert(mbSize == dataSize);
+				mb.copyTo(table.data(), 0, FullSize);
+			}
 		}
 
 		float operator()(int idx) const noexcept

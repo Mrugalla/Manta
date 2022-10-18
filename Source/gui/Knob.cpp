@@ -831,24 +831,21 @@ namespace gui
                             auto& state = k.states[0];
                             state = (state + 1) % NumStates;
 							
-                            for (auto pID : pIDs)
+                            switch (state)
                             {
-                                switch (state)
-                                {
-                                case StateMaxModDepth:
-                                    k.label.setText("M");
-                                    k.setCursorType(CursorType::Mod);
-                                    k.activeCursor = CursorType::Mod;
-                                    break;
-                                case StateModBias:
-                                    k.label.setText("B");
-                                    k.setCursorType(CursorType::Bias);
-                                    k.activeCursor = CursorType::Bias;
-                                    break;
-                                }
-
-                                repaintWithChildren(&k);
+                            case StateMaxModDepth:
+                                k.label.setText("M");
+                                k.setCursorType(CursorType::Mod);
+                                k.activeCursor = CursorType::Mod;
+                                break;
+                            case StateModBias:
+                                k.label.setText("B");
+                                k.setCursorType(CursorType::Bias);
+                                k.activeCursor = CursorType::Bias;
+                                break;
                             }
+
+                            repaintWithChildren(&k);
                         }
                     }
                 };

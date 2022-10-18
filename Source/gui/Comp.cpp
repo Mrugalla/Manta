@@ -13,6 +13,7 @@ namespace gui
 		evts.emplace_back(utils.getEventSystem(), makeNotifyBasic(this));
 
 		setMouseCursor(makeCursor(cursorType));
+		setInterceptsMouseClicks(false, true);
 	}
 
 	Comp::Comp(Utils& _utils, const String& _tooltip, Notify&& _notify, CursorType _cursorType) :
@@ -27,6 +28,7 @@ namespace gui
 		evts.emplace_back(utils.getEventSystem(), _notify);
 
 		setMouseCursor(makeCursor(cursorType));
+		setInterceptsMouseClicks(false, true);
 	}
 
 	const Utils& Comp::getUtils() const noexcept { return utils; }

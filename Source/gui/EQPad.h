@@ -152,6 +152,7 @@ namespace gui
 			tool(Tool::Select),
 			hovered(nullptr)
 		{
+			setInterceptsMouseClicks(true, true);
 			startTimerHz(PPDFPSKnobs);
 		}
 
@@ -176,7 +177,7 @@ namespace gui
 
 			paintSelectionBounds(g, thicc);
 
-			g.setColour(Colours::c(ColourID::Txt));
+			g.setColour(Colours::c(ColourID::Hover));
 			g.drawRoundedRectangle(bounds, thicc, thicc);
 
 			for (const auto& node : nodes)
@@ -449,6 +450,7 @@ namespace gui
 						showCursor(*this);
 				}
 			}
+			
 			notify(EvtType::ClickedEmpty);
 		}
 		

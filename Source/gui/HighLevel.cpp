@@ -2,8 +2,21 @@
 
 namespace gui
 {
+	static Notify makeHighLevelNotify(Utils& _u)
+	{
+		return [&u = _u](EvtType t, const void* stuff)
+		{
+			if (t == EvtType::ClickedEmpty)
+			{
+				// host grabs keyboard focus
+				auto& pluginTop = u.pluginTop;
+				pluginTop.giveAwayKeyboardFocus();
+			}
+		};
+	}
+
 	HighLevel::HighLevel(Utils& u, LowLevel* _lowLevel, CompWidgetable* tuningEditor) :
-		Comp(u, "", CursorType::Default),
+		Comp(u, "", makeHighLevelNotify(u), CursorType::Default),
 #if PPDHasPatchBrowser
 		patchBrowser(u),
 		patchBrowserButton(u, patchBrowser),

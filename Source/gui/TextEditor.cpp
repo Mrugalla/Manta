@@ -21,6 +21,7 @@ namespace gui
 		addAndMakeVisible(label);
 		label.mode = Label::Mode::TextToLabelBounds;
 		setWantsKeyboardFocus(true);
+		setInterceptsMouseClicks(true, true);
 	}
 
 	TextEditor::TextEditor(Utils& u, const String& _tooltip, const String& _emptyString) :

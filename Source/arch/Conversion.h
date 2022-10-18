@@ -221,4 +221,24 @@ namespace audio
     {
 		return !isWhiteKey(pitchclass);
     }
+
+	template<typename Float>
+    void applySomeWindowingFunction(Float* buffer, int size) noexcept
+    {
+        https://www.desmos.com/calculator/qzrswwvqfo
+        const auto a0 = static_cast<Float>(0.35875f);
+        const auto a1 = static_cast<Float>(0.48829f);
+        const auto a2 = static_cast<Float>(0.14128f);
+        const auto a3 = static_cast<Float>(0.01168f);
+        const auto inc = Tau / static_cast<Float>(size);
+        auto x = static_cast<Float>(0);
+        for (auto i = 0; i < size; ++i, x += inc)
+        {
+            const auto w0 = a1 * std::cos(x);
+            const auto w1 = a2 * std::cos(static_cast<Float>(2) * x);
+            const auto w2 = a3 * std::cos(static_cast<Float>(3) * x);
+            const auto w = a0 - w0 + w1 - a3 * w2;
+            buffer[i] *= w;
+        }
+    }
 }

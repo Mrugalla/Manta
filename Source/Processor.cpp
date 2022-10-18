@@ -138,20 +138,6 @@ namespace audio
     bool ProcessorBackEnd::producesMidi() const { return true; }
     bool ProcessorBackEnd::isMidiEffect() const { return false; }
 
-    /////////////////////////////////////////////
-    /////////////////////////////////////////////;
-    void ProcessorBackEnd::getStateInformation(juce::MemoryBlock& destData)
-    {
-        savePatch();
-        state.savePatch(*this, destData);
-    }
-
-    void ProcessorBackEnd::setStateInformation(const void* data, int sizeInBytes)
-    {
-        state.loadPatch(*this, data, sizeInBytes);
-        loadPatch();
-    }
-
     void ProcessorBackEnd::forcePrepareToPlay()
     {
         sus.suspend();
@@ -508,14 +494,30 @@ namespace audio
 
     void Processor::releaseResources() {}
 
-    void Processor::savePatch()
+    /////////////////////////////////////////////
+    /////////////////////////////////////////////;
+    void Processor::getStateInformation(juce::MemoryBlock& destData)
     {
         ProcessorBackEnd::savePatch();
+        savePatch();
+        state.savePatch(*this, destData);
+    }
+
+    void Processor::setStateInformation(const void* data, int sizeInBytes)
+    {
+        state.loadPatch(*this, data, sizeInBytes);
+        ProcessorBackEnd::loadPatch();
+        loadPatch();
+    }
+
+    void Processor::savePatch()
+    {
+        manta.savePatch(state);
     }
 
     void Processor::loadPatch()
     {
-        ProcessorBackEnd::loadPatch();
+        manta.loadPatch(state);
     }
 }
 

@@ -67,6 +67,8 @@ namespace gui
 			hoverIdx(-1),
 			octIdx(3)
 		{
+			setInterceptsMouseClicks(true, false);
+			
 			layout.init
 			(
 				{ 1, 21, 1 },

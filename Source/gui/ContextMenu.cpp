@@ -39,17 +39,18 @@ namespace gui
 		auto& pluginTop = utils.pluginTop;
 
 		const auto screenPos = (comp->getScreenPosition() + Point(comp->getWidth() / 2, comp->getHeight() / 2) - pluginTop.getScreenPosition()).toFloat();
-		BoundsF dest(screenPos.x, screenPos.y, 150.f, pluginTop.getHeight() * .5f);
+		BoundsF dest(screenPos.x, screenPos.y, 120.f, pluginTop.getHeight() * .4f);
 		if (dest.getBottom() > pluginTop.getBottom())
-			dest.setY(pluginTop.getBottom() - dest.getHeight());
+			dest.setY(pluginTop.getBottom() - dest.getHeight() * 1.5f);
 		if (dest.getRight() > pluginTop.getWidth())
 			dest.setX(pluginTop.getWidth() - dest.getWidth());
 
-		defineBounds(
+		defineBounds
+		(
 			BoundsF(screenPos.x, screenPos.y, 1.f, 1.f),
 			dest
 		);
-		initWidget(.08f, false);
+		initWidget(.05f, false);
 		setVisible(true);
 	}
 

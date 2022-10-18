@@ -3,7 +3,7 @@
 #include "juce_core/juce_core.h"
 #include <random>
 
-#define DebugFormularParser true
+#define DebugFormularParser false
 
 namespace fx
 {
@@ -28,9 +28,15 @@ namespace fx
 	template<typename Float>
 	inline Float getNumber(const String& txt, int& i) noexcept
 	{
-		auto num = static_cast<Float>(getDigit(txt[i]));
-		while (i + 1 < txt.length() && isDigit(txt[i + 1]))
-			num = num * 10.f + static_cast<Float>(getDigit(txt[++i]));
+		auto num = 0.f;
+		if (txt[i] != '.')
+		{
+			num = static_cast<Float>(getDigit(txt[i]));
+			while (i + 1 < txt.length() && isDigit(txt[i + 1]))
+				num = num * 10.f + static_cast<Float>(getDigit(txt[++i]));
+		}
+		else
+			--i;
 		if (txt[i + 1] == '.')
 		{
 			++i;
@@ -600,7 +606,7 @@ namespace fx
 					addNumberToTokens(tokens, 3.14159265359f);
 					++i;
 				}
-				else if (chr >= '0' && chr <= '9')
+				else if (chr >= '0' && chr <= '9' || chr == '.')
 				{
 					const auto numbr = getNumber<float>(txt, i);
 					addNumberToTokens(tokens, numbr);
@@ -695,8 +701,9 @@ namespace fx
 					}
 				}
 				
-				for (const auto& t : stack)
+				for (auto i = static_cast<int>(stack.size()) - 1; i >= 0; --i)
 				{
+					const auto& t = stack[i];
 					if (t.type == Token::Type::ParenthesisLeft || t.type == Token::Type::ParenthesisRight)
 					{
 						errorType = ParserErrorType::MismatchedParenthesis;
@@ -722,9 +729,11 @@ namespace fx
 					switch (p.type)
 					{
 					case Token::Type::Number:
+						y = p.value;
 						stack.push_back(p);
 						break;
 					case Token::Type::X:
+						y = x;
 						stack.push_back({ Token::Type::Number, String(x) });
 						break;
 					case Token::Type::Operator:
@@ -762,7 +771,7 @@ namespace fx
 			return true;
 		}
 		
-		float operator()(float x) const noexcept
+		float operator()(float x = 0.f) const noexcept
 		{
 			return func(x);
 		}
@@ -777,26 +786,5 @@ namespace fx
 // https://www.youtube.com/watch?v=PAceaOSnxQs
 // https://stackoverflow.com/questions/789847/postfix-notation-validation
 // http://mathcenter.oxford.emory.edu/site/cs171/postfixExpressions/
-
-/*
-todo
-	-xx
-
-	infix:
-	0
-	-
-	X
-	*
-	X
-
-	postfix:
-	0
-	X
-	X
-	-
-	*
-
-
-*/
 
 #undef DebugFormularParser

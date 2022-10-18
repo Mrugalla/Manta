@@ -20,20 +20,17 @@ HOW TO USE:
 4. Code GUI in lowlevel.cpp/h
 5. Ship it!
 
-
 ------------------------------------------------------------------- 
 
 TO DO:
 
+fix alignment of text in menu/controls
+
+Formularparser
+	.2cos(xpi) doesn't scale cos(xpi) down
+
 WaveTable(Formularparser)
-	setting to 0 sounds grainy (should result in perfectly clean)
-		make wt size larger?
-		better interpolation?
-	only drew positive values for
-		cos(cos(xtau)xtau))
-		cos(cos(xtau))
-	always replaced every wt instead of just the needed one
-	save state
+	state is loaded or saved wrong
 
 WaveTableDisplay
 	add mode of showing frequency response of that wavetable
@@ -48,7 +45,6 @@ Reduce RAM-Usage
 
 WaveTable
 	implement spline editor
-	implement formular parser
 
 filterResponseGraph
 	in decibels

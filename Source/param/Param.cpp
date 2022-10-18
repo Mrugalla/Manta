@@ -1,5 +1,5 @@
 #include "Param.h"
-#include "../arch/FormularParser.h"
+#include "../arch/FormularParser2.h"
 #include "../arch/Conversion.h"
 
 namespace param
@@ -538,9 +538,9 @@ namespace param::strToVal
 	{
 		return [](const String& txt, const float altVal)
 		{
-			parser::Parser parse;
-			if (parse(txt))
-				return parse[0];
+			fx::Parser fx;
+			if (fx(txt))
+				return fx();
 
 			return altVal;
 		};

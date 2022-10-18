@@ -19,13 +19,14 @@ namespace gui
 		static constexpr int WTSize = audio::Manta::WaveTableSize;
 		using WTDisplay = WaveTableDisplay<WTSize>;
 		using FlexWTDisplay = std::unique_ptr<WTDisplay>;
-		using FlexParser = std::unique_ptr<FormularParser<WTSize>>;
+		using FlexParser = std::unique_ptr<FormularParser2>;
 
 		MantaComp(Utils& u, OnSelectionChangeds& onSelectionChanged) :
 			Comp(u, "", CursorType::Default),
 			mainLabel(u, "Main"),
 			filterLabel(u, "Filter"),
 			feedbackLabel(u, "Feedback"),
+			heatLabel(u, "Heat"),
 			ringModLabel(u, "Ring Mod"),
 			enabled(),
 			gain(),
@@ -35,6 +36,7 @@ namespace gui
 			delayOct(),
 			delaySemi(),
 			delayFeedback(),
+			heat(),
 			rmOct(),
 			rmSemi(),
 			rmDepth(),
@@ -44,21 +46,25 @@ namespace gui
 			addAndMakeVisible(mainLabel);
 			addAndMakeVisible(filterLabel);
 			addAndMakeVisible(feedbackLabel);
+			addAndMakeVisible(heatLabel);
 			addAndMakeVisible(ringModLabel);
 
 			mainLabel.textCID = ColourID::Txt;
 			filterLabel.textCID = mainLabel.textCID;
 			feedbackLabel.textCID = mainLabel.textCID;
+			heatLabel.textCID = mainLabel.textCID;
 			ringModLabel.textCID = mainLabel.textCID;
 			
 			mainLabel.font = getFontLobster();
 			filterLabel.font = mainLabel.font;
 			feedbackLabel.font = mainLabel.font;
+			heatLabel.font = mainLabel.font;
 			ringModLabel.font = mainLabel.font;
 
 			mainLabel.mode = Label::Mode::TextToLabelBounds;
 			filterLabel.mode = mainLabel.mode;
 			feedbackLabel.mode = mainLabel.mode;
+			heatLabel.mode = mainLabel.mode;
 			ringModLabel.mode = mainLabel.mode;
 
 			onSelectionChanged.push_back([&](const NodePtrs& selected)
@@ -89,6 +95,9 @@ namespace gui
 
 					removeChildComponent(delayFeedback.get());
 					delayFeedback.reset();
+
+					removeChildComponent(heat.get());
+					heat.reset();
 
 					removeChildComponent(rmOct.get());
 					rmOct.reset();
@@ -189,12 +198,22 @@ namespace gui
 						makeParameter(*delayFeedback, pIDs, "Feedback");
 					}
 
+					heat = std::make_unique<Knob>(u);
+					addAndMakeVisible(*heat);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[4]);
+
+						makeParameter(*heat, pIDs, "Heat");
+					}
+
 					rmOct = std::make_unique<Knob>(u);
 					addAndMakeVisible(*rmOct);
 					{
 						std::vector<PID> pIDs;
 						for (auto i = 0; i < numSelected; ++i)
-							pIDs.push_back(selected[i]->morePIDs[4]);
+							pIDs.push_back(selected[i]->morePIDs[5]);
 
 						makeParameter(*rmOct, pIDs, "Oct", true, nullptr, Knob::LooksType::VerticalSlider);
 					}
@@ -204,7 +223,7 @@ namespace gui
 					{
 						std::vector<PID> pIDs;
 						for (auto i = 0; i < numSelected; ++i)
-							pIDs.push_back(selected[i]->morePIDs[5]);
+							pIDs.push_back(selected[i]->morePIDs[6]);
 
 						makeParameter(*rmSemi, pIDs, "Semi", true, nullptr, Knob::LooksType::VerticalSlider);
 					}
@@ -214,28 +233,42 @@ namespace gui
 					{
 						std::vector<PID> pIDs;
 						for (auto i = 0; i < numSelected; ++i)
-							pIDs.push_back(selected[i]->morePIDs[6]);
+							pIDs.push_back(selected[i]->morePIDs[7]);
 
 						makeParameter(*rmDepth, pIDs, "Depth", true, nullptr, Knob::LooksType::VerticalSlider);
 					}
 
-					wtDisplay = std::make_unique<WTDisplay>(u, u.audioProcessor.manta.getWaveTable(0));
+					{
+
+						const auto pID = selected[0]->morePIDs[7];
+						const auto tableIdx = pID == PID::Lane1RMDepth ? 0 :
+							pID == PID::Lane2RMDepth ? 1 : 2;
+						wtDisplay = std::make_unique<WTDisplay>(u, u.audioProcessor.manta.getWaveTable(tableIdx));
+					}
 					addAndMakeVisible(*wtDisplay);
 
 					{
 						std::vector<float*> tables;
+						tables.reserve(numSelected);
 						for (auto i = 0; i < numSelected; ++i)
-							tables.push_back(u.audioProcessor.manta.getWaveTable(i).data());
-
-						wtParser = std::make_unique<FormularParser<WTSize>>
+						{
+							const auto pID = selected[i]->morePIDs[7];
+							const auto tableIdx = pID == PID::Lane1RMDepth ? 0 :
+								pID == PID::Lane2RMDepth ? 1 : 2;
+							tables.emplace_back(u.audioProcessor.manta.getWaveTable(tableIdx).data());
+						}
+						
+						wtParser = std::make_unique<FormularParser2>
 						(
 							u,
 							"This wavetable's formular parser.",
-							tables
+							tables,
+							WTSize,
+							audio::WaveTable<WTSize>::NumExtraSamples
 						);
 						
-						auto oR = wtParser->onReturn;
-						wtParser->onReturn = [&, oR]()
+						auto oR = wtParser->parser.onReturn;
+						wtParser->parser.onReturn = [&, oR]()
 						{
 							if (!oR())
 								return false;
@@ -255,7 +288,7 @@ namespace gui
 
 			layout.init
 			(
-				{ 1, 8, 1, 5, 5, 1, 2, 2, 5, 1, 2, 2, 8, 2, 1 },
+				{ 1, 3, 1, 5, 5, 1, 2, 2, 5, 1, 3, 1, 2, 2, 13, 2, 1 },
 				{ 1, 3, 13, 5, 1 }
 			);
 		}
@@ -284,7 +317,11 @@ namespace gui
 				drawRectEdges(g, feedbackBounds, thicc, stroke);
 			}
 			{
-				auto ringmodBounds = layout(10, 1, 4, 3);
+				auto heatBounds = layout(10, 1, 2, 3);
+				drawRectEdges(g, heatBounds, thicc, stroke);
+			}
+			{
+				auto ringmodBounds = layout(12, 1, 4, 3);
 				drawRectEdges(g, ringmodBounds, thicc, stroke);
 			}
 		}
@@ -318,23 +355,27 @@ namespace gui
 			if (delayFeedback)
 				layout.place(*delayFeedback, 8, 2, 1, 1, false);
 
+			// heat
+			layout.place(heatLabel, 10, 1, 2, 1, false);
+			if (heat)
+				layout.place(*heat, 10, 2, 2, 2, false);
 			// ringmod
-			layout.place(ringModLabel, 10, 1, 3, 1, false);
+			layout.place(ringModLabel, 12, 1, 3, 1, false);
 			if (rmOct)
-				layout.place(*rmOct, 10, 2, 1, 2, false);
+				layout.place(*rmOct, 12, 2, 1, 2, false);
 			if (rmSemi)
-				layout.place(*rmSemi, 11, 2, 1, 2, false);
+				layout.place(*rmSemi, 13, 2, 1, 2, false);
 			if (rmDepth)
-				layout.place(*rmDepth, 13, 2, 1, 2, false);
+				layout.place(*rmDepth, 15, 2, 1, 2, false);
 			if(wtDisplay)
-				layout.place(*wtDisplay, 12, 2, 1, 1, false);
+				layout.place(*wtDisplay, 14, 2, 1, 1, false);
 			if (wtParser)
-				layout.place(*wtParser, 12, 3, 1, 1, false);
+				layout.place(*wtParser, 14, 3, 1, 1, false);
 		}
 		
 	protected:
 		// labels
-		Label mainLabel, filterLabel, feedbackLabel, ringModLabel;
+		Label mainLabel, filterLabel, feedbackLabel, heatLabel, ringModLabel;
 		// main
 		FlexButton enabled;
 		FlexKnob gain;
@@ -343,6 +384,8 @@ namespace gui
 		FlexButton slope;
 		// delay
 		FlexKnob delayOct, delaySemi, delayFeedback;
+		// heat
+		FlexKnob heat;
 		// ring mod
 		FlexKnob rmOct, rmSemi, rmDepth;
 		FlexWTDisplay wtDisplay;

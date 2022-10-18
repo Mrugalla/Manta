@@ -52,11 +52,6 @@ namespace audio
 
         juce::AudioProcessor::BusesProperties makeBusesProperties();
 
-        /////////////////////////////////////////////
-        /////////////////////////////////////////////
-        void getStateInformation(juce::MemoryBlock&) override;
-        void setStateInformation(const void* /*data*/, int /*sizeInBytes*/) override;
-
         AppProps props;
         ProcessSuspender sus;
 
@@ -113,7 +108,13 @@ namespace audio
         ) noexcept;
 
         void releaseResources() override;
-
+		
+        /////////////////////////////////////////////
+        /////////////////////////////////////////////
+        void getStateInformation(juce::MemoryBlock&) override;
+		/* data, sizeInBytes */
+        void setStateInformation(const void*, int) override;
+		
         void savePatch();
 
         void loadPatch();

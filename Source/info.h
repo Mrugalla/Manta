@@ -24,7 +24,8 @@ HOW TO USE:
 
 TO DO:
 
-fix alignment of text in menu/controls
+implement menu's juxtaposition component
+	for controls
 
 WaveTableDisplay
 	add mode of showing frequency response of that wavetable

@@ -12,45 +12,27 @@ Click on the nav tabs to navigate
 to the different pages!"
     />
   </menu>
-  <menu id="Controls" x="40;5;40;5;40" y="1;5" tooltip="Get help! Literally.">
-    <title x="1" y="0" w="3" h="1" />
-    <txt x="0" y="1" w="1" h="1" just="topRight" text=
-"Knobs:
-Click/Drag/Mousewheel
-Hold Shift
-Alt Click/Doubleclick
-Right Click
-
-
-
-(M):
-Drag/Mousewheel
- 
-Right Click
- 
-(B):
-Drag/Mousewheel
- 
-Right Click"/>
-
-    <txt x="2" y="1" w="3" h="1" just="topLeft" text=
-"
-_
-Modify parameter value.
-Sensitive parameter changes.
-Back to default value.
-Additional parameter options.
- 
-_
-Modify macro parameter's modulation depth
-relative to its parameter value.
-Switch to bias-control.
- 
-_
-Bias macro parameter's influence on
-the parameter.
-Switch to mod-depth-control."/>
-
+  <menu id="Controls" x="1" y="1;5" tooltip="Get help! Literally.">
+    <title x="0" y="0" w="1" h="1" />
+    <juxtaposition x="0" y="1" w="1" h="1">
+		  <jux text="Knobs:"/>
+		  <jux textA="Left Click/Drag/Wheel"  textB="Modify Parameter Value"/>
+		  <jux textA="Hold Shift"             textB="Sensitive Parameter Changes"/>
+		  <jux textA="Alt-/Double Click"      textB="Back To Default Value"/>
+		  <jux textA="Right Click"            textB="Context Menu"/>
+      
+      <jux text="Mod Dials:"/>
+      <jux textA="Right Click"            textB="Switch between Mod Depth and Bias"/>
+      
+      <jux text="Buttons:"/>
+      <jux textA="Left Click/Wheel"       textB="Modify Parameter Value"/>
+		  <jux textA="Alt-/Double Click"      textB="Back To Default Value"/>
+    
+      <jux text="Text Fields:"/>
+      <jux textA="Enter"                  textB="Apply Changes"/>
+      <jux textA="Escape"                 textB="Discard Changes"/>
+      <jux textA="Ctrl + C/V"             textB="Copy / Paste"/>
+    </juxtaposition>
   </menu>
   <menu id="Colours" x="1" y="1;5" tooltip="Individualize the colour sheme of the plugin here.">
     <title y="0" />

@@ -423,14 +423,15 @@ namespace gui
 					sub->initLayout(xLayoutProp.toString(), yLayoutProp.toString());
 				}
 
-				enum Type { kTitle, kTxt, kColourScheme, kLink, kErkenntnisse, kNumTypes };
+				enum Type { kTitle, kTxt, kColourScheme, kLink, kErkenntnisse, kJuxtaposition, kNumTypes };
 				std::array<Identifier, kNumTypes> ids
 				{
 					"title",
 					"txt",
 					"colourscheme",
 					"link",
-					"erkenntnisse"
+					"erkenntnisse",
+					"juxtaposition"
 				};
 
 				for (auto c = 0; c < node.vt.getNumChildren(); ++c)
@@ -480,6 +481,12 @@ namespace gui
 					else if (child.getType() == ids[kErkenntnisse])
 					{
 						auto cmp = new ErkenntnisseComp(utils);
+
+						comp = cmp;
+					}
+					else if (child.getType() == ids[kJuxtaposition])
+					{
+						auto cmp = new Comp(utils);
 
 						comp = cmp;
 					}

@@ -202,6 +202,8 @@ namespace gui
 		if (key == key.escapeKey)
 		{
 			onEscape();
+			txt = "";
+			giveAwayKeyboardFocus();
 			return true;
 		}
 		else if (key == key.returnKey)

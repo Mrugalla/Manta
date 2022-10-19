@@ -55,7 +55,7 @@ namespace audio
 				const auto mbSize = mb.getSize();
 				const auto dataSize = FullSize * sizeof(float);
 				jassert(mbSize == dataSize);
-				mb.copyTo(table.data(), 0, FullSize);
+				mb.copyTo(table.data(), 0, dataSize);
 			}
 		}
 
@@ -79,7 +79,7 @@ namespace audio
 		{
 			return table.data();
 		}
-
+		
 	protected:
 		Table table;
 	};

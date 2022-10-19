@@ -12,8 +12,19 @@ namespace gui
 		static constexpr float SizeInv = 1.f / SizeF;
 		using WT = audio::WaveTable<Size>;
 
+		Notify makeNotify(WaveTableDisplay& _wtd)
+		{
+			return [&wtd = _wtd](EvtType t, const void*)
+			{
+				if (t == EvtType::PatchUpdated)
+				{
+					wtd.repaint();
+				}
+			};
+		}
+
 		WaveTableDisplay(Utils& u, WT& _wt) :
-			Button(u, "This Wavetable's display."),
+			Button(u, "This Wavetable's display.", makeNotify(*this)),
 			outlineCID(ColourID::Hover),
 			lineCID(ColourID::Txt),
 			wt(_wt)

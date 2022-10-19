@@ -37,8 +37,8 @@ namespace gui
 		/* pIDs */
 		void enableParameter(const std::vector<PID>&);
 
-		/* utils, tooltip */
-		Button(Utils&, String&& = "");
+		/* utils, tooltip, notify */
+		Button(Utils&, String&& = "", Notify&& = [](EvtType, const void*){});
 
 		Label& getLabel() noexcept;
 

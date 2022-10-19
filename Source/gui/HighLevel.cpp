@@ -4,7 +4,7 @@ namespace gui
 {
 	static Notify makeHighLevelNotify(Utils& _u)
 	{
-		return [&u = _u](EvtType t, const void* stuff)
+		return [&u = _u](EvtType t, const void*)
 		{
 			if (t == EvtType::ClickedEmpty)
 			{

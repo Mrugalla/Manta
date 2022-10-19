@@ -198,8 +198,8 @@ namespace gui
 		startTimerHz(24);
 	}
 
-	Button::Button(Utils& _utils, String&& _tooltip) :
-		Comp(_utils, _tooltip),
+	Button::Button(Utils& _utils, String&& _tooltip, Notify&& _notify) :
+		Comp(_utils, _tooltip, std::move(_notify)),
 		onClick(),
 		onRightClick(),
 		onTimer(),

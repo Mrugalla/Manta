@@ -486,7 +486,7 @@ namespace gui
 					}
 					else if (child.getType() == ids[kJuxtaposition])
 					{
-						auto cmp = new Comp(utils);
+						auto cmp = new JuxtaComp(utils, child);
 
 						comp = cmp;
 					}

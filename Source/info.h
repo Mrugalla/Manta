@@ -24,9 +24,6 @@ HOW TO USE:
 
 TO DO:
 
-implement menu's juxtaposition component
-	for controls
-
 WaveTableDisplay
 	add mode of showing frequency response of that wavetable
 
@@ -50,8 +47,11 @@ tuningeditor
 	button to play chromatic scale for preview
 
 Colours
+	figure out natural hue steps
 	if chosen white modulations not visible anymore
 	some dark colours make it too dark
+	when changing colours
+		default cursor needs update
 
 highlevel
 	"remove dc offset" switch (steep highpass)
@@ -70,9 +70,6 @@ SplineEditor
 		sometimes makes points on draggable
 	make points come from outside architecturally (maybe?)
 	wavetable from spline
-
-Colours
-	figure out natural hue steps
 
 ScrollBar
 	some things still not handled by scrollbarcomp alone

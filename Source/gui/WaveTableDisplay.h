@@ -51,7 +51,9 @@ namespace gui
 			{
 				auto y0 = cenY2;
 				auto y1 = bounds.getY() + centreY * (1.f - wt(s));
-				if (y0 > y1)
+				if (y0 == y1)
+					++y1;
+				else if (y0 > y1)
 					std::swap(y0, y1);
 				g.drawVerticalLine(static_cast<int>(x), y0, y1);
 			}

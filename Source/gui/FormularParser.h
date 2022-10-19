@@ -12,8 +12,8 @@ namespace gui
 		enum PostFX
 		{
 			DCOffset,
-			Normalize,
 			Windowing,
+			Normalize,
 			Limiting,
 			NumPostFX
 		};
@@ -44,17 +44,9 @@ namespace gui
 					for (auto i = 0; i < size; ++i)
 						sum += tables[0][i];
 
-					if (sum > 0.f)
-						SIMD::add(tables[0], -sum * sizeInv, size);
-				}
-				if (postFX[Normalize])
-				{
-					auto max = 0.f;
-					for (auto i = 0; i < size; ++i)
-						max = std::max(max, std::abs(tables[0][i]));
-
-					if (max > 0.f)
-						SIMD::multiply(tables[0], 1.f / max, size);
+					const auto gain = -sum * sizeInv;
+					if (gain != 0.f)
+						SIMD::add(tables[0], gain, size);
 				}
 				if (postFX[Windowing])
 				{
@@ -68,6 +60,15 @@ namespace gui
 						const auto w = x < alpha ? .5f * (1.f + std::cos(Pi * (x * alphaInv - 1.f))) : x > 1.f - alpha ? .5f * (1.f + std::cos(Pi * (x * alphaInv - 1.f / alpha + 1.f))) : 1.f;
 						tables[0][i] *= w;
 					}
+				}
+				if (postFX[Normalize])
+				{
+					auto max = 0.f;
+					for (auto i = 0; i < size; ++i)
+						max = std::max(max, std::abs(tables[0][i]));
+
+					if (max > 0.f)
+						SIMD::multiply(tables[0], 1.f / max, size);
 				}
 				if (postFX[Limiting])
 				{
@@ -201,8 +202,8 @@ namespace gui
 			layout.place(parser, 0, 0, 4, 1);
 
 			layout.place(dc, 0, 1, 1, 1);
-			layout.place(normalize, 1, 1, 1, 1);
-			layout.place(windowing, 2, 1, 1, 1);
+			layout.place(windowing, 1, 1, 1, 1);
+			layout.place(normalize, 2, 1, 1, 1);
 			layout.place(limiting, 3, 1, 1, 1);
 		}
 

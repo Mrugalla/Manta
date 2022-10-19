@@ -26,12 +26,6 @@ TO DO:
 
 fix alignment of text in menu/controls
 
-Formularparser
-	.2cos(xpi) doesn't scale cos(xpi) down
-
-WaveTable(Formularparser)
-	state is loaded or saved wrong
-
 WaveTableDisplay
 	add mode of showing frequency response of that wavetable
 
@@ -70,7 +64,7 @@ Pan Knob
 SplineEditor
 	Sometimes selection range shows wrong range
 		and that feels bad
-	Add Feature: Non-removable Points
+	Add Feature: Non-removable/Fixed Points
 	Snap to Grid
 		sometimes makes points on draggable
 	make points come from outside architecturally (maybe?)
@@ -85,12 +79,6 @@ ScrollBar
 
 PatchBrowser
 	revisit tag system
-
-FormularParser
-	is log and ln working right?
-	make more lightweight
-		values push_backs in calculate and calculateX needed?
-		make callbacks instead of buffers?
 
 TextEditor
 	multiline text

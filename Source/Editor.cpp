@@ -38,7 +38,7 @@ namespace gui
 		
         addAndMakeVisible(tooltip);
 
-        pluginTitle.font = getFontDosisExtraLight();
+        pluginTitle.font = getFontLobster();
         addAndMakeVisible(pluginTitle);
         pluginTitle.mode = Label::Mode::TextToLabelBounds;
 
@@ -57,7 +57,7 @@ namespace gui
         setOpaque(true);
         setResizable(true, true);
         {
-            auto user = audioProcessor.props.getUserSettings();
+            const auto user = audioProcessor.props.getUserSettings();
             const auto w = user->getIntValue("gui/width", PPDEditorWidth);
             const auto h = user->getIntValue("gui/height", PPDEditorHeight);
             setSize(w, h);

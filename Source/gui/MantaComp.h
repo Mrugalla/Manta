@@ -27,7 +27,7 @@ namespace gui
 			filterLabel(u, "Filter"),
 			feedbackLabel(u, "Feedback"),
 			heatLabel(u, "Heat"),
-			ringModLabel(u, "Ring Mod"),
+			ringModLabel(u, "Phase Distortion"),
 			enabled(),
 			gain(),
 			pitch(),
@@ -319,15 +319,15 @@ namespace gui
 			
 			g.setColour(Colours::c(ColourID::Txt));
 			{
-				auto mainBounds = layout(1, 1, 1, 3);
+				auto mainBounds = layout(1, 1, 2, 3);
 				drawRectEdges(g, mainBounds, thicc, stroke);
 			}
 			{
-				auto filterBounds = layout(3, 1, 2, 3);
+				auto filterBounds = layout(3, 1, 3, 3);
 				drawRectEdges(g, filterBounds, thicc, stroke);
 			}
 			{
-				auto feedbackBounds = layout(6, 1, 3, 3);
+				auto feedbackBounds = layout(6, 1, 4, 3);
 				drawRectEdges(g, feedbackBounds, thicc, stroke);
 			}
 			{

@@ -52,7 +52,9 @@ namespace audio
 				const auto base64 = var->toString();
 				juce::MemoryBlock mb;
 				mb.fromBase64Encoding(base64);
+#if JUCE_DEBUG
 				const auto mbSize = mb.getSize();
+#endif
 				const auto dataSize = FullSize * sizeof(float);
 				jassert(mbSize == dataSize);
 				mb.copyTo(table.data(), 0, dataSize);

@@ -27,6 +27,8 @@ namespace gui
         locked(false),
         activeCursor(_cursorType)
     {
+        setInterceptsMouseClicks(true, true);
+
         setName(_name);
 
         label.textCID = ColourID::Txt;
@@ -200,36 +202,33 @@ namespace gui
 
                     if (hasMeter)
                     {
-                        const auto radiusBetween = radiusInner + radDif;
                         // METER
                         if (vals[Meter] != 0.f)
                         {
-                            g.setColour(Colours::c(ColourID::Txt));
-                            Path meterArc;
-
+                            const auto radiusBetween = radiusInner + radDif;
                             const auto metr = vals[Meter] > 1.f ? 1.f : vals[Meter];
-
-                            const auto meterAngle = AngleRange * metr - AngleWidth;
-
+                            const auto meterAngle = AngleRange * metr;
+                            
+                            Path meterArc;
                             meterArc.addCentredArc
                             (
                                 centre.x, centre.y,
                                 radiusBetween, radiusBetween,
-                                0.f,
-                                -AngleWidth, meterAngle,
+                                -AngleWidth,
+                                0.f, meterAngle,
                                 true
                             );
 
                             strokeType.setStrokeThickness(radDif);
+                            g.setColour(Colours::c(ColourID::Mod));
                             g.strokePath(meterArc, strokeType);
                             strokeType.setStrokeThickness(thicc);
                         }
                     }
 
                     { // paint lines
-                        g.setColour(col);
+                        
                         Path arcOutline;
-
                         arcOutline.addCentredArc
                         (
                             centre.x, centre.y,
@@ -238,6 +237,7 @@ namespace gui
                             -AngleWidth, AngleWidth,
                             true
                         );
+                        g.setColour(col);
                         g.strokePath(arcOutline, strokeType);
 
                         Path arcInline;

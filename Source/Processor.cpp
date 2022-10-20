@@ -410,7 +410,7 @@ namespace audio
         const auto l1Pitch = params[PID::Lane1Pitch]->getValModDenorm();
         const auto l1Resonance = params[PID::Lane1Resonance]->getValModDenorm();
 		const auto l1Slope = params[PID::Lane1Slope]->getValModDenorm();
-        const auto l1Drive = params[PID::Lane1Drive]->getValMod();
+        const auto l1Drive = params[PID::Lane1Heat]->getValMod();
         const auto l1Feedback = params[PID::Lane1Feedback]->getValMod();
 		const auto l1Oct = params[PID::Lane1DelayOct]->getValModDenorm();
 		const auto l1Semi = params[PID::Lane1DelaySemi]->getValModDenorm();
@@ -423,7 +423,7 @@ namespace audio
 		const auto l2Pitch = params[PID::Lane2Pitch]->getValModDenorm();
 		const auto l2Resonance = params[PID::Lane2Resonance]->getValModDenorm();
 		const auto l2Slope = params[PID::Lane2Slope]->getValModDenorm();
-		const auto l2Drive = params[PID::Lane2Drive]->getValMod();
+		const auto l2Drive = params[PID::Lane2Heat]->getValMod();
 		const auto l2Feedback = params[PID::Lane2Feedback]->getValMod();
 		const auto l2Oct = params[PID::Lane2DelayOct]->getValModDenorm();
 		const auto l2Semi = params[PID::Lane2DelaySemi]->getValModDenorm();
@@ -436,7 +436,7 @@ namespace audio
 		const auto l3Pitch = params[PID::Lane3Pitch]->getValModDenorm();
 		const auto l3Resonance = params[PID::Lane3Resonance]->getValModDenorm();
 		const auto l3Slope = params[PID::Lane3Slope]->getValModDenorm();
-		const auto l3Drive = params[PID::Lane3Drive]->getValMod();
+		const auto l3Drive = params[PID::Lane3Heat]->getValMod();
 		const auto l3Feedback = params[PID::Lane3Feedback]->getValMod();
 		const auto l3Oct = params[PID::Lane3DelayOct]->getValModDenorm();
 		const auto l3Semi = params[PID::Lane3DelaySemi]->getValModDenorm();

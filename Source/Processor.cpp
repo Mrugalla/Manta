@@ -407,6 +407,7 @@ namespace audio
     ) noexcept
     {
         const auto l1Enabled = params[PID::Lane1Enabled]->getValMod() > .5f;
+		const auto l1Snap = params[PID::Lane1PitchSnap]->getValMod() > .5f;
         const auto l1Pitch = params[PID::Lane1Pitch]->getValModDenorm();
         const auto l1Resonance = params[PID::Lane1Resonance]->getValModDenorm();
 		const auto l1Slope = params[PID::Lane1Slope]->getValModDenorm();
@@ -420,6 +421,7 @@ namespace audio
         const auto l1Gain = params[PID::Lane1Gain]->getValModDenorm();
 		
 		const auto l2Enabled = params[PID::Lane2Enabled]->getValMod() > .5f;
+		const auto l2Snap = params[PID::Lane2PitchSnap]->getValMod() > .5f;
 		const auto l2Pitch = params[PID::Lane2Pitch]->getValModDenorm();
 		const auto l2Resonance = params[PID::Lane2Resonance]->getValModDenorm();
 		const auto l2Slope = params[PID::Lane2Slope]->getValModDenorm();
@@ -433,6 +435,7 @@ namespace audio
 		const auto l2Gain = params[PID::Lane2Gain]->getValModDenorm();
 
 		const auto l3Enabled = params[PID::Lane3Enabled]->getValMod() > .5f;
+		const auto l3Snap = params[PID::Lane3PitchSnap]->getValMod() > .5f;
 		const auto l3Pitch = params[PID::Lane3Pitch]->getValModDenorm();
 		const auto l3Resonance = params[PID::Lane3Resonance]->getValModDenorm();
 		const auto l3Slope = params[PID::Lane3Slope]->getValModDenorm();
@@ -452,7 +455,8 @@ namespace audio
             numSamples,
 
 			l1Enabled,
-            std::round(l1Pitch),
+            l1Snap,
+            l1Pitch,
 			l1Resonance,
 			static_cast<int>(std::round(l1Slope)),
 			l1Drive,
@@ -465,7 +469,8 @@ namespace audio
 			l1Gain,
 
 			l2Enabled,
-            std::round(l2Pitch),
+			l2Snap,
+			l2Pitch,
 			l2Resonance,
 			static_cast<int>(std::round(l2Slope)),
 			l2Drive,
@@ -478,7 +483,8 @@ namespace audio
 			l2Gain,
 
 			l3Enabled,
-            std::round(l3Pitch),
+			l3Snap,
+			l3Pitch,
 			l3Resonance,
 			static_cast<int>(std::round(l3Slope)),
 			l3Drive,

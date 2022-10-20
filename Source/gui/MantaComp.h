@@ -32,6 +32,7 @@ namespace gui
 			gain(),
 			pitch(),
 			resonance(),
+			snap(),
 			slope(),
 			delayOct(),
 			delaySemi(),
@@ -83,6 +84,9 @@ namespace gui
 
 					removeChildComponent(resonance.get());
 					resonance.reset();
+
+					removeChildComponent(snap.get());
+					snap.reset();
 
 					removeChildComponent(slope.get());
 					slope.reset();
@@ -156,6 +160,16 @@ namespace gui
 							pIDs.push_back(selected[i]->xyParam[EQPad::Y]->id);
 
 						makeParameter(*resonance, pIDs, "Reso");
+					}
+
+					snap = std::make_unique<Button>(u);
+					addAndMakeVisible(*snap);
+					{
+						std::vector<PID> pIDs;
+						for (auto i = 0; i < numSelected; ++i)
+							pIDs.push_back(selected[i]->morePIDs[8]);
+
+						makeParameterSwitchButton(*snap, pIDs, "Snap");
 					}
 
 					slope = std::make_unique<Button>(u);
@@ -343,8 +357,10 @@ namespace gui
 				layout.place(*pitch, 3, 2, 1, 1, false);
 			if (resonance)
 				layout.place(*resonance, 4, 2, 1, 1, false);
+			if (snap)
+				layout.place(*snap, 3, 3, 1, 1, true);
 			if (slope)
-				layout.place(*slope, 3, 3, 2, 1, false);
+				layout.place(*slope, 4, 3, 1, 1, false);
 
 			// delay
 			layout.place(feedbackLabel, 6, 1, 3, 1, false);
@@ -381,7 +397,7 @@ namespace gui
 		FlexKnob gain;
 		// filter
 		FlexKnob pitch, resonance;
-		FlexButton slope;
+		FlexButton snap, slope;
 		// delay
 		FlexKnob delayOct, delaySemi, delayFeedback;
 		// heat

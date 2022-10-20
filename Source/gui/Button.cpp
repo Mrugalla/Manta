@@ -911,6 +911,12 @@ namespace gui
 		b.enableParameterSwitch(pIDs);
 	}
 
+	void makeParameterSwitchButton(Button& b, const std::vector<PID>& pIDs, String&& txt)
+	{
+		makeToggleButton(b, txt);
+		b.enableParameterSwitch(pIDs);
+	}
+
 	void makeParameter(Button& b, const std::vector<PID>& pIDs)
 	{
 		const auto mainParam = b.getUtils().getParam(pIDs[0]);

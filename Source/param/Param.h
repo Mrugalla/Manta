@@ -45,17 +45,18 @@ namespace param
 #if PPDHasDelta
 		Delta,
 #endif
-		
+
 		// tuning parameters
 		Xen,
 		MasterTune,
 		BaseNote,
 		PitchbendRange,
-		
+
 		Power,
 
 		// low level parameters
 		Lane1Enabled,
+		Lane1PitchSnap,
 		Lane1Pitch,
 		Lane1Resonance,
 		Lane1Slope,
@@ -67,8 +68,9 @@ namespace param
 		Lane1RMSemi,
 		Lane1RMDepth,
 		Lane1Gain,
-		
+
 		Lane2Enabled,
+		Lane2PitchSnap,
 		Lane2Pitch,
 		Lane2Resonance,
 		Lane2Slope,
@@ -82,6 +84,7 @@ namespace param
 		Lane2Gain,
 
 		Lane3Enabled,
+		Lane3PitchSnap,
 		Lane3Pitch,
 		Lane3Resonance,
 		Lane3Slope,

@@ -593,11 +593,14 @@ namespace fx
 							tokens.push_back(Token(Token::Type::Number, "0"));
 						}
 					}
-					if(tokens.back().type == Token::Type::Number ||
-						tokens.back().type == Token::Type::X ||
-						tokens.back().type == Token::Type::ParenthesisRight)
+					else
 					{
-						tokens.push_back({ Token::Type::Operator, '*' });
+						if (tokens.back().type == Token::Type::Number ||
+							tokens.back().type == Token::Type::X ||
+							tokens.back().type == Token::Type::ParenthesisRight)
+						{
+							tokens.push_back({ Token::Type::Operator, '*' });
+						}
 					}
 					tokens.push_back(Token(Token::Type::Operator, opStr));
 				}

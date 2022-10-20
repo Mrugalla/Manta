@@ -106,11 +106,15 @@ namespace gui
 
 	void makeToggleButton(Button&, const String&);
 
-	void makeParameterSwitchButton(Button&, PID, String&& /*text*/);
+	/* btn, pID, text */
+	void makeParameterSwitchButton(Button&, PID, String&&);
 
 	void makeParameterSwitchButton(Button&, PID, ButtonSymbol);
 
 	void makeParameterSwitchButton(Button&, const std::vector<PID>&, ButtonSymbol);
+
+	/* btn, pIDs, text */
+	void makeParameterSwitchButton(Button&, const std::vector<PID>&, String&&);
 
 	/* button, pIDs, text */
 	void makeParameter(Button&, const std::vector<PID>&);

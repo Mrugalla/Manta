@@ -13,8 +13,8 @@ namespace audio
 {
 	struct Manta
 	{
-		// enabled, cutoff, resonance, slope, feedback, oct, semi, drive, rm-oct, rm-semi, rm-depth, gain
-		static constexpr int NumParametersPerLane = 12;
+		// enabled, pitch-snap, cutoff, resonance, slope, feedback, oct, semi, heat, rm-oct, rm-semi, rm-depth, gain
+		static constexpr int NumParametersPerLane = 13;
 		static constexpr int WaveTableSize = 1 << 13; // around min 5hz
 		static constexpr int NumLanes = 3;
 		static constexpr int MaxSlopeStage = 4; //4*12db/oct
@@ -189,11 +189,11 @@ namespace audio
 			{
 				Fs = sampleRate;
 
-				ringMod.prepare(Fs, blockSize);
+				
 
 				laneBuffer.setSize(2, blockSize, false, true, false);
 
-				frequency.prepare(Fs, blockSize, 10.f);
+				frequency.prepare(Fs, blockSize, 20.f);
 				resonance.prepare(Fs, blockSize, 10.f);
 				drive.prepare(Fs, blockSize, 10.f);
 				feedback.prepare(Fs, blockSize, 10.f);
@@ -201,9 +201,9 @@ namespace audio
 				gain.prepare(Fs, blockSize, 10.f);
 				rmDepth.prepare(Fs, blockSize, 10.f);
 				rmFreqHz.prepare(Fs, blockSize, 10.f);
-
 				delayFB.prepare(delaySize);
 				readHead.resize(blockSize, 0.f);
+				ringMod.prepare(Fs, blockSize);
 
 				delaySizeF = static_cast<float>(delaySize);
 			}
@@ -351,12 +351,17 @@ namespace audio
 		* l3Enabled [0, 1], l3Pitch [12, N]note, l3Resonance [1, N]q, l3Slope [1, 4]db/oct, l3Drive [0, 1]%, l3Feedback [0, 1]%, l3Gain [-60, 60]db
 		*/
 		void operator()(float** samples, int numChannels, int numSamples,
-			bool l1Enabled, float l1Pitch, float l1Resonance, int l1Slope, float l1Drive, float l1Feedback, float l1Oct, float l1Semi, float l1RMOct, float l1RMSemi, float l1RMDepth, float l1Gain,
-			bool l2Enabled, float l2Pitch, float l2Resonance, int l2Slope, float l2Drive, float l2Feedback, float l2Oct, float l2Semi, float l2RMOct, float l2RMSemi, float l2RMDepth, float l2Gain,
-			bool l3Enabled, float l3Pitch, float l3Resonance, int l3Slope, float l3Drive, float l3Feedback, float l3Oct, float l3Semi, float l3RMOct, float l3RMSemi, float l3RMDepth, float l3Gain) noexcept
+			bool l1Enabled, bool l1Snap, float l1Pitch, float l1Resonance, int l1Slope, float l1Drive, float l1Feedback, float l1Oct, float l1Semi, float l1RMOct, float l1RMSemi, float l1RMDepth, float l1Gain,
+			bool l2Enabled, bool l2Snap, float l2Pitch, float l2Resonance, int l2Slope, float l2Drive, float l2Feedback, float l2Oct, float l2Semi, float l2RMOct, float l2RMSemi, float l2RMDepth, float l2Gain,
+			bool l3Enabled, bool l3Snap, float l3Pitch, float l3Resonance, int l3Slope, float l3Drive, float l3Feedback, float l3Oct, float l3Semi, float l3RMOct, float l3RMSemi, float l3RMDepth, float l3Gain) noexcept
 		{
 			bool enabled[NumLanes] = { l1Enabled, l2Enabled, l3Enabled };
-			float pitch[NumLanes] = { l1Pitch, l2Pitch, l3Pitch };
+			float pitch[NumLanes] =
+			{
+				l1Snap ? std::rint(l1Pitch) : l1Pitch,
+				l2Snap ? std::rint(l2Pitch) : l2Pitch,
+				l3Snap ? std::rint(l3Pitch) : l3Pitch
+			};
 			float resonance[NumLanes] = { l1Resonance, l2Resonance, l3Resonance };
 			int slope[NumLanes] = { l1Slope, l2Slope, l3Slope };
 			float drive[NumLanes] = { l1Drive, l2Drive, l3Drive };

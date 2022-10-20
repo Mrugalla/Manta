@@ -24,6 +24,8 @@ HOW TO USE:
 
 TO DO:
 
+Snap Button design needed
+
 WaveTableDisplay
 	add mode of showing frequency response of that wavetable
 

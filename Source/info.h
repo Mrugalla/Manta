@@ -24,10 +24,8 @@ HOW TO USE:
 
 TO DO:
 
-you should be able to drag the wavetable like you would a slider to increase its depth rather than just the one slider to the side
-
 WaveTableDisplay
-	add mode of showing frequency response of that wavetable
+	spectral mode doesn't make sense yet
 
 Knob Looks
 	make free funcs for knob vs slider behaviour
@@ -108,9 +106,6 @@ Options Menu
 
 All Params
 	saving and loading max mod depths as preset
-
-Param
-	...
 
 Oversampler
 	make less cpu demanding (FFT?)

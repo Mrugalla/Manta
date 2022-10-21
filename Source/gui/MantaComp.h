@@ -275,7 +275,7 @@ namespace gui
 						wtParser = std::make_unique<FormularParser2>
 						(
 							u,
-							"This wavetable's formular parser. Enter a math expression to generate a wavetable.",
+							"This wavetable's formular parser. Enter a math expression and hit enter to generate a wavetable.",
 							tables,
 							WTSize,
 							audio::WaveTable<WTSize>::NumExtraSamples

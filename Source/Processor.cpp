@@ -358,9 +358,8 @@ namespace audio
 #endif
         }
 #endif
-        tuningEditorSynth(samples, numChannels, numSamples);
-
         dryWetMix.processOutGain(samples, numChannels, numSamples);
+        tuningEditorSynth(samples, numChannels, numSamples);
         meters.processOut(constSamples, numChannels, numSamples);
 #if PPD_MixOrGainDry
         if (!muteDry)

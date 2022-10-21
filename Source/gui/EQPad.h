@@ -33,7 +33,8 @@ namespace gui
 				g.setColour(Colours::c(ColourID::Hover));
 				g.fillEllipse(bounds);
 
-				g.setColour(Colours::c(ColourID::Interact));
+				if(rightClickParam->getValMod() > .5f)
+					g.setColour(Colours::c(ColourID::Interact));
 				g.drawEllipse(bounds, thicc);
 			}
 
@@ -448,6 +449,9 @@ namespace gui
 
 					if (wasDragged)
 						showCursor(*this);
+					auto mms = juce::Desktop::getInstance().getMainMouseSource();
+					const auto pos = getScreenPosition().toFloat() + selected[0]->bounds.getCentre();
+					mms.setScreenPosition(pos);
 				}
 			}
 			

@@ -24,7 +24,7 @@ HOW TO USE:
 
 TO DO:
 
-Snap Button design needed
+you should be able to drag the wavetable like you would a slider to increase its depth rather than just the one slider to the side
 
 WaveTableDisplay
 	add mode of showing frequency response of that wavetable

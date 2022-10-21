@@ -188,9 +188,7 @@ namespace audio
 			void prepare(float sampleRate, int blockSize, int delaySize)
 			{
 				Fs = sampleRate;
-
 				
-
 				laneBuffer.setSize(2, blockSize, false, true, false);
 
 				frequency.prepare(Fs, blockSize, 20.f);

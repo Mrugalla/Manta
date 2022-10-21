@@ -104,11 +104,12 @@ namespace gui
 			dc(u, "De/activate DC Offset"),
 			normalize(u, "De/activate Normalize"),
 			windowing(u, "De/activate Windowing"),
-			limiting(u, "De/activate Limiting")
+			limiting(u, "De/activate Limiting"),
+			create(u, "Create a wavetable.")
 		{
 			layout.init
 			(
-				{ 1, 1, 1, 1 },
+				{ 1, 1, 1, 1, 1 },
 				{ 1, 1 }
 			);
 
@@ -118,11 +119,13 @@ namespace gui
 			addAndMakeVisible(normalize);
 			addAndMakeVisible(windowing);
 			addAndMakeVisible(limiting);
+			addAndMakeVisible(create);
 
 			makeToggleButton(dc, "DC");
 			makeToggleButton(normalize, "N");
 			makeToggleButton(windowing, "W");
 			makeToggleButton(limiting, "L");
+			makeTextButton(create, "C", false);
 
 			dc.onClick.push_back([&](Button& btn)
 			{
@@ -169,6 +172,10 @@ namespace gui
 					user->save();
 				}
 			});
+			create.onClick.push_back([&](Button&)
+			{
+				parser.onReturn();
+			});
 
 			auto& props = u.getProps();
 			auto user = props.getUserSettings();
@@ -199,15 +206,16 @@ namespace gui
 		{
 			layout.resized();
 
-			layout.place(parser, 0, 0, 4, 1);
+			layout.place(parser, 0, 0, 5, 1);
 
 			layout.place(dc, 0, 1, 1, 1);
 			layout.place(windowing, 1, 1, 1, 1);
 			layout.place(normalize, 2, 1, 1, 1);
 			layout.place(limiting, 3, 1, 1, 1);
+			layout.place(create, 4, 1, 1, 1);
 		}
 
 		FormularParser parser;
-		Button dc, normalize, windowing, limiting;
+		Button dc, normalize, windowing, limiting, create;
 	};
 }

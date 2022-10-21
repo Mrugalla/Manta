@@ -86,7 +86,7 @@ namespace gui
 				real += buf[s] * std::cos(sf);
 				imag -= buf[s] * std::sin(sf);
 			}
-			dft[n] += { real, imag };
+			dft[n] += std::complex<float>{ real, imag };
 		}
 
 		for (auto i = 0; i < Size; ++i)

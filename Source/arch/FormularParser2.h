@@ -498,7 +498,7 @@ namespace fx
 
 		Token(Type _type, const String& text = "") :
 			type(_type),
-			value(type == Type::Number ? text.getFloatValue() : 0.f),
+			value((type == Type::Number) || (type == Type::X) ? text.getFloatValue() : 0.f),
 			op(getOperator(text)),
 			precedence(getPrecedence(op)),
 			associativity(getAssociativity(op)),
@@ -509,7 +509,7 @@ namespace fx
 
 		Token(Type _type, const Char _char) :
 			type(_type),
-			value(type == Type::Number ? static_cast<float>(_char - '0') : 0.f),
+			value((type == Type::Number) || (type == Type::X) ? static_cast<float>(_char - '0') : 0.f),
 			op(getOperator(String::charToString(_char))),
 			precedence(getPrecedence(op)),
 			associativity(getAssociativity(op)),
@@ -533,7 +533,7 @@ namespace fx
 		case Token::Type::Number:
 			return String(t.value);
 		case Token::Type::X:
-			return "X";
+			return String((t.value == -1.f ? "-" : "")) + "X";
 		case Token::Type::Operator:
 			return toString(t.op);
 		case Token::Type::ParenthesisLeft:
@@ -549,6 +549,7 @@ namespace fx
 
 	inline void addNumberToTokens(Tokens& tokens, float numbr)
 	{
+		auto mult = 1.f;
 		if (!tokens.empty())
 			if (tokens.back().type == Token::Type::Number ||
 				tokens.back().type == Token::Type::X ||
@@ -556,7 +557,19 @@ namespace fx
 			{
 				tokens.push_back({ Token::Type::Operator, "*" });
 			}
-		tokens.push_back(Token(Token::Type::Number, String(numbr)));
+			else if (tokens.back().type == Token::Type::Operator)
+			{
+				if (tokens.back().op == Operator::Minus)
+				{
+					mult = -1.f;
+					tokens.pop_back();
+				}
+				else if (tokens.back().op == Operator::Plus)
+				{
+					tokens.pop_back();
+				}
+			}
+		tokens.push_back(Token(Token::Type::Number, String(numbr * mult)));
 	}
 
 	struct Parser
@@ -623,6 +636,7 @@ namespace fx
 				// CHECK FOR X
 				else if (chr == 'x')
 				{
+					float mult = 1.f;
 					if (!tokens.empty())
 						if (tokens.back().type == Token::Type::Number ||
 							tokens.back().type == Token::Type::X ||
@@ -630,7 +644,19 @@ namespace fx
 						{
 							tokens.push_back({ Token::Type::Operator, "*" });
 						}
-					tokens.push_back(Token(Token::Type::X));
+						else if (tokens.back().type == Token::Type::Operator)
+						{
+							if (tokens.back().op == Operator::Minus)
+							{
+								mult = -1.f;
+								tokens.pop_back();
+							}
+							else if (tokens.back().op == Operator::Plus)
+							{
+								tokens.pop_back();
+							}
+						}
+					tokens.push_back(Token(Token::Type::X, String(mult)));
 				}
 				// CHECK FOR PARANTHESIS
 				else if (chr == '(')
@@ -742,8 +768,8 @@ namespace fx
 						stack.push_back(p);
 						break;
 					case Token::Type::X:
-						y = x;
-						stack.push_back({ Token::Type::Number, String(x) });
+						y = x * p.value;
+						stack.push_back({ Token::Type::Number, String(y) });
 						break;
 					case Token::Type::Operator:
 						if (stack.size() < p.numArguments)

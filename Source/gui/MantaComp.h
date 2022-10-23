@@ -3,7 +3,7 @@
 #include "EQPad.h"
 #include "WaveTableDisplay.h"
 #include "Knob.h"
-#include "FormularParser.h"
+#include "FormulaParser.h"
 
 namespace gui
 {
@@ -19,7 +19,7 @@ namespace gui
 		static constexpr int WTSize = audio::Manta::WaveTableSize;
 		using WTDisplay = WaveTableDisplay<WTSize>;
 		using FlexWTDisplay = std::unique_ptr<WTDisplay>;
-		using FlexParser = std::unique_ptr<FormularParser2>;
+		using FlexParser = std::unique_ptr<FormulaParser2>;
 
 		MantaComp(Utils& u, OnSelectionChangeds& onSelectionChanged) :
 			Comp(u, "", CursorType::Default),
@@ -272,10 +272,10 @@ namespace gui
 							tables.emplace_back(u.audioProcessor.manta.getWaveTable(tableIdx).data());
 						}
 						
-						wtParser = std::make_unique<FormularParser2>
+						wtParser = std::make_unique<FormulaParser2>
 						(
 							u,
-							"This wavetable's formular parser. Enter a math expression and hit enter to generate a wavetable.",
+							"This wavetable's formula parser. Enter a math expression and hit enter to generate a wavetable.",
 							tables,
 							WTSize,
 							audio::WaveTable<WTSize>::NumExtraSamples

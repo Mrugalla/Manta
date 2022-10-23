@@ -617,6 +617,8 @@ namespace gui
 			searchBar(u, "Define a name or search for a patch!", "Init.."),
 			authorEditor(u, "Define your author name if you want to save a patch!", "Author..")
 		{
+			setInterceptsMouseClicks(true, true);
+			
 			{
 				auto& props = utils.getProps();
 				const auto& user = *props.getUserSettings();

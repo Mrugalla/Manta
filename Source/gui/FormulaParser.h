@@ -1,10 +1,10 @@
 #pragma once
-#include "../arch/FormularParser2.h"
+#include "../arch/FormulaParser2.h"
 #include "TextEditor.h"
 
 namespace gui
 {
-	struct FormularParser :
+	struct FormulaParser :
 		public TextEditor
 	{
 		using Parser = fx::Parser;
@@ -18,7 +18,7 @@ namespace gui
 			NumPostFX
 		};
 
-		FormularParser(Utils& u, String&& _tooltip, std::vector<float*>& tables, int size, int overshoot = 0) :
+		FormulaParser(Utils& u, String&& _tooltip, std::vector<float*>& tables, int size, int overshoot = 0) :
 			TextEditor(u, _tooltip, "enter some math"),
 			postFX{ false, false, false, true },
 			fx()
@@ -95,10 +95,10 @@ namespace gui
 		Parser fx;
 	};
 
-	struct FormularParser2 :
+	struct FormulaParser2 :
 		public Comp
 	{
-		FormularParser2(Utils& u, String&& _tooltip, std::vector<float*>& tables, int size, int overshoot) :
+		FormulaParser2(Utils& u, String&& _tooltip, std::vector<float*>& tables, int size, int overshoot) :
 			Comp(u, "", CursorType::Default),
 			parser(u, std::move(_tooltip), tables, size, overshoot),
 			dc(u, "De/activate DC Offset"),
@@ -129,7 +129,7 @@ namespace gui
 
 			dc.onClick.push_back([&](Button& btn)
 			{
-				parser.postFX[FormularParser::DCOffset] = dc.toggleState == 1;
+				parser.postFX[FormulaParser::DCOffset] = dc.toggleState == 1;
 				
 				auto& props = btn.utils.getProps();
 				auto user = props.getUserSettings();
@@ -141,7 +141,7 @@ namespace gui
 			});
 			normalize.onClick.push_back([&](Button& btn)
 			{
-				parser.postFX[FormularParser::Normalize] = normalize.toggleState == 1;
+				parser.postFX[FormulaParser::Normalize] = normalize.toggleState == 1;
 				auto& props = btn.utils.getProps();
 				auto user = props.getUserSettings();
 				if (user != nullptr)
@@ -152,7 +152,7 @@ namespace gui
 			});
 			windowing.onClick.push_back([&](Button& btn)
 			{
-				parser.postFX[FormularParser::Windowing] = windowing.toggleState == 1;
+				parser.postFX[FormulaParser::Windowing] = windowing.toggleState == 1;
 				auto& props = btn.utils.getProps();
 				auto user = props.getUserSettings();
 				if (user != nullptr)
@@ -163,7 +163,7 @@ namespace gui
 			});
 			limiting.onClick.push_back([&](Button& btn)
 			{
-				parser.postFX[FormularParser::Limiting] = limiting.toggleState == 1;
+				parser.postFX[FormulaParser::Limiting] = limiting.toggleState == 1;
 				auto& props = btn.utils.getProps();
 				auto user = props.getUserSettings();
 				if (user != nullptr)
@@ -194,10 +194,10 @@ namespace gui
 				limiting.toggleState = 1;
 			}
 			
-			parser.postFX[FormularParser::DCOffset] = dc.toggleState == 1;
-			parser.postFX[FormularParser::Normalize] = normalize.toggleState == 1;
-			parser.postFX[FormularParser::Windowing] = windowing.toggleState == 1;
-			parser.postFX[FormularParser::Limiting] = limiting.toggleState == 1;
+			parser.postFX[FormulaParser::DCOffset] = dc.toggleState == 1;
+			parser.postFX[FormulaParser::Normalize] = normalize.toggleState == 1;
+			parser.postFX[FormulaParser::Windowing] = windowing.toggleState == 1;
+			parser.postFX[FormulaParser::Limiting] = limiting.toggleState == 1;
 		}
 
 		void paint(Graphics&) {}
@@ -215,7 +215,7 @@ namespace gui
 			layout.place(create, 4, 1, 1, 1);
 		}
 
-		FormularParser parser;
+		FormulaParser parser;
 		Button dc, normalize, windowing, limiting, create;
 	};
 }

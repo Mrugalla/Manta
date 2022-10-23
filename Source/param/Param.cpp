@@ -1,5 +1,5 @@
 #include "Param.h"
-#include "../arch/FormularParser2.h"
+#include "../arch/FormulaParser2.h"
 #include "../arch/Conversion.h"
 
 namespace param
@@ -1180,7 +1180,7 @@ namespace param
 			params.push_back(makeParam(PID::Mix, state, 0.f, makeRange::withCentre(-80.f, 0.f, -6.f), Unit::Decibel));
 			params.push_back(makeParam(PID::MuteDry, state, 0.f, makeRange::toggle(), Unit::Mute));
 #endif
-			params.push_back(makeParam(PID::Gain, state, 17.f, makeRange::withCentre(PPD_GainOut_Min, PPD_GainOut_Max, 0.f), Unit::Decibel));
+			params.push_back(makeParam(PID::Gain, state, 0.f, makeRange::withCentre(PPD_GainOut_Min, PPD_GainOut_Max, 0.f), Unit::Decibel));
 #if PPDHasPolarity
 			params.push_back(makeParam(PID::Polarity, state, 0.f, makeRange::toggle(), Unit::Polarity));
 #endif
@@ -1230,7 +1230,7 @@ namespace param
 		params.push_back(makeParam(PID::Lane1RMDepth, state, 0.f));
 		params.push_back(makeParam(PID::Lane1Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
-		params.push_back(makeParam(PID::Lane2Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
+		params.push_back(makeParam(PID::Lane2Enabled, state, 1.f, makeRange::toggle(), Unit::Power));
 		params.push_back(makeParam(PID::Lane2PitchSnap, state, 1.f, makeRange::toggle(), Unit::Power));
 		params.push_back(makeParamPitch(PID::Lane2Pitch, state, g5, makeRange::lin(0.f, 127.f), xen));
 		params.push_back(makeParam(PID::Lane2Resonance, state, 40.f, makeRange::withCentre(1.f, 80.f, 12.f), Unit::Q));
@@ -1244,7 +1244,7 @@ namespace param
 		params.push_back(makeParam(PID::Lane2RMDepth, state, 0.f));
 		params.push_back(makeParam(PID::Lane2Gain, state, 0.f, makeRange::lin(-30.f, 30.f), Unit::Decibel));
 
-		params.push_back(makeParam(PID::Lane3Enabled, state, 0.f, makeRange::toggle(), Unit::Power));
+		params.push_back(makeParam(PID::Lane3Enabled, state, 1.f, makeRange::toggle(), Unit::Power));
 		params.push_back(makeParam(PID::Lane3PitchSnap, state, 1.f, makeRange::toggle(), Unit::Power));
 		params.push_back(makeParamPitch(PID::Lane3Pitch, state, g7, makeRange::lin(0.f, 127.f), xen));
 		params.push_back(makeParam(PID::Lane3Resonance, state, 40.f, makeRange::withCentre(1.f, 80.f, 12.f), Unit::Q));

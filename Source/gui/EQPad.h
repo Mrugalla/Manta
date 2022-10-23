@@ -128,7 +128,7 @@ namespace gui
 			std::array<Param*, NumDimensions> xyParam;
 			Param *scrollParam, *rightClickParam;
 			std::vector<PID> morePIDs;
-			BoundsF bounds;
+			BoundsF bounds, hitbox;
 			float x, y;
 		protected:
 			Utils& utils;
@@ -272,7 +272,7 @@ namespace gui
 
 		float getNodeSize() noexcept
 		{
-			return utils.thicc * 7.f;
+			return utils.thicc * 5.f;
 		}
 
 		void moveNode(int idx)
@@ -296,12 +296,13 @@ namespace gui
 			);
 
 			node.bounds = nodeBounds;
+			node.hitbox = nodeBounds.expanded(nodeSize * 2.f);
 		}
 		
-		Node* getNode(const PointF& pos)
+		Node* getNode(const PointF& pos) noexcept
 		{
 			for (auto& node : nodes)
-				if (node.bounds.contains(pos))
+				if (node.hitbox.contains(pos))
 					return &node;
 
 			return nullptr;

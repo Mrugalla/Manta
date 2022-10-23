@@ -553,6 +553,8 @@ namespace gui
 		navBar(u, xml),
 		subMenu(nullptr)
 	{
+		setInterceptsMouseClicks(true, true);
+
 		layout.init
 		(
 			{ 20, 50, 20 },

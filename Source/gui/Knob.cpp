@@ -171,7 +171,7 @@ namespace gui
     namespace looks
     {
         enum { Value, MaxModDepth, ValMod, ModBias, Meter, NumValues };
-        enum { ModDial, NumComps };
+        enum { ModDial, LockButton, NumComps };
 		
         namespace def
         {
@@ -326,7 +326,10 @@ namespace gui
                     k.knobBounds = layout(0, 0, 3, 2, true).reduced(thicc);
                     layout.place(k.label, 0, 2, 3, 1, false);
                     if (modulatable)
+                    {
                         layout.place(*k.comps[ModDial], 1, 1, 1, 1, true);
+                        layout.place(*k.comps[LockButton], 2.f, 1.4f, 1.f, .6f, false);
+                    }
                 };
 
                 k.init
@@ -416,16 +419,20 @@ namespace gui
                     const auto thicc = k.utils.thicc;
                     auto& layout = k.layout;
 
-                    k.knobBounds = layout(0, 0, 1, 1, false).reduced(thicc);
-                    layout.place(k.label, 0, 2, 1, 1, false);
+                    k.knobBounds = layout(0, 1, 1, 1, false).reduced(thicc);
+                    layout.place(k.label, 0, 3, 1, 1, false);
                     if (modulatable)
-                        layout.place(*k.comps[ModDial], 0, 1, 1, 1, true);
+                    {
+                        layout.place(*k.comps[LockButton], 0, 0, 1, 1, true);
+                        layout.place(*k.comps[ModDial], 0, 2, 1, 1, true);
+                    }
+                        
                 };
 
                 k.init
                 (
                     { 1 },
-                    { 13, 3, 3 }
+                    { 3, 13, 3, 3 }
                 );
             }
         }
@@ -746,6 +753,8 @@ namespace gui
             return shallRepaint;
         };
 
+        knob.comps.reserve(looks::NumComps);
+
         if (modulatable)
         {
             auto modDial = std::make_unique<Knob>(knob.getUtils(), "M", "Drag this to modulate the macro's modulation depth.", CursorType::Mod);
@@ -830,7 +839,7 @@ namespace gui
                         {
                             auto& state = k.states[0];
                             state = (state + 1) % NumStates;
-							
+
                             switch (state)
                             {
                             case StateMaxModDepth:
@@ -860,8 +869,31 @@ namespace gui
                     }
                 };
 
-                knob.comps.push_back(std::move(modDial));
+                knob.comps.emplace_back(std::move(modDial));
                 knob.addAndMakeVisible(*knob.comps.back());
+            }
+
+            { // lockable
+                auto lockButton = std::make_unique<Button>(knob.getUtils(), "Un-/Lock this parameter.");
+                {
+                    auto& lck = *lockButton;
+
+                    makeTextButton(lck, "L", false);
+
+                    lck.onClick.push_back([pIDs](Button& btn)
+                    {
+                        for (auto pID : pIDs)
+                        {
+                            auto param = btn.utils.getParam(pID);
+							param->setLocked(!param->isLocked());
+                        }
+
+                        btn.toggleState = btn.utils.getParam(pIDs[0])->isLocked() ? 1 : 0;
+                    });
+
+                    knob.comps.emplace_back(std::move(lockButton));
+                    knob.addAndMakeVisible(*knob.comps.back());
+                }
             }
         }
 

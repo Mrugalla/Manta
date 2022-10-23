@@ -599,6 +599,8 @@ namespace fx
 				const auto opStr = getOperator(txt, i);
 				if (opStr.isNotEmpty())
 				{
+					Token op(Token::Type::Operator, opStr);
+					
 					if (tokens.empty())
 					{
 						if (opStr == "-" || opStr == "+")
@@ -612,10 +614,11 @@ namespace fx
 							tokens.back().type == Token::Type::X ||
 							tokens.back().type == Token::Type::ParenthesisRight)
 						{
-							tokens.push_back({ Token::Type::Operator, '*' });
+							if(op.numArguments != 2)
+								tokens.push_back({ Token::Type::Operator, '*' });
 						}
 					}
-					tokens.push_back(Token(Token::Type::Operator, opStr));
+					tokens.push_back(op);
 				}
 				// CHECK FOR NUMBERS
 				else if (txt.substring(i, i + 3) == "tau")

@@ -43,10 +43,9 @@
       </GROUP>
       <GROUP id="{D379AB76-3EAE-A37D-31CD-FC91511F3FC1}" name="arch">
         <FILE id="Rwen3L" name="Conversion.h" compile="0" resource="0" file="Source/arch/Conversion.h"/>
-        <FILE id="OiS45d" name="FormularParser.h" compile="0" resource="0"
-              file="Source/arch/FormularParser.h"/>
-        <FILE id="s963BZ" name="FormularParser2.h" compile="0" resource="0"
-              file="Source/arch/FormularParser2.h"/>
+        <FILE id="OiS45d" name="FormulaParser.h" compile="0" resource="0" file="Source/arch/FormulaParser.h"/>
+        <FILE id="s963BZ" name="FormulaParser2.h" compile="0" resource="0"
+              file="Source/arch/FormulaParser2.h"/>
         <FILE id="f4V9L3" name="Interpolation.h" compile="0" resource="0" file="Source/arch/Interpolation.h"/>
         <FILE id="bgyAlz" name="Range.h" compile="0" resource="0" file="Source/arch/Range.h"/>
         <FILE id="pjozVu" name="Smooth.cpp" compile="1" resource="0" file="Source/arch/Smooth.cpp"/>
@@ -55,8 +54,7 @@
         <FILE id="Uad8Jv" name="State.h" compile="0" resource="0" file="Source/arch/State.h"/>
       </GROUP>
       <GROUP id="{DA435779-5001-4379-F809-3E7C21D55DC0}" name="gui">
-        <FILE id="EMWM6x" name="FormularParser.h" compile="0" resource="0"
-              file="Source/gui/FormularParser.h"/>
+        <FILE id="EMWM6x" name="FormulaParser.h" compile="0" resource="0" file="Source/gui/FormulaParser.h"/>
         <FILE id="ZcE1oE" name="WaveTableDisplay.h" compile="0" resource="0"
               file="Source/gui/WaveTableDisplay.h"/>
         <FILE id="yz905S" name="MantaComp.h" compile="0" resource="0" file="Source/gui/MantaComp.h"/>

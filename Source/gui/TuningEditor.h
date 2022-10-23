@@ -190,6 +190,8 @@ namespace gui
 			keys(u, "Scrub the keys to test your tuning settings."),
 			gain(u)
 		{
+			setInterceptsMouseClicks(true, true);
+			
 			addAndMakeVisible(title);
 			title.textCID = ColourID::Txt;
 			title.font = getFontDosisRegular();

@@ -192,6 +192,8 @@ namespace audio
         manta(xenManager),
         spectroBeam()
     {
+        auto& gainParam = *params[PID::Gain];
+        gainParam.setValueWithGesture(gainParam.range.convertTo0to1(17.f));
     }
 
     void Processor::prepareToPlay(double sampleRate, int maxBlockSize)

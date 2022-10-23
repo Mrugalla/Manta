@@ -193,7 +193,7 @@ namespace audio
 				
 				laneBuffer.setSize(2, blockSize, false, true, false);
 
-				frequency.prepare(Fs, blockSize, 20.f);
+				frequency.prepare(Fs, blockSize, 10.f);
 				resonance.prepare(Fs, blockSize, 10.f);
 				drive.prepare(Fs, blockSize, 10.f);
 				feedback.prepare(Fs, blockSize, 10.f);

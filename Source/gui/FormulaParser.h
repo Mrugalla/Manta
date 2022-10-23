@@ -14,13 +14,12 @@ namespace gui
 			DCOffset,
 			Windowing,
 			Normalize,
-			Limiting,
 			NumPostFX
 		};
 
 		FormulaParser(Utils& u, String&& _tooltip, std::vector<float*>& tables, int size, int overshoot = 0) :
 			TextEditor(u, _tooltip, "enter some math"),
-			postFX{ false, false, false, true },
+			postFX{ false, false, false },
 			fx()
 		{
 			onReturn = [this, tables, size, overshoot]()
@@ -70,11 +69,8 @@ namespace gui
 					if (max > 0.f)
 						SIMD::multiply(tables[0], 1.f / max, size);
 				}
-				if (postFX[Limiting])
-				{
-					for (auto i = 0; i < size; ++i)
-						tables[0][i] = std::clamp(tables[0][i], -1.f, 1.f);
-				}
+				for (auto i = 0; i < size; ++i)
+					tables[0][i] = std::clamp(tables[0][i], -1.f, 1.f);
 
 				for (auto i = 0; i < overshoot; ++i)
 					tables[0][size + i] = tables[0][i];
@@ -104,12 +100,11 @@ namespace gui
 			dc(u, "De/activate DC Offset"),
 			normalize(u, "De/activate Normalize"),
 			windowing(u, "De/activate Windowing"),
-			limiting(u, "De/activate Limiting"),
 			create(u, "Create a wavetable.")
 		{
 			layout.init
 			(
-				{ 1, 1, 1, 1, 1 },
+				{ 1, 1, 1, 1 },
 				{ 1, 1 }
 			);
 
@@ -118,13 +113,11 @@ namespace gui
 			addAndMakeVisible(dc);
 			addAndMakeVisible(normalize);
 			addAndMakeVisible(windowing);
-			addAndMakeVisible(limiting);
 			addAndMakeVisible(create);
 
 			makeToggleButton(dc, "DC");
 			makeToggleButton(normalize, "N");
 			makeToggleButton(windowing, "W");
-			makeToggleButton(limiting, "L");
 			makeTextButton(create, "C", false);
 
 			dc.onClick.push_back([&](Button& btn)
@@ -161,17 +154,6 @@ namespace gui
 					user->save();
 				}
 			});
-			limiting.onClick.push_back([&](Button& btn)
-			{
-				parser.postFX[FormulaParser::Limiting] = limiting.toggleState == 1;
-				auto& props = btn.utils.getProps();
-				auto user = props.getUserSettings();
-				if (user != nullptr)
-				{
-					user->setValue("Parser_Limiting", limiting.toggleState);
-					user->save();
-				}
-			});
 			create.onClick.push_back([&](Button&)
 			{
 				parser.onReturn();
@@ -184,20 +166,17 @@ namespace gui
 				dc.toggleState = user->getIntValue("Parser_DCOffset", 0);
 				normalize.toggleState = user->getIntValue("Parser_Normalize", 0);
 				windowing.toggleState = user->getIntValue("Parser_Windowing", 0);
-				limiting.toggleState = user->getIntValue("Parser_Limiting", 1);
 			}
 			else
 			{
 				dc.toggleState = 0;
 				normalize.toggleState = 0;
 				windowing.toggleState = 0;
-				limiting.toggleState = 1;
 			}
 			
 			parser.postFX[FormulaParser::DCOffset] = dc.toggleState == 1;
 			parser.postFX[FormulaParser::Normalize] = normalize.toggleState == 1;
 			parser.postFX[FormulaParser::Windowing] = windowing.toggleState == 1;
-			parser.postFX[FormulaParser::Limiting] = limiting.toggleState == 1;
 		}
 
 		void paint(Graphics&) {}
@@ -211,11 +190,10 @@ namespace gui
 			layout.place(dc, 0, 1, 1, 1);
 			layout.place(windowing, 1, 1, 1, 1);
 			layout.place(normalize, 2, 1, 1, 1);
-			layout.place(limiting, 3, 1, 1, 1);
-			layout.place(create, 4, 1, 1, 1);
+			layout.place(create, 3, 1, 1, 1);
 		}
 
 		FormulaParser parser;
-		Button dc, normalize, windowing, limiting, create;
+		Button dc, normalize, windowing, create;
 	};
 }

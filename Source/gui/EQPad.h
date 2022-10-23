@@ -128,8 +128,8 @@ namespace gui
 			std::array<Param*, NumDimensions> xyParam;
 			Param *scrollParam, *rightClickParam;
 			std::vector<PID> morePIDs;
-			BoundsF bounds, hitbox;
-			float x, y;
+			BoundsF bounds;
+			float x, y, hitboxDistSquared;
 		protected:
 			Utils& utils;
 		};
@@ -304,14 +304,27 @@ namespace gui
 			);
 
 			node.bounds = nodeBounds;
-			node.hitbox = nodeBounds.expanded(nodeSize * 2.f);
+			node.hitboxDistSquared = normalizeX(LineF(nodeBounds.getTopLeft(), nodeBounds.getBottomRight()).getLengthSquared());
 		}
 		
 		Node* getNode(const PointF& pos) noexcept
 		{
+			Node* closest = nullptr;
+			
+			float distance = std::numeric_limits<float>::max();
 			for (auto& node : nodes)
-				if (node.hitbox.contains(pos))
-					return &node;
+			{
+				PointF nodePos(node.x, node.y);
+				auto nodeDistance = pos.getDistanceSquaredFrom(nodePos);
+				if (distance > nodeDistance)
+				{
+					distance = nodeDistance;
+					closest = &node;
+				}
+			}
+
+			if (closest->hitboxDistSquared > distance)
+				return closest;
 
 			return nullptr;
 		}
@@ -331,7 +344,7 @@ namespace gui
 
 		void mouseMove(const Mouse& mouse) override
 		{
-			auto h = getNode(mouse.position);
+			auto h = getNode(normalize(mouse.position));
 			if (hovered != h)
 			{
 				hovered = h;

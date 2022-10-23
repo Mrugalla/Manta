@@ -199,14 +199,22 @@ namespace gui
 					hovered->bounds.getX() + hovered->bounds.getWidth() * .5f,
 					hovered->bounds.getY() + hovered->bounds.getHeight() * .5f
 				);
-				auto nodeSize = getNodeSize() * 7.f;
-				auto nodeSizeHalf = nodeSize * .5f;
+				const auto infoSize = getNodeSize() * 7.f;
+				const auto infoSizeHalf = infoSize * .5f;
+				auto infoX = hCentre.x - infoSizeHalf;
+				if(infoX < 0.f)
+					infoX += infoSizeHalf;
+				else if (infoX + infoSize > bounds.getWidth())
+					infoX -= infoSizeHalf;
+				auto infoY = hCentre.y - infoSizeHalf;
+				if (infoY < 0.f)
+					infoY += infoSizeHalf;
 				BoundsF infoBounds
 				(
-					hCentre.x - nodeSizeHalf,
-					hCentre.y - nodeSizeHalf,
-					nodeSize,
-					nodeSizeHalf
+					infoX,
+					infoY,
+					infoSize,
+					infoSizeHalf
 				);
 				g.setColour(Colours::c(ColourID::Txt));
 				g.drawFittedText(hovered->xyParam[X]->getCurrentValueAsText(), infoBounds.toNearestInt(), Just::centred, 1);

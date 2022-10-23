@@ -51,9 +51,11 @@ namespace audio
 					auto smpls = samples[ch];
 					auto& fltr = filta[ch];
 
+					fltr.setStage(stage);
+
 					for (auto s = 0; s < numSamples; ++s)
 					{
-						fltr.copy(filta[0]);
+						fltr.setFc(fcBuf[s], resoBuf[s]);
 						lane[s] = fltr(smpls[s]);
 					}
 				}

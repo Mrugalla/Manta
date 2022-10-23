@@ -37,7 +37,6 @@ TO DO:
 17. plugin looks empty or weird when no node is selected
 18. reinit a patch button
 19. lowlevel controls are smaller than highlevel ones
-20. text clips when eq node on top of eqpad
 21: modulating signal makes mono content stereo. dsp bug
 22: add a clipper because of high volume danger
 23: discard wavetable limiter feature. stuff always gets clipped to -1,1

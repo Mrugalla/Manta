@@ -134,7 +134,7 @@ namespace gui
 		responseCurve()
 	{
 		setInterceptsMouseClicks(false, false);
-		startTimerHz(12);
+		startTimerHz(PPDFPSKnobs);
 	}
 
 	void FilterResponseGraph2::paint(Graphics& g)

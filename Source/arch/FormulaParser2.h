@@ -601,14 +601,7 @@ namespace fx
 				{
 					Token op(Token::Type::Operator, opStr);
 					
-					if (tokens.empty())
-					{
-						if (opStr == "-" || opStr == "+")
-						{
-							tokens.push_back(Token(Token::Type::Number, "0"));
-						}
-					}
-					else
+					if (!tokens.empty())
 					{
 						if (tokens.back().type == Token::Type::Number ||
 							tokens.back().type == Token::Type::X ||

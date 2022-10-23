@@ -30,7 +30,6 @@ TO DO:
 7. y-achsis eq pad for gain. mousewheel for q. slope as extra setting
 10. after randomizing lanes can't be reliably de/activated
 11. logic crash on feedback knob
-12. first thing I notice is x2x gives me a different visual output than 2x*x
 13. grabs keyboard focus when clicking on a knob (feedback)
 14. slope not as button click
 15. 60fps knob is not appreciated

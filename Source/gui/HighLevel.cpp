@@ -22,9 +22,6 @@ namespace gui
 				highLevel.patchBrowserButton.toggleState = 0;
 				highLevel.patchBrowserButton.repaint();
 #endif
-				tuningEditor.initWidget(.05f, true);
-				highLevel.tuningEditorButton.toggleState = 0;
-				highLevel.tuningEditorButton.repaint();
 			}
 		};
 	}

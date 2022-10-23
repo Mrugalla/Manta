@@ -2,21 +2,35 @@
 
 namespace gui
 {
-	static Notify makeHighLevelNotify(Utils& _u)
+	Notify HighLevel::makeNotify(HighLevel& hl, CompWidgetable* te)
 	{
-		return [&u = _u](EvtType t, const void*)
+		return [&highLevel = hl, &tuningEditor = *te](EvtType t, const void*)
 		{
 			if (t == EvtType::ClickedEmpty)
 			{
 				// host grabs keyboard focus
-				auto& pluginTop = u.pluginTop;
+				auto& pluginTop = highLevel.utils.pluginTop;
 				pluginTop.giveAwayKeyboardFocus();
+				if (highLevel.menu != nullptr)
+				{
+					highLevel.menu->setVisible(false);
+					highLevel.menuButton.toggleState = 0;
+					highLevel.menuButton.repaint();
+				}
+#if PPDHasPatchBrowser
+				highLevel.patchBrowser.setVisible(false);
+				highLevel.patchBrowserButton.toggleState = 0;
+				highLevel.patchBrowserButton.repaint();
+#endif
+				tuningEditor.initWidget(.05f, true);
+				highLevel.tuningEditorButton.toggleState = 0;
+				highLevel.tuningEditorButton.repaint();
 			}
 		};
 	}
 
 	HighLevel::HighLevel(Utils& u, LowLevel* _lowLevel, CompWidgetable* tuningEditor) :
-		Comp(u, "", makeHighLevelNotify(u), CursorType::Default),
+		Comp(u, "", makeNotify(*this, tuningEditor), CursorType::Default),
 #if PPDHasPatchBrowser
 		patchBrowser(u),
 		patchBrowserButton(u, patchBrowser),

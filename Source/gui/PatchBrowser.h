@@ -630,7 +630,8 @@ namespace gui
 				loadPatchesFromDisk(directory);
 			}
 
-			layout.init(
+			layout.init
+			(
 				{ 1, 3, 34, 13, 3, 3, 1 },
 				{ 1, 3, 34, 21, 1 }
 			);
@@ -829,15 +830,15 @@ namespace gui
 		{
 			makeTextButton(*this, browser.getSelectedPatchName(), false);
 			onClick.push_back([&](Button&, const Mouse&)
+			{
+				const auto e = browser.isVisible();
+				if (e)
+					browser.setVisible(false);
+				else
 				{
-					const auto e = browser.isVisible();
-					if (e)
-						browser.setVisible(false);
-					else
-					{
-						browser.setVisible(true);
-					}
-				});
+					browser.setVisible(true);
+				}
+			});
 		}
 
 		void paint(Graphics& g) override

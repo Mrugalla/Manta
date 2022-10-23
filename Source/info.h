@@ -28,7 +28,6 @@ TO DO:
 4. en/disable filter on doubleclick instead of rightclick
 5. logic crashes on move knot
 7. y-achsis eq pad for gain. mousewheel for q. slope as extra setting
-11. logic crash on feedback knob
 14. slope not as button click
 17. plugin looks empty or weird when no node is selected
 18. reinit a patch button
@@ -39,7 +38,6 @@ TO DO:
 33: preset formulas for formula parser for the math noobs
 34: dice button looks not dice-y enough
 35: when snap-to-pitch is activated should be reflected in gui
-36: not obvious how to leave the patch browser
 37: if enter value manually and exceeds range, textbox should show corrected value
 39: rand relative for all parameters at once
 40. rightclick on knob when menu already open closes menu

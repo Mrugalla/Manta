@@ -26,13 +26,14 @@ namespace gui
 		void paint(Graphics& g) override;
 
 		void resized() override;
-
+		
 	protected:
 #if PPDHasPatchBrowser
 		PatchBrowser patchBrowser;
 		ButtonPatchBrowser patchBrowserButton;
 #endif
 		TuningEditorButton tuningEditorButton;
+
 		Knob macro;
 		Button clipper;
 		Button modDepthLocked;
@@ -56,7 +57,9 @@ namespace gui
 		LowLevel* lowLevel;
 		std::unique_ptr<Menu> menu;
 		Button menuButton;
-
+		
 		std::unique_ptr<FileChooser> fileChooser;
+
+		Notify makeNotify(HighLevel&, CompWidgetable*);
 	};
 }

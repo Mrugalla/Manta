@@ -91,6 +91,8 @@ namespace gui
 
             onDown(*this);
         }
+
+        utils.giveDAWKeyboardFocus();
     }
 
     void Knob::mouseDrag(const Mouse& mouse)

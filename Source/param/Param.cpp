@@ -26,6 +26,7 @@ namespace param
 		switch (pID)
 		{
 		case PID::Macro: return "Macro";
+		case PID::Clipper: return "Clipper";
 #if PPDHasGainIn
 		case PID::GainIn: return "Gain In";
 #endif
@@ -138,6 +139,7 @@ namespace param
 		switch (pID)
 		{
 		case PID::Macro: return "Dial in the desired amount of macro modulation depth.";
+		case PID::Clipper: return "A soft clipper on the wet signal.";
 #if PPDHasGainIn
 		case PID::GainIn: return "Apply input gain to the wet signal.";
 #endif
@@ -1171,6 +1173,7 @@ namespace param
 	{
 		{ // HIGH LEVEL PARAMS:
 			params.push_back(makeParam(PID::Macro, state, 0.f));
+			params.push_back(makeParam(PID::Clipper, state, 0.f, makeRange::toggle(), Unit::Power));
 #if PPDHasGainIn
 			params.push_back(makeParam(PID::GainIn, state, 0.f, makeRange::withCentre(PPD_GainIn_Min, PPD_GainIn_Max, 0.f), Unit::Decibel));
 #endif

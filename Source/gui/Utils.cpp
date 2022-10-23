@@ -98,6 +98,11 @@ namespace gui
 		return std::floor(8.5f + norm * 5.f);
 	}
 
+	void Utils::giveDAWKeyboardFocus()
+	{
+		pluginTop.giveAwayKeyboardFocus();
+	}
+
 	EventSystem& Utils::getEventSystem()
 	{
 		return eventSystem;

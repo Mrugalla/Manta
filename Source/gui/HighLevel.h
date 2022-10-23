@@ -34,6 +34,7 @@ namespace gui
 #endif
 		TuningEditorButton tuningEditorButton;
 		Knob macro;
+		Button clipper;
 		Button modDepthLocked;
 		Button swapParamWithModDepth;
 		Button saveModPatch, loadModPatch, removeCurModPatch;

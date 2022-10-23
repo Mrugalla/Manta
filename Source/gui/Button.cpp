@@ -276,11 +276,18 @@ namespace gui
 
 	void Button::mouseUp(const Mouse& mouse)
 	{
+		utils.giveDAWKeyboardFocus();
+		
 		if (mouse.mouseWasDraggedSinceMouseDown())
 			return;
 
 		if (locked)
+		{
+			if(mouse.mods.isRightButtonDown())
+				for (auto& oc : onClick)
+					oc(*this, mouse);
 			return;
+		}
 
 		blinkyBoy.init(this, .25f);
 
@@ -687,7 +694,8 @@ namespace gui
 				const auto arcHeight = bounds.getHeight() * .4f;
 				const auto arcWidth = bounds.getWidth() * .6f;
 
-				const BoundsF arcBounds(
+				const BoundsF arcBounds
+				(
 					bounds.getX() + (bounds.getWidth() - arcWidth) * .5f,
 					bounds.getY(),
 					arcWidth,
@@ -702,14 +710,15 @@ namespace gui
 
 				g.strokePath(path, stroke);
 
-				const BoundsF bodyBounds(
+				const BoundsF bodyBounds
+				(
 					bounds.getX(),
 					arcBounds.getBottom(),
 					bounds.getWidth(),
 					bounds.getHeight() - arcBounds.getHeight()
 				);
 
-				g.fillRoundedRectangle(bodyBounds, thicc);
+				g.drawRoundedRectangle(bodyBounds, thicc, thicc);
 			}
 			else if (symbol == ButtonSymbol::Save)
 			{

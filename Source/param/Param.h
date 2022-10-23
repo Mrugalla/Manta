@@ -19,6 +19,7 @@ namespace param
 	{
 		// high level params
 		Macro,
+		Clipper,
 #if PPDHasGainIn
 		GainIn,
 #endif

@@ -76,6 +76,8 @@ namespace gui
 			return audioProcessor.midiVoices.voices;
 		}
 
+		void giveDAWKeyboardFocus();
+
 		Component& pluginTop;
 		float thicc;
 		Processor& audioProcessor;

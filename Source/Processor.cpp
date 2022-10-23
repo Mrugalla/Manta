@@ -362,6 +362,15 @@ namespace audio
 #endif
         dryWetMix.processOutGain(samples, numChannels, numSamples);
         tuningEditorSynth(samples, numChannels, numSamples);
+        {
+            const auto isClipping = params[PID::Clipper]->getValMod() > .5f ? 1.f : 0.f;
+            if (isClipping)
+            {
+                for (auto ch = 0; ch < numChannels; ++ch)
+                    for (auto s = 0; s < numSamples; ++s)
+                        samples[ch][s] = softclip(samples[ch][s], .6f);
+            }
+        }
         meters.processOut(constSamples, numChannels, numSamples);
 #if PPD_MixOrGainDry
         if (!muteDry)
@@ -383,10 +392,10 @@ namespace audio
 
             for (auto s = 0; s < numSamples; ++s)
             {
-                if (smpls[s] > 1.f)
-                    smpls[s] = 1.f;
-                else if (smpls[s] < -1.f)
-                    smpls[s] = -1.f;
+                if (smpls[s] > 2.f)
+                    smpls[s] = 2.f;
+                else if (smpls[s] < -2.f)
+                    smpls[s] = -2.f;
             }
         }
 #endif

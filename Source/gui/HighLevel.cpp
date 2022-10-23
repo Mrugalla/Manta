@@ -23,6 +23,7 @@ namespace gui
 #endif
 		tuningEditorButton(u, tuningEditor),
 		macro(u),
+		clipper(u),
 		modDepthLocked(u, "(Un-)Lock this patch's modulation patch."),
 		swapParamWithModDepth(u, "Swap parameter patch with modulation patch."),
 		saveModPatch(u, "Save the current Modulation Patch to disk."),
@@ -271,6 +272,9 @@ namespace gui
 
 		makeParameter(macro, PID::Macro, "Macro", false);
 
+		makeParameterSwitchButton(clipper, PID::Clipper, "Clip");
+		addAndMakeVisible(clipper);
+
 #if PPDHasPatchBrowser
 		addAndMakeVisible(patchBrowserButton);
 #endif
@@ -403,9 +407,10 @@ namespace gui
 	{
 		layout.resized();
 
-		layout.place(tuningEditorButton, 3.f, 1.f, 1.f, 1.f, true);
-		layout.place(menuButton, 5.f, 1.f, 1.f, 1.f, true);
-		layout.place(parameterRandomizer, 7.f, 1.f, 1.f, 1.f, true);
+		layout.place(tuningEditorButton, 1.f, 1.f, 1.f, 1.f, true);
+		layout.place(menuButton, 3.f, 1.f, 1.f, 1.f, true);
+		layout.place(parameterRandomizer, 5.f, 1.f, 1.f, 1.f, true);
+		layout.place(clipper, 7.f, 1.f, 1.f, 1.f, true);
 
 #if PPDHasPatchBrowser
 		layout.place(patchBrowserButton, 1.f, 3.f, 7.f, 1.f, false);

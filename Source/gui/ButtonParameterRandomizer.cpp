@@ -36,7 +36,7 @@ namespace gui
         for (auto& func : randFuncs)
             func(rand);
         for (auto randomizable : randomizables)
-            if (randomizable->id != PID::Power)
+            if (randomizable->id != PID::Power && randomizable->id != PID::Clipper)
             {
                 const auto& range = randomizable->range;
 
@@ -67,7 +67,7 @@ namespace gui
     String ButtonParameterRandomizer::makeTooltip()
     {
         Random rand;
-        static constexpr float count = 222.f;
+        static constexpr float count = 224.f;
         const auto v = static_cast<int>(std::round(rand.nextFloat() * count));
         switch (v)
         {
@@ -294,6 +294,8 @@ namespace gui
 		case 220: return "In the future there will be more tooltip messages.";
 		case 221: return "Refresh yourself with a cold shower!";
 		case 222: return "This is the last tooltip message. I promise.";
+		case 223: return "Insanity is the only way to achieve perfection.";
+		case 224: return "Destructive forces cause constructive changes.";
         default: "Are you sure?";
         }
         return "You are not supposed to read this message!";

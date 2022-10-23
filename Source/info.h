@@ -30,20 +30,13 @@ TO DO:
 7. y-achsis eq pad for gain. mousewheel for q. slope as extra setting
 10. after randomizing lanes can't be reliably de/activated
 11. logic crash on feedback knob
-13. grabs keyboard focus when clicking on a knob (feedback)
 14. slope not as button click
-15. 60fps knob is not appreciated
-16. cursor too large
 17. plugin looks empty or weird when no node is selected
 18. reinit a patch button
 19. lowlevel controls are smaller than highlevel ones
-22: add a clipper because of high volume danger
 24. tooltips in high level component and new design for less space
-26. lock maxmoddepth button should not be filled. looks too heavy
-27. text entry thing of knob doesn't go away on escape and off-clicks
 29. init preset can have other values than the parameter defaults, so that gain can have default on 0, but init on +17
 30. FFT with overlap technique
-31. x^2 doesnt work?
 32: A/B to flip arrows to make more obvious that it's for macro
 33: preset formulas for formula parser for the math noobs
 34: dice button looks not dice-y enough

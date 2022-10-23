@@ -28,14 +28,12 @@ TO DO:
 4. en/disable filter on doubleclick instead of rightclick
 5. logic crashes on move knot
 7. y-achsis eq pad for gain. mousewheel for q. slope as extra setting
-10. after randomizing lanes can't be reliably de/activated
 11. logic crash on feedback knob
 14. slope not as button click
 17. plugin looks empty or weird when no node is selected
 18. reinit a patch button
 19. lowlevel controls are smaller than highlevel ones
 24. tooltips in high level component and new design for less space
-29. init preset can have other values than the parameter defaults, so that gain can have default on 0, but init on +17
 30. FFT with overlap technique
 32: A/B to flip arrows to make more obvious that it's for macro
 33: preset formulas for formula parser for the math noobs
@@ -43,8 +41,8 @@ TO DO:
 35: when snap-to-pitch is activated should be reflected in gui
 36: not obvious how to leave the patch browser
 37: if enter value manually and exceeds range, textbox should show corrected value
-38: transparency of knobs' textbox is too high
 39: rand relative for all parameters at once
+40. rightclick on knob when menu already open closes menu
 
 modulation of the filter
 	TPT/SVF filters work better?

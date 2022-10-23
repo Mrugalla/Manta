@@ -56,10 +56,10 @@ namespace gui
 
                 setInternal(ColourID::Bg, col.darker(8.f).withMultipliedSaturation(.15f));
                 setInternal(ColourID::Txt, col.withMultipliedBrightness(.6f));
-                setInternal(ColourID::Mod, col.withRotatedHue(.4f));
-                setInternal(ColourID::Bias, col.withRotatedHue(.6f));
+                setInternal(ColourID::Mod, col.withRotatedHue(.3333f));
+                setInternal(ColourID::Bias, col.withRotatedHue(.6666f));
                 setInternal(ColourID::Darken, col.darker(2.f).withMultipliedAlpha(.5f));
-                setInternal(ColourID::Hover, col.withMultipliedSaturation(2.f).brighter(2.f).withMultipliedAlpha(.15f));
+                setInternal(ColourID::Hover, col.withMultipliedSaturation(2.f).brighter(2.f).withMultipliedAlpha(.3f));
                 setInternal(ColourID::Inactive, col.withMultipliedSaturation(.1f));
                 
                 if (props->needsToBeSaved())

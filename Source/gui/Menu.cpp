@@ -33,7 +33,7 @@ namespace gui
 		makeTextButton(revert, "Revert", false, true);
 		makeTextButton(deflt, "Default", false, true);
 
-		revert.onClick.push_back([this](Button&)
+		revert.onClick.push_back([this](Button&, const Mouse&)
 			{
 				Colours::c.set(curSheme);
 
@@ -44,7 +44,7 @@ namespace gui
 
 				notify(EvtType::ColourSchemeChanged);
 			});
-		deflt.onClick.push_back([this](Button&)
+		deflt.onClick.push_back([this](Button&, const Mouse&)
 			{
 				Colours::c.set(Colours::c.defaultColour());
 
@@ -144,12 +144,12 @@ namespace gui
 			return true;
 		};
 
-		manifest.onClick.push_back([&](Button&)
+		manifest.onClick.push_back([&](Button&, const Mouse&)
 			{
 				saveToDisk();
 			});
 
-		inspire.onClick.push_back([&](Button&)
+		inspire.onClick.push_back([&](Button&, const Mouse&)
 			{
 				const File folder(getFolder());
 
@@ -185,7 +185,7 @@ namespace gui
 				}
 			});
 
-		reveal.onClick.push_back([&](Button&)
+		reveal.onClick.push_back([&](Button&, const Mouse&)
 			{
 				const File file(getFolder() + date.getText());
 				if (file.exists())
@@ -195,14 +195,14 @@ namespace gui
 				folder.revealToUser();
 			});
 
-		clear.onClick.push_back([&](Button&)
+		clear.onClick.push_back([&](Button&, const Mouse&)
 			{
 				editor.clear();
 				editor.enable();
 				parse("");
 			});
 
-		paste.onClick.push_back([&](Button&)
+		paste.onClick.push_back([&](Button&, const Mouse&)
 		{
 			auto cbTxt = SystemClipboard::getTextFromClipboard();
 			if (cbTxt.isEmpty())
@@ -406,7 +406,7 @@ namespace gui
 
 			// make navigation functionality
 
-			btn.onClick.push_back([&sub = subMenu, &prnt = parent, &node = nodes[i]](Button&)
+			btn.onClick.push_back([&sub = subMenu, &prnt = parent, &node = nodes[i]](Button&, const Mouse&)
 			{
 				auto& utils = prnt.getUtils();
 
@@ -511,9 +511,19 @@ namespace gui
 				prnt.getLayout().place(*sub, 1, 2, 2, 1, false);
 			});
 		}
-
+		// make a temporary mouse event obj lol, hacky af
+		Mouse tmp
+		(
+			*juce::Desktop::getInstance().getMouseSource(0),
+			{0.f, 0.f},
+			juce::ModifierKeys(),
+			1.f, 1.f, 1.f, 1.f, 1.f,
+			this, this, juce::Time(),
+			{0.f, 0.f}, juce::Time(),
+			1, false
+		);
 		for (auto& oc : buttons.front()->onClick)
-			oc(*buttons.front().get());
+			oc(*buttons.front().get(), tmp);
 	}
 
 	void NavBar::paint(Graphics&) {}

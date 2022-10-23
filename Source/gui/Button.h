@@ -24,7 +24,8 @@ namespace gui
 		public Comp,
 		public Timer
 	{
-		using OnClick = std::function<void(Button&)>;
+		using OnClick = std::function<void(Button&, const Mouse&)>;
+		using OnTimer = std::function<void(Button&)>;
 		using OnPaint = std::function<void(Graphics&, Button&)>;
 		using OnMouseWheel = std::function<void(Button&, const Mouse&, const MouseWheel&)>;
 
@@ -44,7 +45,8 @@ namespace gui
 
 		const String& getText() const noexcept;
 
-		std::vector<OnClick> onClick, onRightClick, onTimer;
+		std::vector<OnClick> onClick;
+		std::vector<OnTimer> onTimer;
 		std::vector<OnPaint> onPaint;
 		std::vector<OnMouseWheel> onMouseWheel;
 		BlinkyBoy blinkyBoy;

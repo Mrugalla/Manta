@@ -302,7 +302,7 @@ namespace gui
 
 			layout.init
 			(
-				{ 1, 3, 1, 5, 5, 1, 2, 2, 5, 1, 3, 1, 2, 2, 13, 2, 1 },
+				{ 1, 3, 5, 5, 2, 2, 5, 3, 2, 2, 13, 2, 1 },
 				{ 1, 3, 13, 5, 1 }
 			);
 		}
@@ -319,23 +319,23 @@ namespace gui
 			
 			g.setColour(Colours::c(ColourID::Txt));
 			{
-				auto mainBounds = layout(1, 1, 2, 3);
+				auto mainBounds = layout(1, 1, 1, 3);
 				drawRectEdges(g, mainBounds, thicc, stroke);
 			}
 			{
-				auto filterBounds = layout(3, 1, 3, 3);
+				auto filterBounds = layout(2, 1, 2, 3);
 				drawRectEdges(g, filterBounds, thicc, stroke);
 			}
 			{
-				auto feedbackBounds = layout(6, 1, 4, 3);
+				auto feedbackBounds = layout(4, 1, 3, 3);
 				drawRectEdges(g, feedbackBounds, thicc, stroke);
 			}
 			{
-				auto heatBounds = layout(10, 1, 2, 3);
+				auto heatBounds = layout(7, 1, 1, 3);
 				drawRectEdges(g, heatBounds, thicc, stroke);
 			}
 			{
-				auto ringmodBounds = layout(12, 1, 4, 3);
+				auto ringmodBounds = layout(8, 1, 4, 3);
 				drawRectEdges(g, ringmodBounds, thicc, stroke);
 			}
 		}
@@ -352,41 +352,41 @@ namespace gui
 				layout.place(*enabled, 1, 3, 1, 1, true);
 			
 			// filter
-			layout.place(filterLabel, 3, 1, 2, 1, false);
+			layout.place(filterLabel, 2, 1, 2, 1, false);
 			if(pitch)
-				layout.place(*pitch, 3, 2, 1, 1, false);
+				layout.place(*pitch, 2, 2, 1, 1, false);
 			if (resonance)
-				layout.place(*resonance, 4, 2, 1, 1, false);
+				layout.place(*resonance, 3, 2, 1, 1, false);
 			if (snap)
-				layout.place(*snap, 3, 3, 1, 1, true);
+				layout.place(*snap, 2, 3, 1, 1, true);
 			if (slope)
-				layout.place(*slope, 4, 3, 1, 1, false);
+				layout.place(*slope, 3, 3, 1, 1, false);
 
 			// delay
-			layout.place(feedbackLabel, 6, 1, 3, 1, false);
+			layout.place(feedbackLabel, 4, 1, 3, 1, false);
 			if (delayOct)
-				layout.place(*delayOct, 6, 2, 1, 2, false);
+				layout.place(*delayOct, 4, 2, 1, 2, false);
 			if (delaySemi)
-				layout.place(*delaySemi, 7, 2, 1, 2, false);
+				layout.place(*delaySemi, 5, 2, 1, 2, false);
 			if (delayFeedback)
-				layout.place(*delayFeedback, 8, 2, 1, 1, false);
+				layout.place(*delayFeedback, 6, 2, 1, 1, false);
 
 			// heat
-			layout.place(heatLabel, 10, 1, 2, 1, false);
+			layout.place(heatLabel, 7, 1, 1, 1, false);
 			if (heat)
-				layout.place(*heat, 10, 2, 2, 2, false);
+				layout.place(*heat, 7, 2, 1, 2, false);
 			// ringmod
-			layout.place(ringModLabel, 12, 1, 3, 1, false);
+			layout.place(ringModLabel, 8, 1, 3, 1, false);
 			if (rmOct)
-				layout.place(*rmOct, 12, 2, 1, 2, false);
+				layout.place(*rmOct, 8, 2, 1, 2, false);
 			if (rmSemi)
-				layout.place(*rmSemi, 13, 2, 1, 2, false);
+				layout.place(*rmSemi, 9, 2, 1, 2, false);
 			if (rmDepth)
-				layout.place(*rmDepth, 15, 2, 1, 2, false);
+				layout.place(*rmDepth, 11, 2, 1, 2, false);
 			if(wtDisplay)
-				layout.place(*wtDisplay, 14, 2, 1, 1, false);
+				layout.place(*wtDisplay, 10, 2, 1, 1, false);
 			if (wtParser)
-				layout.place(*wtParser, 14, 3, 1, 1, false);
+				layout.place(*wtParser, 10, 3, 1, 1, false);
 		}
 		
 	protected:

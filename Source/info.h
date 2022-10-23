@@ -38,17 +38,14 @@ TO DO:
 18. reinit a patch button
 19. lowlevel controls are smaller than highlevel ones
 22: add a clipper because of high volume danger
-23: discard wavetable limiter feature. stuff always gets clipped to -1,1
 24. tooltips in high level component and new design for less space
-25. the extra space on the right of each section of a lane is not cool. makes stuff un-centred
 26. lock maxmoddepth button should not be filled. looks too heavy
 27. text entry thing of knob doesn't go away on escape and off-clicks
-28. ctrl+click for open textbox
 29. init preset can have other values than the parameter defaults, so that gain can have default on 0, but init on +17
 30. FFT with overlap technique
 31. x^2 doesnt work?
 32: A/B to flip arrows to make more obvious that it's for macro
-33: preset formulars for formula parser for the math noobs
+33: preset formulas for formula parser for the math noobs
 34: dice button looks not dice-y enough
 35: when snap-to-pitch is activated should be reflected in gui
 36: not obvious how to leave the patch browser
@@ -57,7 +54,7 @@ TO DO:
 39: rand relative for all parameters at once
 
 modulation of the filter
-	TPT/SVF filters work better
+	TPT/SVF filters work better?
 	randomizer doesn't repaint transfer curve correctly
 
 randomizer dangerous - make locks more obvious

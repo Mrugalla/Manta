@@ -78,7 +78,7 @@ namespace gui
 			makeTextButton(octDown, "<<", false);
 			makeTextButton(octUp, ">>", false);
 
-			octDown.onClick.push_back([&](Button&)
+			octDown.onClick.push_back([&](Button&, const Mouse&)
 				{
 					if (octIdx > 0)
 					{
@@ -87,7 +87,7 @@ namespace gui
 						resized();
 					}
 				});
-			octUp.onClick.push_back([&](Button&)
+			octUp.onClick.push_back([&](Button&, const Mouse&)
 				{
 					if (octIdx < 8)
 					{

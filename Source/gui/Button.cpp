@@ -57,8 +57,18 @@ namespace gui
 		const auto numParams = pID.size();
 		for (auto p = 0; p < numParams; ++p)
 		{
-			onClick.push_back([param = utils.getParam(pID[p])](Button&)
+			onClick.push_back([param = utils.getParam(pID[p])](Button& btn, const Mouse& mouse)
 			{
+				if (mouse.mods.isRightButtonDown())
+				{
+					btn.utils.getEventSystem().notify(EvtType::ButtonRightClicked, &btn);
+					return;
+				}
+				if (mouse.mods.isCtrlDown())
+				{
+					// open textbox
+					return;
+				}
 				const auto ts = param->getValue() > .5f ? 0.f : 1.f;
 				param->setValueWithGesture(ts);
 			});
@@ -125,8 +135,19 @@ namespace gui
 
 		stopTimer();
 
-		onClick.push_back([](Button& btn)
+		onClick.push_back([](Button& btn, const Mouse& mouse)
 		{
+			if (mouse.mods.isRightButtonDown())
+			{
+				btn.utils.getEventSystem().notify(EvtType::ButtonRightClicked, &btn);
+				return;
+			}
+			if (mouse.mods.isCtrlDown())
+			{
+				// open textbox
+				return;
+			}
+
 			const auto& pIDs = btn.pID;
 			for (auto pID : pIDs)
 			{
@@ -201,7 +222,6 @@ namespace gui
 	Button::Button(Utils& _utils, String&& _tooltip, Notify&& _notify) :
 		Comp(_utils, _tooltip, std::move(_notify)),
 		onClick(),
-		onRightClick(),
 		onTimer(),
 		onPaint(),
 		onMouseWheel(),
@@ -259,23 +279,14 @@ namespace gui
 		if (mouse.mouseWasDraggedSinceMouseDown())
 			return;
 
-		if (mouse.mods.isLeftButtonDown())
-		{
-			if (locked)
-				return;
+		if (locked)
+			return;
 
-			blinkyBoy.init(this, .25f);
+		blinkyBoy.init(this, .25f);
 
-			for (auto& oc : onClick)
-				oc(*this);
-			notify(EvtType::ButtonClicked, this);
-		}
-		else
-		{
-			for (auto& oc : onRightClick)
-				oc(*this);
-			notify(EvtType::ButtonRightClicked, this);
-		}
+		notify(EvtType::ButtonClicked, this);
+		for (auto& oc : onClick)
+			oc(*this, mouse);
 	}
 
 	void Button::mouseWheelMove(const Mouse& mouse, const MouseWheel& mouseWheel)
@@ -887,7 +898,7 @@ namespace gui
 	void makeToggleButton(Button& b, const String& txt)
 	{
 		makeTextButton(b, txt, true);
-		b.onClick.push_back([](Button& btn)
+		b.onClick.push_back([](Button& btn, const Mouse&)
 		{
 			btn.toggleState = btn.toggleState == 0 ? 1 : 0;
 		});
@@ -958,7 +969,7 @@ namespace gui
 		{
 			auto& button = *btns[i];
 
-			button.onClick.push_back([&buttons = btns](Button& btn)
+			button.onClick.push_back([&buttons = btns](Button& btn, const Mouse&)
 				{
 					for (auto& b : buttons)
 					{
@@ -975,7 +986,7 @@ namespace gui
 	{
 		const juce::URL url(urlPath);
 
-		b.onClick.push_back([url](Button&)
+		b.onClick.push_back([url](Button&, const Mouse&)
 		{
 			url.launchInDefaultBrowser();
 		});

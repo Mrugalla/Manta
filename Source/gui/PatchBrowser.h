@@ -188,7 +188,7 @@ namespace gui
 			patches.push_back(std::make_unique<Patch>(utils, name, auth, utils.savePatch()));
 			auto& patch = *patches.back();
 
-			patch.onClick.push_back([&list = patches](Button& btn)
+			patch.onClick.push_back([&list = patches](Button& btn, const Mouse&)
 			{
 				for (auto& p : list)
 					p->toggleState = 0;
@@ -196,7 +196,7 @@ namespace gui
 				btn.toggleState = 1;
 			});
 
-			patch.onClick.push_back([&, &file = patch.file](Button& btn)
+			patch.onClick.push_back([&, &file = patch.file](Button& btn, const Mouse&)
 			{
 				auto& utils = btn.getUtils();
 				const auto stream = file.createInputStream();
@@ -229,7 +229,7 @@ namespace gui
 			patches.push_back(std::make_unique<Patch>(utils, file));
 			auto& patch = *patches.back();
 
-			patch.onClick.push_back([&list = patches](Button& btn)
+			patch.onClick.push_back([&list = patches](Button& btn, const Mouse&)
 			{
 				for (auto& p : list)
 					p->toggleState = 0;
@@ -237,7 +237,7 @@ namespace gui
 				btn.toggleState = 1;
 			});
 
-			patch.onClick.push_back([&, &file = patch.file](Button& btn)
+			patch.onClick.push_back([&, &file = patch.file](Button& btn, const Mouse&)
 			{
 				auto& utils = btn.getUtils();
 				const auto stream = file.createInputStream();
@@ -452,7 +452,7 @@ namespace gui
 			makeTextButton(sortByName, "NAME");
 			makeTextButton(sortByAuthor, "AUTHOR");
 
-			sortByName.onClick.push_back([&](Button& btn)
+			sortByName.onClick.push_back([&](Button& btn, const Mouse&)
 				{
 					btn.toggleState = btn.toggleState == 0 ? 1 : 0;
 
@@ -470,7 +470,7 @@ namespace gui
 					sort(sortFunc);
 				});
 
-			sortByAuthor.onClick.push_back([&](Button& btn)
+			sortByAuthor.onClick.push_back([&](Button& btn, const Mouse&)
 				{
 					btn.toggleState = btn.toggleState == 0 ? 1 : 0;
 
@@ -638,14 +638,14 @@ namespace gui
 			makeTextButton(closeButton, "X", false);
 			closeButton.getLabel().mode = Label::Mode::TextToLabelBounds;
 			closeButton.getLabel().textCID = ColourID::Abort;
-			closeButton.onClick.push_back([&](Button&)
+			closeButton.onClick.push_back([&](Button&, const Mouse&)
 			{
 				setVisible(false);
 			});
 
 			makeTextButton(saveButton, "save", false);
 			saveButton.getLabel().mode = Label::Mode::TextToLabelBounds;
-			saveButton.onClick.push_back([&](Button&)
+			saveButton.onClick.push_back([&](Button&, const Mouse&)
 			{
 				savePatch();
 			});
@@ -666,7 +666,7 @@ namespace gui
 
 			makeTextButton(removeButton, "rmv", false);
 			removeButton.getLabel().textCID = ColourID::Abort;
-			removeButton.onClick.push_back([&](Button&)
+			removeButton.onClick.push_back([&](Button&, const Mouse&)
 			{
 				removePatch();
 			});
@@ -828,7 +828,7 @@ namespace gui
 			browser(_browser)
 		{
 			makeTextButton(*this, browser.getSelectedPatchName(), false);
-			onClick.push_back([&](Button&)
+			onClick.push_back([&](Button&, const Mouse&)
 				{
 					const auto e = browser.isVisible();
 					if (e)

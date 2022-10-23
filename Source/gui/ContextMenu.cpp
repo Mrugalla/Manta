@@ -114,7 +114,7 @@ namespace gui
 
 				auto& utils = pop.getUtils();
 
-				pop.setButton([&u = utils, pIDs](Button&)
+				pop.setButton([&u = utils, pIDs](Button&, const Mouse&)
 				{
 					juce::Random rand;
 					for (auto pID : pIDs)
@@ -123,7 +123,7 @@ namespace gui
 						param->setValueWithGesture(rand.nextFloat());
 					}
 				}, 0);
-				pop.setButton([&u = utils, pIDs](Button&)
+				pop.setButton([&u = utils, pIDs](Button&, const Mouse&)
 				{
 					for (auto pID : pIDs)
 					{
@@ -132,7 +132,7 @@ namespace gui
 						param->setValueWithGesture(val);
 					}
 				}, 1);
-				pop.setButton([&u = utils, pIDs](Button&)
+				pop.setButton([&u = utils, pIDs](Button&, const Mouse&)
 				{
 					for (auto pID : pIDs)
 					{
@@ -140,7 +140,7 @@ namespace gui
 						param->setDefaultValue(param->getValue());
 					}
 				}, 2);
-				pop.setButton([&u = utils, pIDs](Button&)
+				pop.setButton([&u = utils, pIDs](Button&, const Mouse&)
 				{
 					for (auto pID : pIDs)
 					{
@@ -148,21 +148,21 @@ namespace gui
 						param->switchLock();
 					}
 				}, 3);
-				pop.setButton([&u = utils, pIDs](Button&)
+				pop.setButton([&u = utils, pIDs](Button&, const Mouse&)
 				{
 					for (auto pID : pIDs)
 					{
 						u.assignMIDILearn(pID);
 					}
 				}, 4);
-				pop.setButton([&u = utils, pIDs](Button&)
+				pop.setButton([&u = utils, pIDs](Button&, const Mouse&)
 				{
 					for (auto pID : pIDs)
 					{
 						u.removeMIDILearn(pID);
 					}
 				}, 5);
-				pop.setButton([&u = utils, &btn = button](Button&)
+				pop.setButton([&u = utils, &btn = button](Button&, const Mouse&)
 				{
 					//u.getEventSystem().notify(EvtType::EnterParametrValue, &btn);
 					// idk yet if this works
@@ -200,31 +200,31 @@ namespace gui
 			{
 				const auto& button = *static_cast<const Button*>(stuff);
 
-				pop.setButton([](Button&)
+				pop.setButton([](Button&, const Mouse&)
 				{
 
 				}, 0);
-				pop.setButton([](Button&)
+				pop.setButton([](Button&, const Mouse&)
 				{
 					
 				}, 1);
-				pop.setButton([](Button&)
+				pop.setButton([](Button&, const Mouse&)
 				{
 
 				}, 2);
-				pop.setButton([](Button&)
+				pop.setButton([](Button&, const Mouse&)
 				{
 
 				}, 3);
-				pop.setButton([](Button&)
+				pop.setButton([](Button&, const Mouse&)
 				{
 
 				}, 4);
-				pop.setButton([](Button&)
+				pop.setButton([](Button&, const Mouse&)
 				{
 
 				}, 5);
-				pop.setButton([](Button&)
+				pop.setButton([](Button&, const Mouse&)
 				{
 
 				}, 6);

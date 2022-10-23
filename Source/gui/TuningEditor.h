@@ -14,7 +14,7 @@ namespace gui
 
 			toggleState = 0;
 
-			onClick.push_back([tu](Button& btn)
+			onClick.push_back([tu](Button& btn, const Mouse&)
 			{
 				if (btn.toggleState == 0)
 				{

@@ -129,7 +129,7 @@ namespace gui
 			Param *scrollParam, *rightClickParam;
 			std::vector<PID> morePIDs;
 			BoundsF bounds;
-			float x, y, hitboxDistSquared;
+			float x, y;
 		protected:
 			Utils& utils;
 		};
@@ -151,7 +151,8 @@ namespace gui
 			selectionLine(),
 			selectionBounds(),
 			tool(Tool::Select),
-			hovered(nullptr)
+			hovered(nullptr),
+			hitBoxLength(0.f)
 		{
 			setInterceptsMouseClicks(true, true);
 			startTimerHz(PPDFPSKnobs);
@@ -249,10 +250,17 @@ namespace gui
 			
 		void resized() override
 		{
-			bounds = getLocalBounds().toFloat().reduced(getNodeSize() * .5f);
+			auto nodeSize = getNodeSize();
+
+			bounds = getLocalBounds().toFloat().reduced(nodeSize * .5f);
 
 			for (auto i = 0; i < numNodes(); ++i)
 				moveNode(i);
+
+			const auto minDimen = std::min(bounds.getWidth(), bounds.getHeight());
+			const auto minDimenInv = 1.f / minDimen;
+
+			hitBoxLength = std::sqrt(nodeSize * minDimenInv) / 24.f;
 		}
 
 		void timerCallback() override
@@ -304,7 +312,6 @@ namespace gui
 			);
 
 			node.bounds = nodeBounds;
-			node.hitboxDistSquared = normalizeX(LineF(nodeBounds.getTopLeft(), nodeBounds.getBottomRight()).getLengthSquared());
 		}
 		
 		Node* getNode(const PointF& pos) noexcept
@@ -323,7 +330,7 @@ namespace gui
 				}
 			}
 
-			if (closest->hitboxDistSquared > distance)
+			if (distance < hitBoxLength)
 				return closest;
 
 			return nullptr;
@@ -560,6 +567,7 @@ namespace gui
 		BoundsF selectionBounds;
 		Tool tool;
 		Node* hovered;
+		float hitBoxLength;
 		
 		void selectionChanged()
 		{

@@ -120,7 +120,7 @@ namespace gui
 			makeToggleButton(windowing, "W");
 			makeTextButton(create, "C", false);
 
-			dc.onClick.push_back([&](Button& btn)
+			dc.onClick.push_back([&](Button& btn, const Mouse&)
 			{
 				parser.postFX[FormulaParser::DCOffset] = dc.toggleState == 1;
 				
@@ -132,7 +132,7 @@ namespace gui
 					user->save();
 				}
 			});
-			normalize.onClick.push_back([&](Button& btn)
+			normalize.onClick.push_back([&](Button& btn, const Mouse&)
 			{
 				parser.postFX[FormulaParser::Normalize] = normalize.toggleState == 1;
 				auto& props = btn.utils.getProps();
@@ -143,7 +143,7 @@ namespace gui
 					user->save();
 				}
 			});
-			windowing.onClick.push_back([&](Button& btn)
+			windowing.onClick.push_back([&](Button& btn, const Mouse&)
 			{
 				parser.postFX[FormulaParser::Windowing] = windowing.toggleState == 1;
 				auto& props = btn.utils.getProps();
@@ -154,7 +154,7 @@ namespace gui
 					user->save();
 				}
 			});
-			create.onClick.push_back([&](Button&)
+			create.onClick.push_back([&](Button&, const Mouse&)
 			{
 				parser.onReturn();
 			});

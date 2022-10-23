@@ -70,11 +70,11 @@ namespace gui
 
 			modDepthLocked.toggleState = params.isModDepthLocked();
 
-			modDepthLocked.onClick.push_back([&prms = params](Button&)
+			modDepthLocked.onClick.push_back([&prms = params](Button&, const Mouse&)
 				{
 					prms.switchModDepthLocked();
 				});
-			modDepthLocked.onClick.push_back([](Button& btn)
+			modDepthLocked.onClick.push_back([](Button& btn, const Mouse&)
 				{
 					btn.toggleState = btn.toggleState == 0 ? 1 : 0;
 				});
@@ -86,7 +86,7 @@ namespace gui
 		{
 			auto& params = utils.getParams();
 
-			swapParamWithModDepth.onClick.push_back([&prms = params](Button&)
+			swapParamWithModDepth.onClick.push_back([&prms = params](Button&, const Mouse&)
 				{
 					for (auto i = static_cast<int>(prms.numParams() - 1); i > 0; --i)
 					{
@@ -113,7 +113,7 @@ namespace gui
 
 		addAndMakeVisible(saveModPatch);
 		{
-			saveModPatch.onClick.push_back([](Button& btn)
+			saveModPatch.onClick.push_back([](Button& btn, const Mouse&)
 			{
 				auto& utils = btn.getUtils();
 				const auto& params = utils.getParams();
@@ -180,7 +180,7 @@ namespace gui
 		
 		addAndMakeVisible(loadModPatch);
 		{
-			loadModPatch.onClick.push_back([&](Button&)
+			loadModPatch.onClick.push_back([&](Button&, const Mouse&)
 			{
 				auto& props = utils.getProps();
 				auto& user = *props.getUserSettings();
@@ -253,7 +253,7 @@ namespace gui
 
 		addAndMakeVisible(removeCurModPatch);
 		{
-			removeCurModPatch.onClick.push_back([](Button& btn)
+			removeCurModPatch.onClick.push_back([](Button& btn, const Mouse&)
 			{
 				auto& utils = btn.getUtils();
 				auto& params = utils.getParams();
@@ -331,7 +331,7 @@ namespace gui
 
 		makeSymbolButton(menuButton, ButtonSymbol::Settings);
 		menuButton.toggleState = 0;
-		menuButton.onClick.push_back([this](Button& btn)
+		menuButton.onClick.push_back([this](Button& btn, const Mouse&)
 			{
 				auto& ts = btn.toggleState;
 				ts = ts == 0 ? 1 : 0;

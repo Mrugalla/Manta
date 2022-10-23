@@ -639,6 +639,10 @@ namespace gui
                             auto param = k.getUtils().getParam(pID);
                             param->setValueNotifyingHost(param->getDefaultValue());
                         }
+                    else if (mouse.mods.isCtrlDown())
+                    {
+                        k.utils.getEventSystem().notify(EvtType::EnterParametrValue, &k);
+                    }
 
                 }
                 for (auto& pID : pIDs)
@@ -880,7 +884,7 @@ namespace gui
 
                     makeTextButton(lck, "L", false);
 
-                    lck.onClick.push_back([pIDs](Button& btn)
+                    lck.onClick.push_back([pIDs](Button& btn, const Mouse&)
                     {
                         for (auto pID : pIDs)
                         {
@@ -914,13 +918,13 @@ namespace gui
                 std::vector<PID> pIDs;
                 param::toPIDs(pIDs, pIDsStr, "\n");
 
-                pop.setButton([pIDs](Button& btn)
+                pop.setButton([pIDs](Button& btn, const Mouse&)
                 {
                     Random rand;
                     for(auto pID: pIDs)
                         btn.getUtils().getParam(pID)->setValueWithGesture(rand.nextFloat());
                 }, 0);
-                pop.setButton([pIDs](Button& btn)
+                pop.setButton([pIDs](Button& btn, const Mouse&)
                 {
                     juce::Random rand;
                     for (auto pID : pIDs)
@@ -931,7 +935,7 @@ namespace gui
                         param->setValueWithGesture(juce::jlimit(0.f, 1.f, val));
                     }
                 }, 1);
-                pop.setButton([pIDs](Button& btn)
+                pop.setButton([pIDs](Button& btn, const Mouse&)
                 {
                     for (auto pID : pIDs)
                     {
@@ -940,7 +944,7 @@ namespace gui
                         param->setValueWithGesture(val);
                     }
                 }, 2);
-                pop.setButton([pIDs](Button& btn)
+                pop.setButton([pIDs](Button& btn, const Mouse&)
                 {
                     for (auto pID : pIDs)
                     {
@@ -948,22 +952,22 @@ namespace gui
                         param->setDefaultValue(param->getValue());
                     }
                 }, 3);
-                pop.setButton([pIDs](Button& btn)
+                pop.setButton([pIDs](Button& btn, const Mouse&)
                 {
                     for (auto pID : pIDs)
                         btn.getUtils().getParam(pID)->switchLock();
                 }, 4);
-                pop.setButton([pIDs](Button& btn)
+                pop.setButton([pIDs](Button& btn, const Mouse&)
                 {
                     for (auto pID : pIDs)
                         btn.getUtils().assignMIDILearn(pID);
                 }, 5);
-                pop.setButton([pIDs](Button& btn)
+                pop.setButton([pIDs](Button& btn, const Mouse&)
                 {
                     for (auto pID : pIDs)
                         btn.getUtils().removeMIDILearn(pID);
                 }, 6);
-                pop.setButton([&k = knob](Button& btn)
+                pop.setButton([&k = knob](Button& btn, const Mouse&)
                 {
                     btn.getUtils().getEventSystem().notify(EvtType::EnterParametrValue, &k);
                 }, 7);

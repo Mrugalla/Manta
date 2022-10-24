@@ -219,6 +219,7 @@ namespace audio
 		tuningEditorSynth.prepare(sampleRateF, maxBlockSize);
 
         manta.prepare(sampleRateUpF, blockSizeUp);
+        spectroBeam.prepare(maxBlockSize);
 #if PPDHasLookahead
         latency += lookaheadEnabled ? manta.delaySize / 2 : 0;
 #endif

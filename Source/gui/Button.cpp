@@ -155,15 +155,20 @@ namespace gui
 				auto& range = param->range;
 				auto interval = range.interval;
 				auto denorm = std::round(param->getValueDenorm());
-				auto val = denorm + interval;
+				auto val = denorm + (btn.toggleNext == 0 ? 0 : btn.toggleNext * interval);
 				if (val > range.end)
 					val = range.start;
+				else if (val < range.start)
+					val = range.end;
 				param->setValueWithGesture(range.convertTo0to1(val));
 			}
 		});
 
 		onMouseWheel.push_back([](Button& btn, const Mouse&, const MouseWheel& wheel)
 		{
+			if (btn.toggleNext != 0)
+				return;
+
 			auto move = wheel.deltaY > 0 ? 1.f : -1.f;
 			move *= wheel.isReversed ? -1.f : 1.f;
 			
@@ -229,6 +234,7 @@ namespace gui
 		toggleState(-1),
 		pID(),
 		locked(false),
+		toggleNext(0),
 		label(utils, ""),
 		toggleTexts()
 	{

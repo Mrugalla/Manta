@@ -53,6 +53,7 @@ namespace gui
 		int toggleState;
 		std::vector<PID> pID;
 		bool locked;
+		int toggleNext;
 	protected:
 		Label label;
 		std::vector<String> toggleTexts;

@@ -32,7 +32,7 @@ namespace gui
 
         layout.init
         (
-            { 1, 3 },
+            { 2, 7 },
             { 2, 13, 1 }
         );
 		

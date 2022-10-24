@@ -135,6 +135,8 @@ namespace gui
                 { 1, 13, 1 },
                 { 1, 21, 13, 1 }
             );
+
+            eqPad.selectNode(0);
         }
 
         void paint(Graphics&) override {}

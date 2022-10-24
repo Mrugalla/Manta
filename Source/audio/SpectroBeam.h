@@ -11,14 +11,17 @@ namespace audio
 	{
 		static constexpr size_t Size = 1 << Order;
 		static constexpr size_t Size2 = Size * 2;
+		static constexpr size_t SizeHalf = Size / 2;
 		static constexpr float SizeF = static_cast<float>(Size);
 		static constexpr float SizeInv = 1.f / SizeF;
+		
 		
 		using FFT = juce::dsp::FFT;
 		using Fifo = std::array<float, Size>;
 		using Fifo2 = std::array<float, Size2>;
 
 		SpectroBeam() :
+			smpls(),
 			fft(Order),
 			fifo(),
 			window(),
@@ -27,6 +30,7 @@ namespace audio
 			idx(0)
 		{
 			SIMD::clear(buffer.data(), Size2);
+			SIMD::clear(fifo.data(), Size2);
 
 			// gaussian window
 			for (auto i = 0; i < Size; ++i)
@@ -36,6 +40,11 @@ namespace audio
 				const auto w = std::exp(-x * x * 16.f);
 				window[i] = w;
 			}
+		}
+
+		void prepare(int blockSize)
+		{
+			smpls.resize(blockSize);
 		}
 
 		void operator()(float** samples, int numChannels, int numSamples) noexcept
@@ -48,23 +57,38 @@ namespace audio
 				for (auto ch = 1; ch < numChannels; ++ch)
 					mid += samples[ch][s];
 				mid *= chInv;
+				smpls[s] = mid;
+			}
 
-				fifo[idx] = mid * window[idx];
+			process(numSamples);
+		}
+
+		void process(int numSamples) noexcept
+		{
+			auto fif = fifo.data();
+			for (auto s = 0; s < numSamples; ++s)
+			{
+				fif[idx] = smpls[s];
 				++idx;
 				if (idx == Size)
 				{
-					idx = 0;
+					const auto wndw = window.data();
 					auto buf = buffer.data();
-					SIMD::copy(buf, fifo.data(), Size);
-					fft.performRealOnlyForwardTransform(buf, true);
+					
+					SIMD::multiply(fif, wndw, Size);
+					fft.performRealOnlyForwardTransform(fif, true);
+					SIMD::copy(buf, fif, Size);
 					ready.store(true);
+					idx = 0;
 				}
 			}
 		}
 
 	protected:
+		std::vector<float> smpls;
 		FFT fft;
-		Fifo fifo, window;
+		Fifo2 fifo;
+		Fifo window;
 	public:
 		Fifo2 buffer;
 		std::atomic<bool> ready;

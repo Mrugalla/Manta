@@ -138,8 +138,7 @@ namespace gui
 		using NodePtrs = std::vector<Node*>;
 		using OnSelectionChanged = std::function<void(const NodePtrs&)>;
 		using OnSelectionChangeds = std::vector<OnSelectionChanged>;
-
-	
+		
 		EQPad(Utils& u, String&& _tooltip) :
 			Comp(u, _tooltip, CursorType::Interact),
 			bounds(),
@@ -169,6 +168,16 @@ namespace gui
 				rightClickParam,
 				morePIDs
 			});
+		}
+
+		void selectNode(int idx)
+		{
+			if (idx < 0 || idx >= nodes.size())
+				return;
+
+			selected.clear();
+			selected.push_back(&nodes[idx]);
+			selectionChanged();
 		}
 
 		void paint(Graphics& g) override

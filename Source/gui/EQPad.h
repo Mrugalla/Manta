@@ -180,6 +180,14 @@ namespace gui
 			selectionChanged();
 		}
 
+		void selectAll()
+		{
+			selected.clear();
+			for (auto& node : nodes)
+				selected.push_back(&node);
+			selectionChanged();
+		}
+
 		void paint(Graphics& g) override
 		{
 			const auto thicc = utils.thicc;

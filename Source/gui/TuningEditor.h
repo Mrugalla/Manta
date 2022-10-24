@@ -41,7 +41,7 @@ namespace gui
 			xenModLabel(u, String(std::round(xen.getValModDenorm())) + " Xen")
 		{
 			enum { Value, MaxModDepth, ValMod, ModBias, Meter, NumValues };
-			enum { ModDial, NumComps };
+			enum { ModDial, Lock, NumComps };
 
 			addAndMakeVisible(xenModLabel);
 			xenModLabel.textCID = ColourID::Mod;
@@ -150,6 +150,7 @@ namespace gui
 				k.knobBounds = layout(0, 0, 3, 2, true).reduced(thicc);
 				layout.place(k.label, 0, 2, 3, 1, false);
 				layout.place(*k.comps[ModDial], 0, 1, 1, 1, true);
+				layout.place(*k.comps[Lock], 2.5f, 1, .5f, 1, true);
 
 				const auto width = knobBounds.getWidth();
 				const auto rad = width * .5f;

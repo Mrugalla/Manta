@@ -27,22 +27,15 @@ TO DO:
 5. logic crashes on move knot
 7. y-achsis eq pad for gain. mousewheel for q. slope as extra setting
 24. tooltips in high level component and new design for less space
-32: A/B to flip arrows to make more obvious that it's for macro
 33: preset formulas for formula parser for the math noobs
 34: dice button looks not dice-y enough
 37: if enter value manually and exceeds range, textbox should show corrected value
 39: rand relative for all parameters at once
 40. rightclick on knob when menu already open closes menu
-
-saving patch does not repaint patch browser button
-loading patches doesn't work
+42. buttons need lock
 
 manta 2
 	am/rm between lanes
-
-modulation of the filter
-	TPT/SVF filters work better?
-	randomizer doesn't repaint transfer curve correctly
 
 randomizer dangerous - make locks more obvious
 	not obvious enough yet for buttons

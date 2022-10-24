@@ -30,7 +30,6 @@ TO DO:
 32: A/B to flip arrows to make more obvious that it's for macro
 33: preset formulas for formula parser for the math noobs
 34: dice button looks not dice-y enough
-35: when snap-to-pitch is activated should be reflected in gui
 37: if enter value manually and exceeds range, textbox should show corrected value
 39: rand relative for all parameters at once
 40. rightclick on knob when menu already open closes menu

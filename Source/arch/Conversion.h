@@ -70,6 +70,12 @@ namespace audio
     }
 
 	template<typename Float>
+	inline Float fcInFreqHz(Float fc, Float Fs) noexcept
+	{
+		return fc * Fs;
+	}
+
+	template<typename Float>
     inline Float gainToDecibel(Float gain) noexcept
     {
         return std::log10(gain) * static_cast<Float>(20);

@@ -15,6 +15,7 @@ namespace gui
     {
         static constexpr int NumLanes = audio::Manta::NumLanes;
 		static constexpr int ParamsPerLane = audio::Manta::NumParametersPerLane;
+        static constexpr int NumParamsUsedInEQPad = 6;
 
         LowLevel(Utils& u) :
             Comp(u, "", CursorType::Default),
@@ -35,38 +36,38 @@ namespace gui
             {
                 bool needsUpdate = false;
 
-                const auto Fs = utils.audioProcessor.getSampleRate();
-                const auto fsInv = 1.f / static_cast<float>(Fs);
-
                 for (auto l = 0; l < NumLanes; ++l)
                 {
                     auto offset = l * ParamsPerLane;
 
                     const auto nEnabled = utils.getParam(PID::Lane1Enabled, offset)->getValMod();
                     const auto nPitch = utils.getParam(PID::Lane1Pitch, offset)->getValModDenorm();
-                    const auto nFc = utils.audioProcessor.xenManager.noteToFreqHzWithWrap(nPitch) * fsInv;
                     const auto nResonance = utils.getParam(PID::Lane1Resonance, offset)->getValModDenorm();
                     const auto nSlope = std::round(utils.getParam(PID::Lane1Slope, offset)->getValModDenorm());
                     const auto nGain = audio::decibelToGain(utils.getParam(PID::Lane1Gain, offset)->getValModDenorm());
+					const auto nPitchSnap = utils.getParam(PID::Lane1PitchSnap, offset)->getValMod();
 
-                    offset = l * 5;
+                    offset = l * NumParamsUsedInEQPad;
                     const auto i0 = offset;
                     const auto i1 = 1 + offset;
                     const auto i2 = 2 + offset;
                     const auto i3 = 3 + offset;
                     const auto i4 = 4 + offset;
+					const auto i5 = 5 + offset;
 
                     if (filterParams[i0] != nEnabled
-                        || filterParams[i1] != nFc
+                        || filterParams[i1] != nPitch
                         || filterParams[i2] != nResonance
                         || filterParams[i3] != nSlope
-                        || filterParams[i4] != nGain)
+                        || filterParams[i4] != nGain
+						|| filterParams[i5] != nPitchSnap)
                     {
                         filterParams[i0] = nEnabled;
-                        filterParams[i1] = nFc;
+                        filterParams[i1] = nPitch;
                         filterParams[i2] = nResonance;
                         filterParams[i3] = nSlope;
                         filterParams[i4] = nGain;
+						filterParams[i5] = nPitchSnap;
 
                         needsUpdate = true;
                     }
@@ -76,8 +77,8 @@ namespace gui
             };
             filterResponseGraph.update = [&](Path& responseCurve, float w, float h)
             {
-                const auto Fs = utils.audioProcessor.getSampleRate();
-                const auto fsInv = 1.f / static_cast<float>(Fs);
+                const auto Fs = static_cast<float>(utils.audioProcessor.getSampleRate());
+                const auto fsInv = 1.f / Fs;
 				
                 auto& xen = utils.audioProcessor.xenManager;
 
@@ -95,19 +96,25 @@ namespace gui
                     auto mag = 0.f;
                     for (auto l = 0; l < NumLanes; ++l)
                     {
-                        auto offset = l * 5;
+                        const auto offset = l * NumParamsUsedInEQPad;
                         const auto i0 = offset;
                         const auto i1 = 1 + offset;
                         const auto i2 = 2 + offset;
                         const auto i3 = 3 + offset;
                         const auto i4 = 4 + offset;
+						const auto i5 = 5 + offset;
 
                         const auto nEnabled = filterParams[i0];
-                        const auto nFc = filterParams[i1];
+                        auto nPitch = filterParams[i1]; 
                         const auto nQ = filterParams[i2];
                         const auto nSlope = filterParams[i3];
                         const auto nGain = filterParams[i4];
+						const auto nPitchSnap = filterParams[i5];
 
+                        if (nPitchSnap > .5f)
+							nPitch = std::round(nPitch);
+						
+						const auto nFc = xen.noteToFreqHzWithWrap(nPitch) * fsInv;
                         const auto g = std::round(nEnabled) * nGain;
 
                         fltr.setStage(static_cast<int>(nSlope));
@@ -161,6 +168,6 @@ namespace gui
         FilterResponseGraph2 filterResponseGraph;
         MantaComp manta;
 		
-        std::array<float, NumLanes * 5> filterParams;
+        std::array<float, NumLanes * NumParamsUsedInEQPad> filterParams;
     };
 }

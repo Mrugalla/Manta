@@ -523,6 +523,33 @@ namespace gui
 			}
 		}
 
+		void mouseDoubleClick(const Mouse& mouse) override
+		{
+			if (hovered == nullptr)
+			{
+				for(auto& node: nodes)
+					if (node.rightClickParam->getValue() <= .5f)
+					{
+						const auto h = static_cast<float>(getHeight());
+
+						node.rightClickParam->setValue(1.f);
+						selected.clear();
+						selected.push_back(&node);
+						node.xyParam[Dimension::X]->setValue(normalizeX(mouse.position.x));
+						node.xyParam[Dimension::Y]->setValue(normalizeY(h - mouse.position.y));
+						selectionChanged();
+						return;
+					}
+			}
+			else
+			{
+				for(auto sel: selected)
+					sel->onRightClick();
+				
+				selectionChanged();
+			}
+		}
+
 		void updateSelected()
 		{
 			bool changed = false;

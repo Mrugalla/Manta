@@ -48,6 +48,8 @@ namespace gui
 			const auto thicc = utils.thicc;
 			const auto bounds = getLocalBounds().toFloat().reduced(thicc);
 
+			g.fillAll(Colours::c(ColourID::Darken));
+
 			g.setColour(Colours::c(outlineCID));
 			g.drawRoundedRectangle(bounds, thicc, thicc);
 			g.setColour(Colours::c(lineCID));

@@ -266,9 +266,10 @@ namespace gui
                         const auto valModAngle = vals[ValMod] * AngleRange;
                         const auto modAngle = -AngleWidth + valModAngle;
                         const auto modTick = LineF::fromStartAndAngle(centre, radiusExt, modAngle);
+                        const auto shortenedModTick = modTick.withShortenedStart(radiusInner - thicc);
 
                         g.setColour(Colours::c(ColourID::Bg));
-                        g.drawLine(modTick, thicc * 4.f);
+                        g.drawLine(shortenedModTick, thicc * 4.f);
 
                         const auto maxModDepthAngle = juce::jlimit(-AngleWidth, AngleWidth, valNormAngle + vals[MaxModDepth] * AngleRange - AngleWidth);
                         const auto biasAngle = AngleRange * vals[ModBias] - AngleWidth;
@@ -308,10 +309,11 @@ namespace gui
 					
                     { // paint tick
                         const auto tickLine = LineF::fromStartAndAngle(centre, radius, valAngle);
+                        const auto shortened = tickLine.withShortenedStart(radiusInner - thicc);
                         g.setColour(Colours::c(ColourID::Bg));
-                        g.drawLine(tickLine, thicc5);
+                        g.drawLine(shortened, thicc5);
                         g.setColour(col);
-                        g.drawLine(tickLine.withShortenedStart(radiusInner - thicc), thicc3);
+                        g.drawLine(shortened, thicc3);
                     }
                 };
             }

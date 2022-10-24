@@ -146,7 +146,10 @@ namespace gui
             eqPad.selectAll();
         }
 
-        void paint(Graphics&) override {}
+        void paint(Graphics&) override
+        {
+            
+        }
 
         void resized() override
         {

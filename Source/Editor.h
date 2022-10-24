@@ -34,6 +34,10 @@ protected:
         Layout layout;
         Utils utils;
 
+        Image bgImage;
+        Evt notify;
+        Button imgRefresh;
+
         Tooltip tooltip;
 
         Label pluginTitle;
@@ -49,13 +53,15 @@ protected:
 
         bool bypassed;
         Shader shadr;
-        
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Editor)
         //JUCE_LEAK_DETECTOR(Editor)
         //JUCE_HEAVYWEIGHT_LEAK_DETECTOR(Editor)
     private:
-        
         void saveBounds();
+
+        Notify makeNotify(Editor&);
+
+        void updateBgImage();
     };
 }

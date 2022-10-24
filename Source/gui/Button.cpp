@@ -340,7 +340,7 @@ namespace gui
 
 			const auto area = button.getLocalBounds().toFloat().reduced(thiccHalf);
 
-			const auto col = blinkyBoy.getInterpolated(Colours::c(ColourID::Bg), juce::Colours::white);
+			const auto col = blinkyBoy.getInterpolated(Colour(0x00000000), juce::Colours::white);
 
 			g.setColour(col);
 			g.fillRoundedRectangle(area, thicc);
@@ -375,7 +375,7 @@ namespace gui
 
 			const auto area = button.getLocalBounds().toFloat().reduced(thiccHalf);
 
-			const auto col = blinkyBoy.getInterpolated(Colours::c(ColourID::Bg), juce::Colours::white);
+			const auto col = blinkyBoy.getInterpolated(Colour(0x00000000), juce::Colours::white);
 
 			g.setColour(col);
 			g.fillRoundedRectangle(area, thicc);
@@ -424,8 +424,6 @@ namespace gui
 			Colour col;
 			if (symbol == ButtonSymbol::Empty)
 				col = blinkyBoy.getInterpolated(Colours::c(ColourID::Transp), juce::Colours::white);
-			else
-				col = blinkyBoy.getInterpolated(Colours::c(ColourID::Bg), juce::Colours::white);
 
 			g.setColour(col);
 			g.fillRoundedRectangle(bounds, thicc);

@@ -107,7 +107,7 @@ namespace gui
 		};
 	}
 
-	
+	////////////////////////////////////
 	
 	CompWidgetable::CompWidgetable(Utils& u, String&& _tooltip, CursorType _cursorType) :
 		Comp(u, std::move(_tooltip), _cursorType),

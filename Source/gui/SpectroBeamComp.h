@@ -45,7 +45,7 @@ namespace gui
 			
 			const auto Fs = static_cast<float>(utils.audioProcessor.getSampleRate());
 			const auto fsInv = 1.f / Fs;
-			const auto colBase = Colours::c(ColourID::Bg).withAlpha(1.f);
+			const auto colBase = Colours::c(ColourID::Bg);
 			const auto col = Colours::c(mainColCID);
 			const auto buf = beam.buffer.data();
 

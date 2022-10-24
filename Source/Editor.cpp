@@ -113,7 +113,7 @@ namespace gui
         layout.resized();
 
         layout.place(pluginTitle, 1, 0, 1, 1, false);
-        layout.place(imgRefresh, 1.9f, 0, .1f, 1, true);
+        layout.place(imgRefresh, 1.9f, .5f, .1f, .5f, true);
         layout.place(lowLevel, 1, 1, 1, 1, false);
         layout.place(highLevel, 0, 0, 1, 2, false);
         
@@ -207,11 +207,11 @@ namespace gui
         }
 		
         { // draw dust
-            const auto randWidth = .1f;
+            const auto randWidth = .05f;
             const auto randRange = randWidth * 2.f;
 			auto col = Colours::c(ColourID::Mod).withAlpha(.02f);
 
-            const auto numDusts = 8;
+            const auto numDusts = 13;
             for (auto i = 0; i < numDusts; ++i)
             {
                 col = col.withRotatedHue(rand.nextFloat() * randWidth - randRange);
@@ -235,7 +235,7 @@ namespace gui
         { // draw stars
             const auto maxStarSize = thicc * 1.5f;
 
-            const auto numStars = 64;
+            const auto numStars = 128;
 			for (auto i = 0; i < numStars; ++i)
 			{
 				const auto x = rand.nextFloat() * w;

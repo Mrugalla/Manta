@@ -123,7 +123,6 @@ namespace gui
 	{
 		audioProcessor.state.loadPatch(vt);
 		audioProcessor.loadPatch();
-		audioProcessor.forcePrepareToPlay();
 	}
 
 	AppProps& Utils::getProps() noexcept

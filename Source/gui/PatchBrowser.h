@@ -154,10 +154,16 @@ namespace gui
 			patches(),
 			listBounds()
 		{
-			layout.init(
+			layout.init
+			(
 				{ 34, 1 },
 				{ 1 }
 			);
+			
+			if (numPatches() == 0)
+			{
+				save("Init", "Factory");
+			}
 		}
 
 		int getIdx(const Patch& nPatch) const noexcept
@@ -198,11 +204,14 @@ namespace gui
 
 			patch.onClick.push_back([&, &file = patch.file](Button& btn, const Mouse&)
 			{
-				auto& utils = btn.getUtils();
+				auto& utils = btn.utils;
 				const auto stream = file.createInputStream();
-				const auto vt = ValueTree::fromXml(stream->readEntireStreamAsString());
-				utils.loadPatch(vt);
-				notify(EvtType::PatchUpdated, nullptr);
+				if (stream != nullptr)
+				{
+					const auto vt = ValueTree::fromXml(stream->readEntireStreamAsString());
+					utils.loadPatch(vt);
+					notify(EvtType::PatchUpdated, nullptr);
+				}
 			});
 
 			patch.onMouseWheel.push_back([&](Button&, const Mouse& mouse, const MouseWheel& wheel)
@@ -241,9 +250,12 @@ namespace gui
 			{
 				auto& utils = btn.getUtils();
 				const auto stream = file.createInputStream();
-				const auto vt = ValueTree::fromXml(stream->readEntireStreamAsString());
-				utils.loadPatch(vt);
-				notify(EvtType::PatchUpdated, nullptr);
+				if (stream != nullptr)
+				{
+					const auto vt = ValueTree::fromXml(stream->readEntireStreamAsString());
+					utils.loadPatch(vt);
+					notify(EvtType::PatchUpdated, nullptr);
+				}
 			});
 
 			patch.onMouseWheel.push_back([&](Button&, const Mouse& mouse, const MouseWheel& wheel)
@@ -705,6 +717,8 @@ namespace gui
 								);
 				});
 
+			patches.select(nullptr);
+
 #if DebugNumPatches != 0
 			Random rand;
 			for (auto i = 0; i < DebugNumPatches; ++i)
@@ -808,7 +822,8 @@ namespace gui
 			const auto fileTypes = File::TypesOfFileToFind::findFiles;
 			const String extension(".patch");
 			const auto wildCard = "*" + extension;
-			const RangedDirectoryIterator files(
+			const RangedDirectoryIterator files
+			(
 				directory,
 				true,
 				wildCard,
@@ -824,8 +839,20 @@ namespace gui
 	struct ButtonPatchBrowser :
 		public Button
 	{
+		Notify makeNotify(ButtonPatchBrowser& _bpb)
+		{
+			return [&bpb = _bpb](EvtType evt, const void*)
+			{
+				if (evt == EvtType::PatchUpdated)
+				{
+					bpb.getLabel().setText(bpb.browser.getSelectedPatchName());
+					bpb.repaint();
+				}
+			};
+		}
+
 		ButtonPatchBrowser(Utils& u, PatchBrowser& _browser) :
-			Button(u, "Click here to open the patch browser."),
+			Button(u, "Click here to open the patch browser.", makeNotify(*this)),
 			browser(_browser)
 		{
 			makeTextButton(*this, browser.getSelectedPatchName(), false);

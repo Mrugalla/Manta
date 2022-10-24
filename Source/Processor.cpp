@@ -130,7 +130,6 @@ namespace audio
         params.loadPatch(props);
         midiManager.loadPatch();
         tuningEditorSynth.loadPatch(state);
-        forcePrepareToPlay();
     }
 
     bool ProcessorBackEnd::hasEditor() const { return PPDHasEditor; }
@@ -515,7 +514,6 @@ namespace audio
     /////////////////////////////////////////////;
     void Processor::getStateInformation(juce::MemoryBlock& destData)
     {
-        ProcessorBackEnd::savePatch();
         savePatch();
         state.savePatch(*this, destData);
     }
@@ -523,18 +521,20 @@ namespace audio
     void Processor::setStateInformation(const void* data, int sizeInBytes)
     {
         state.loadPatch(*this, data, sizeInBytes);
-        ProcessorBackEnd::loadPatch();
         loadPatch();
     }
 
     void Processor::savePatch()
     {
+        ProcessorBackEnd::savePatch();
         manta.savePatch(state);
     }
 
     void Processor::loadPatch()
     {
+        ProcessorBackEnd::loadPatch();
         manta.loadPatch(state);
+        forcePrepareToPlay();
     }
 }
 

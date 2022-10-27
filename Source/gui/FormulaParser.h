@@ -20,20 +20,27 @@ namespace gui
 		FormulaParser(Utils& u, String&& _tooltip, std::vector<float*>& tables, int size, int overshoot = 0) :
 			TextEditor(u, _tooltip, "enter some math"),
 			postFX{ false, false, false },
-			fx()
+			fx(),
+			updateFormula()
 		{
 			onReturn = [this, tables, size, overshoot]()
 			{
 				if(!fx(txt))
 					return false;
 				
+				updateFormula();
+				return true;
+			};
+
+			updateFormula = [this, tables, size, overshoot]()
+			{
 				{
 					auto x = -1.f;
 					const auto inc = 2.f / static_cast<float>(size);
 					for (auto i = 0; i < size; ++i, x += inc)
 						tables[0][i] = fx(x);
 				}
-				
+
 				const auto sizeInv = 1.f / static_cast<float>(size);
 				const auto fullSize = size + overshoot;
 
@@ -74,12 +81,10 @@ namespace gui
 
 				for (auto i = 0; i < overshoot; ++i)
 					tables[0][size + i] = tables[0][i];
-				
+
 				auto numTables = tables.size();
 				for (auto i = 1; i < numTables; ++i)
 					SIMD::copy(tables[i], tables[0], fullSize);
-
-				return true;
 			};
 
 			setInterceptsMouseClicks(true, true);
@@ -87,8 +92,8 @@ namespace gui
 
 		/* samples */
 		std::array<bool, NumPostFX> postFX;
-	protected:
 		Parser fx;
+		std::function<void()> updateFormula;
 	};
 
 	struct FormulaParser2 :
@@ -97,14 +102,15 @@ namespace gui
 		FormulaParser2(Utils& u, String&& _tooltip, std::vector<float*>& tables, int size, int overshoot) :
 			Comp(u, "", CursorType::Default),
 			parser(u, std::move(_tooltip), tables, size, overshoot),
-			dc(u, "De/activate DC Offset"),
-			normalize(u, "De/activate Normalize"),
-			windowing(u, "De/activate Windowing"),
+			dc(u, "De/activate DC Offset."),
+			normalize(u, "De/activate Normalize."),
+			windowing(u, "De/activate Windowing."),
+			random(u, "Generate a random formula."),
 			create(u, "Create a wavetable.")
 		{
 			layout.init
 			(
-				{ 1, 1, 1, 1 },
+				{ 1, 1, 1, 1, 1 },
 				{ 1, 1 }
 			);
 
@@ -113,11 +119,13 @@ namespace gui
 			addAndMakeVisible(dc);
 			addAndMakeVisible(normalize);
 			addAndMakeVisible(windowing);
+			addAndMakeVisible(random);
 			addAndMakeVisible(create);
 
 			makeToggleButton(dc, "DC");
 			makeToggleButton(normalize, "N");
 			makeToggleButton(windowing, "W");
+			makeTextButton(random, "R", false);
 			makeTextButton(create, "C", false);
 
 			dc.onClick.push_back([&](Button& btn, const Mouse&)
@@ -153,6 +161,21 @@ namespace gui
 					user->setValue("Parser_Windowing", windowing.toggleState);
 					user->save();
 				}
+			});
+			random.onClick.push_back([&](Button&, const Mouse&)
+			{
+				fx::Tokens postfix;
+				fx::generateTerm(postfix, 5, .75f, -1.f, 1.f);
+				if (parser.fx(postfix))
+				{
+					parser.updateFormula();
+					notify(EvtType::FormulaUpdated);
+				}
+				
+				//DBG("INFIX:");
+				//fx::Tokens infix;
+				//fx::toInfix(infix, postfix);
+				//DBG(fx::toString(infix));
 			});
 			create.onClick.push_back([&](Button&, const Mouse&)
 			{
@@ -190,10 +213,11 @@ namespace gui
 			layout.place(dc, 0, 1, 1, 1);
 			layout.place(windowing, 1, 1, 1, 1);
 			layout.place(normalize, 2, 1, 1, 1);
-			layout.place(create, 3, 1, 1, 1);
+			layout.place(random, 3, 1, 1, 1);
+			layout.place(create, 4, 1, 1, 1);
 		}
 
 		FormulaParser parser;
-		Button dc, normalize, windowing, create;
+		Button dc, normalize, windowing, random, create;
 	};
 }

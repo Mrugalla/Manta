@@ -62,6 +62,7 @@ protected:
 
         Notify makeNotify(Editor&);
 
-        void updateBgImage();
+        /* forced */
+        void updateBgImage(bool);
     };
 }

@@ -205,7 +205,11 @@ namespace gui
                     if (hasMeter)
                     {
                         // METER
-                        if (vals[Meter] != 0.f)
+						auto valMeter = vals[Meter];
+#if !JUCE_DEBUG
+						if (std::isnan(valMeter))
+#endif
+                        if (valMeter != 0.f)
                         {
                             const auto radiusBetween = radiusInner + radDif;
                             const auto metr = vals[Meter] > 1.f ? 1.f : vals[Meter];

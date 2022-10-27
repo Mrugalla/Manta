@@ -402,7 +402,7 @@ namespace gui
 	void makeSymbolButton(Button& b, ButtonSymbol symbol, int targetToggleState)
 	{
 		bool withToggle = true;
-		if (symbol == ButtonSymbol::PatchMode)
+		if (symbol == ButtonSymbol::PatchMode || symbol == ButtonSymbol::Img)
 			withToggle = false;
 		else if (symbol == ButtonSymbol::StereoConfig)
 		{
@@ -904,6 +904,37 @@ namespace gui
 				const auto x0 = centre.x + w * .2f;
 				g.drawLine({ centre.x, y1, x0, y1 }, thicc);
 					
+			}
+			else if (symbol == ButtonSymbol::Img)
+			{
+				const auto thicc3 = thicc * 3.f;
+				bounds = maxQuadIn(bounds).reduced(thicc3);
+				
+				auto w = bounds.getWidth();
+				auto h = bounds.getHeight();
+				auto x = bounds.getX();
+				auto y = bounds.getY();
+
+				auto pt0 = bounds.getBottomLeft();
+				auto x1 = x + w * .25f;
+				auto y1 = y + h * .4f;
+				PointF pt1(x1, y1);
+				g.drawLine({ pt0, pt1 }, thicc);
+
+				auto x2 = x + w * .5f;
+				auto y2 = y + h * .8f;
+				PointF pt2(x2, y2);
+				g.drawLine({ pt1, pt2 }, thicc);
+
+				auto x3 = x + w * .75f;
+				auto y3 = y + h * .1f;
+				PointF pt3(x3, y3);
+				g.drawLine({ pt2, pt3 }, thicc);
+
+				auto x4 = x + w;
+				auto y4 = y + h;
+				PointF pt4(x4, y4);
+				g.drawLine({ pt3, pt4 }, thicc);
 			}
 		});
 	}

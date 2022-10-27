@@ -99,6 +99,7 @@ namespace gui
 		Remove,
 		TuningFork,
 		Lookahead,
+		Img,
 		NumSymbols
 	};
 

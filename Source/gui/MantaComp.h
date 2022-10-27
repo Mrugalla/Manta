@@ -137,7 +137,7 @@ namespace gui
 					{
 						std::vector<PID> pIDs;
 						for (auto i = 0; i < numSelected; ++i)
-							pIDs.push_back(selected[i]->morePIDs[0]);
+							pIDs.push_back(selected[i]->xyParam[EQPad::Y]->id);
 
 						makeParameter(*gain, pIDs, "Gain");
 					}
@@ -157,7 +157,7 @@ namespace gui
 					{
 						std::vector<PID> pIDs;
 						for (auto i = 0; i < numSelected; ++i)
-							pIDs.push_back(selected[i]->xyParam[EQPad::Y]->id);
+							pIDs.push_back(selected[i]->scrollParam->id);
 
 						makeParameter(*resonance, pIDs, "Reso");
 					}
@@ -177,7 +177,7 @@ namespace gui
 					{
 						std::vector<PID> pIDs;
 						for (auto i = 0; i < numSelected; ++i)
-							pIDs.push_back(selected[i]->scrollParam->id);
+							pIDs.push_back(selected[i]->morePIDs[0]);
 						
 						makeParameter(*slope, pIDs);
 					}

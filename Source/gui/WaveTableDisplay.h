@@ -22,6 +22,10 @@ namespace gui
 				{
 					wtd.repaint();
 				}
+				else if (t == EvtType::FormulaUpdated)
+				{
+					wtd.repaint();
+				}
 			};
 		}
 

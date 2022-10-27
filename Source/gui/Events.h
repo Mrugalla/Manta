@@ -18,6 +18,7 @@ namespace evt
         EnterParametrValue,
         BrowserOpened,
         BrowserClosed,
+        FormulaUpdated,
         NumTypes
     };
 

@@ -7,7 +7,8 @@ namespace gui
 		buildDateLabel(utils, static_cast<String>(JucePlugin_Manufacturer) + " Plugins, v: " + static_cast<String>(__DATE__) + " " + static_cast<String>(__TIME__)),
 		tooltipLabel(utils, "")
 	{
-		layout.init(
+		layout.init
+		(
 			{ 1 },
 			{ 1, 2 }
 		);
@@ -15,7 +16,7 @@ namespace gui
 		buildDateLabel.textCID = ColourID::Hover;
 		buildDateLabel.just = Just::centredLeft;
 		buildDateLabel.mode = Label::Mode::TextToLabelBounds;
-		buildDateLabel.font = getFontDosisLight();
+		buildDateLabel.font = getFontDosisVariable();
 		tooltipLabel.textCID = ColourID::Txt;
 		tooltipLabel.just = Just::centredLeft;
 		tooltipLabel.mode = buildDateLabel.mode;

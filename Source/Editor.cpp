@@ -8,7 +8,7 @@ namespace gui
         {
             if (evt == EvtType::ColourSchemeChanged)
             {
-                e.updateBgImage();
+                e.updateBgImage(true);
                 e.repaint();
 
                 e.setMouseCursor(makeCursor(CursorType::Default));
@@ -23,7 +23,7 @@ namespace gui
         layout(*this),
         utils(*this, p),
 
-        bgImage(),
+        bgImage(Image::RGB, 1, 1, false),
         notify(utils.getEventSystem(), makeNotify(*this)),
         imgRefresh(utils, "Click here to request a new background image."),
 
@@ -57,10 +57,10 @@ namespace gui
         addAndMakeVisible(tooltip);
 
         addAndMakeVisible(imgRefresh);
-        makeTextButton(imgRefresh, "IMG", false);
+		makeSymbolButton(imgRefresh, ButtonSymbol::Img, false);
         imgRefresh.onClick.push_back([&](Button&, const Mouse&)
         {
-			updateBgImage();
+			updateBgImage(true);
             repaint();
         });
 
@@ -88,6 +88,8 @@ namespace gui
             const auto h = user->getIntValue("gui/height", PPDEditorHeight);
             setSize(w, h);
         }
+
+        updateBgImage(false);
     }
 
     Editor::~Editor()
@@ -134,7 +136,7 @@ namespace gui
         const auto thicc = utils.thicc;
         editorKnobs.setBounds(0, 0, static_cast<int>(thicc * 42.f), static_cast<int>(thicc * 12.f));
 
-        updateBgImage();
+		bgImage = bgImage.rescaled(lowLevel.getWidth(), getHeight(), Graphics::ResamplingQuality::lowResamplingQuality);
 
         saveBounds();
     }
@@ -171,8 +173,36 @@ namespace gui
         user->setValue("gui/height", h);
     }
 
-    void Editor::updateBgImage()
+    void Editor::updateBgImage(bool forced)
     {
+        auto props = audioProcessor.getProps();
+        if (!forced)
+        {
+            if (props != nullptr)
+            {
+                auto user = props->getUserSettings();
+                if (user != nullptr)
+                {
+                    auto file = user->getFile();
+                    file = file.getParentDirectory();
+                    const auto findFiles = File::TypesOfFileToFind::findFiles;
+                    const auto wildCard = "*.png";
+                    for (auto f : file.findChildFiles(findFiles, true, wildCard))
+                    {
+                        if (f.getFileName() == "bgImage.png")
+                        {
+                            auto img = juce::ImageFileFormat::loadFrom(f);
+                            if (img.isValid())
+                            {
+                                bgImage = img;
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         bgImage = Image(Image::ARGB, lowLevel.getWidth(), getHeight(), true);
 		
         Graphics g{ bgImage };
@@ -276,6 +306,22 @@ namespace gui
 					const auto col = Colour::fromRGBA(rgb[0], rgb[1], rgb[2], rgb[3]);
 					bgImage.setPixelAt(x0, y0, pxl.interpolatedWith(col, .1f));
 				}
+            }
+        }
+
+        if (props != nullptr)
+        {
+            auto user = props->getUserSettings();
+            if (user != nullptr)
+            {
+				auto file = user->getFile();
+				file = file.getParentDirectory();
+				file = file.getChildFile("bgImage.png");
+                if (file.exists())
+                    file.deleteFile();
+                juce::FileOutputStream stream(file);
+                juce::PNGImageFormat pngWriter;
+                pngWriter.writeImageToStream(bgImage, stream);
             }
         }
     }

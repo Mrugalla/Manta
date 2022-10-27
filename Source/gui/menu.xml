@@ -39,8 +39,7 @@ to the different pages!"
     <colourscheme y="1" id="colourscheme"/>
   </menu>
   <menu id=
-"The Manifest
-of Wisdom" x="1" y="1;13" tooltip="Use the manifest of wisdom to let your inspiration flow.">
+"Manifest of Wisdom" x="1" y="1;13" tooltip="Use the manifest of wisdom to let your inspiration flow.">
     <title y="0" />
     <erkenntnisse y="1" id="erkenntnisse"/>
   </menu>

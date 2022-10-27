@@ -3,7 +3,7 @@
 #include "juce_core/juce_core.h"
 #include <random>
 
-#define DebugFormularParser false
+#define DebugFormularParser true
 
 namespace fx
 {
@@ -518,6 +518,17 @@ namespace fx
 			func2(getFunc2(op))
 		{}
 
+		Token(Operator _op) :
+			type(Type::Operator),
+			value(0.f),
+			op(_op),
+			precedence(getPrecedence(op)),
+			associativity(getAssociativity(op)),
+			numArguments(getNumArguments(op)),
+			func(getFunc(op)),
+			func2(getFunc2(op))
+		{}
+
 		const Type type;
 		const float value;
 		const Operator op;
@@ -547,6 +558,14 @@ namespace fx
 
 	using Tokens = std::vector<Token>;
 
+	inline String toString(const Tokens& t)
+	{
+		String s;
+		for (const auto& token : t)
+			s += toString(token) + "\n";
+		return s;
+	}
+
 	inline void addNumberToTokens(Tokens& tokens, float numbr)
 	{
 		auto mult = 1.f;
@@ -570,6 +589,69 @@ namespace fx
 				}
 			}
 		tokens.push_back(Token(Token::Type::Number, String(numbr * mult)));
+	}
+
+	inline Operator getRandomOperator(Random& rand) noexcept
+	{
+		return static_cast<Operator>(rand.nextInt(static_cast<int>(Operator::NumOperators)));
+	}
+
+	inline void addRandomNumber(Tokens& tokens, Random& rand, float likelyX, float numMin, float numMax)
+	{
+		bool addX = !(rand.nextFloat() > likelyX);
+		if (addX)
+			tokens.emplace_back(Token(Token::Type::X, (rand.nextBool() ? "1" : "-1")));
+		else
+		{
+			const auto range = numMax - numMin;
+			const auto numbr = numMin + rand.nextFloat() * range;
+			tokens.push_back(Token(Token::Type::Number, String(numbr)));
+		}
+	}
+
+	inline void generateTerm(Tokens& postfix, int numElements, float likelyX, float numMin, float numMax)
+	{
+		postfix.clear();
+		postfix.reserve(numElements);
+		Random rand;
+		addRandomNumber(postfix, rand, likelyX, numMin, numMax);
+		auto numArguments = 1;
+		
+		for (int i = 1; i < numElements; ++i)
+		{
+			bool addOperator = numArguments == 2 || rand.nextFloat() > .75f;
+			if (addOperator)
+			{
+				while (true)
+				{
+					auto op = getRandomOperator(rand);
+					auto numArgs = getNumArguments(op);
+					if (numArgs == numArguments)
+					{
+						postfix.push_back(Token(op));
+						numArguments = 1;
+						break;
+					}
+				}
+			}
+			else
+			{
+				addRandomNumber(postfix, rand, likelyX, numMin, numMax);
+				++numArguments;
+			}
+		}
+		
+		if (postfix.back().type == Token::Type::Number || postfix.back().type == Token::Type::X)
+			while (numArguments != 0)
+			{
+				auto op = getRandomOperator(rand);
+				auto args = getNumArguments(op);
+				if (args == numArguments)
+				{
+					postfix.push_back({ op });
+					return;
+				}
+			}
 	}
 
 	struct Parser
@@ -677,8 +759,7 @@ namespace fx
 			
 #if DebugFormularParser
 			DBG("infix:");
-			for (auto& t : tokens)
-				DBG(toString(t));
+			DBG(toString(tokens));
 #endif
 			
 			// TO POSTFIX
@@ -744,10 +825,14 @@ namespace fx
 				}
 			}	
 			
+			return operator()(postfix);
+		}
+
+		bool operator()(const Tokens& postfix)
+		{
 #if DebugFormularParser
-			DBG("\npostfix:");
-			for (auto& p : postfix)
-				DBG(toString(p));
+			DBG("postfix:");
+			DBG(toString(postfix));
 #endif
 
 			// CREATE FUNCTION
@@ -773,15 +858,15 @@ namespace fx
 							errorType = ParserErrorType::WroteAmountOfArguments;
 							return 0.f;
 						}
-						
+
 						if (p.numArguments == 1)
 							y = p.func(stack.back().value);
 						else if (p.numArguments == 2)
 							y = p.func2(stack[stack.size() - 2].value, stack.back().value);
-						
-						for(auto i = 0; i < p.numArguments; ++i)
+
+						for (auto i = 0; i < p.numArguments; ++i)
 							stack.pop_back();
-						
+
 						stack.push_back({ Token::Type::Number, String(y) });
 						break;
 					default:
@@ -789,12 +874,12 @@ namespace fx
 						return 0.f;
 					}
 				}
-				
+
 				if (std::isnan(y) || std::isinf(y))
 					return 0.f;
 				return y;
 			};
-			
+
 			errorType = ParserErrorType::NoError;
 #if DebugFormularParser
 			DBG("\nerr: " << toString(errorType));

@@ -145,62 +145,63 @@ namespace gui
 		};
 
 		manifest.onClick.push_back([&](Button&, const Mouse&)
-			{
-				saveToDisk();
-			});
+		{
+			saveToDisk();
+		});
 
 		inspire.onClick.push_back([&](Button&, const Mouse&)
+		{
+			const File folder(getFolder());
+
+			const auto fileTypes = File::TypesOfFileToFind::findFiles;
+			const String extension(".txt");
+			const auto wildCard = "*" + extension;
+			const auto numFiles = folder.getNumberOfChildFiles(fileTypes, wildCard);
+			if (numFiles == 0)
+				return parse("I am deeply sorry. There is no wisdom in the manifest of wisdom yet.");
+
+			Random rand;
+			auto idx = rand.nextInt(numFiles);
+
+			const RangedDirectoryIterator files
+			(
+				folder,
+				false,
+				wildCard,
+				fileTypes
+			);
+
+			for (const auto& it : files)
 			{
-				const File folder(getFolder());
-
-				const auto fileTypes = File::TypesOfFileToFind::findFiles;
-				const String extension(".txt");
-				const auto wildCard = "*" + extension;
-				const auto numFiles = folder.getNumberOfChildFiles(fileTypes, wildCard);
-				if (numFiles == 0)
-					return parse("I am deeply sorry. There is no wisdom in the manifest of wisdom yet.");
-
-				Random rand;
-				auto idx = rand.nextInt(numFiles);
-
-				const RangedDirectoryIterator files(
-					folder,
-					false,
-					wildCard,
-					fileTypes
-				);
-
-				for (const auto& it : files)
+				if (idx == 0)
 				{
-					if (idx == 0)
-					{
-						const File file(it.getFile());
-						parse(file.getFileName());
-						editor.setText(file.loadFileAsString());
-						editor.disable();
-						return;
-					}
-					else
-						--idx;
+					const File file(it.getFile());
+					parse(file.getFileName());
+					editor.setText(file.loadFileAsString());
+					editor.disable();
+					return;
 				}
-			});
+				else
+					--idx;
+			}
+		});
 
 		reveal.onClick.push_back([&](Button&, const Mouse&)
-			{
-				const File file(getFolder() + date.getText());
-				if (file.exists())
-					file.revealToUser();
+		{
+			const File file(getFolder() + date.getText());
+			if (file.exists())
+				file.revealToUser();
 
-				const File folder(getFolder());
-				folder.revealToUser();
-			});
+			const File folder(getFolder());
+			folder.revealToUser();
+		});
 
 		clear.onClick.push_back([&](Button&, const Mouse&)
-			{
-				editor.clear();
-				editor.enable();
-				parse("");
-			});
+		{
+			editor.clear();
+			editor.enable();
+			parse("");
+		});
 
 		paste.onClick.push_back([&](Button&, const Mouse&)
 		{
@@ -243,7 +244,7 @@ namespace gui
 	{
 		auto specialLoc = File::getSpecialLocation(File::SpecialLocationType::userApplicationDataDirectory);
 
-		return specialLoc.getFullPathName() + "\\Mrugalla\\sharedState\\TheManifestOfWisdom\\";
+		return specialLoc.getFullPathName() + "\\Mrugalla\\SharedState\\TheManifestOfWisdom\\";
 	}
 
 	void ErkenntnisseComp::saveToDisk()
@@ -294,7 +295,7 @@ namespace gui
 			addAndMakeVisible(*cmp.c);
 	}
 
-	void CompModular::paint(Graphics&){}
+	void CompModular::paint(Graphics&) {}
 
 	void CompModular::resized()
 	{
@@ -355,7 +356,7 @@ namespace gui
 
 	NavBar::NavBar(Utils& u, const ValueTree& xml) :
 		Comp(u, "", CursorType::Default),
-		label(u, "Navigation"),
+		label(u, "Nav"),
 		nodes(makeNodes(xml)),
 		buttons(),
 		numMenus(static_cast<int>(nodes.size())),
@@ -559,7 +560,7 @@ namespace gui
 
 	Menu::Menu(Utils& u, const ValueTree& xml) :
 		CompWidgetable(u, "", CursorType::Default),
-		label(u, xml.getProperty("id", "")),
+		label(u, xml.getProperty("id", "").toString().replaceCharacters("\n"," ")),
 		navBar(u, xml),
 		subMenu(nullptr)
 	{

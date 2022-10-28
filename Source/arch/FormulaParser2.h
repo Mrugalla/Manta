@@ -3,7 +3,7 @@
 #include "juce_core/juce_core.h"
 #include <random>
 
-#define DebugFormularParser true
+#define DebugFormularParser false
 
 namespace fx
 {
@@ -757,7 +757,7 @@ namespace fx
 				}
 			}
 			
-#if DebugFormularParser
+#if JUCE_DEBUG && DebugFormularParser
 			DBG("infix:");
 			DBG(toString(tokens));
 #endif
@@ -830,7 +830,7 @@ namespace fx
 
 		bool operator()(const Tokens& postfix)
 		{
-#if DebugFormularParser
+#if JUCE_DEBUG && DebugFormularParser
 			DBG("postfix:");
 			DBG(toString(postfix));
 #endif
@@ -881,7 +881,7 @@ namespace fx
 			};
 
 			errorType = ParserErrorType::NoError;
-#if DebugFormularParser
+#if JUCE_DEBUG && DebugFormularParser
 			DBG("\nerr: " << toString(errorType));
 #endif
 			return true;

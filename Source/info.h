@@ -24,9 +24,7 @@ HOW TO USE:
 
 TO DO:
 
-37: if enter value manually and exceeds range, textbox should show corrected value
 39: rand relative for all parameters at once
-40. rightclick on knob when menu already open closes menu
 42. buttons need lock
 
 formulaparser

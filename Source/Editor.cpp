@@ -23,7 +23,7 @@ namespace gui
         layout(*this),
         utils(*this, p),
 
-        bgImage(Image::RGB, 1, 1, false),
+        bgImage(),
         notify(utils.getEventSystem(), makeNotify(*this)),
         imgRefresh(utils, "Click here to request a new background image."),
 
@@ -80,6 +80,8 @@ namespace gui
 
         addChildComponent(editorKnobs);
 
+        updateBgImage(false);
+
         setOpaque(true);
         setResizable(true, true);
         {
@@ -88,8 +90,6 @@ namespace gui
             const auto h = user->getIntValue("gui/height", PPDEditorHeight);
             setSize(w, h);
         }
-
-        updateBgImage(false);
     }
 
     Editor::~Editor()
@@ -136,7 +136,10 @@ namespace gui
         const auto thicc = utils.thicc;
         editorKnobs.setBounds(0, 0, static_cast<int>(thicc * 42.f), static_cast<int>(thicc * 12.f));
 
-		bgImage = bgImage.rescaled(lowLevel.getWidth(), getHeight(), Graphics::ResamplingQuality::lowResamplingQuality);
+        if (bgImage.isValid())
+            bgImage = bgImage.rescaled(lowLevel.getWidth(), getHeight(), Graphics::ResamplingQuality::lowResamplingQuality);
+        else
+            updateBgImage(true);
 
         saveBounds();
     }
@@ -202,14 +205,20 @@ namespace gui
                 }
             }
         }
+
+        auto width = lowLevel.getWidth();
+		auto height = getHeight();
+
+        if (width == 0 || height == 0)
+            return;
         
-        bgImage = Image(Image::ARGB, lowLevel.getWidth(), getHeight(), true);
+        bgImage = Image(Image::ARGB, width, height, true);
 		
         Graphics g{ bgImage };
 
         Random rand;
-        const auto w = static_cast<float>(getWidth());
-        const auto h = static_cast<float>(getHeight());
+        const auto w = static_cast<float>(width);
+        const auto h = static_cast<float>(height);
         const BoundsF bounds(0.f, 0.f, w, h);
         const Colour trans(0x000000);
         const auto thicc = utils.thicc;

@@ -1038,8 +1038,20 @@ namespace gui
                         for (auto pID : pIDs)
                         {
 							auto param = tek.getUtils().getParam(pID);
-                            const auto val = juce::jlimit(0.f, 1.f, param->getValueForText(tek.txt));
-                            param->setValueWithGesture(val);
+                            auto& range = param->range;
+
+                            const auto valDenorm = param->getValForTextDenorm(tek.txt);
+							const auto val = range.snapToLegalValue(juce::jlimit(range.start, range.end, valDenorm));
+                            if (valDenorm >= range.start && valDenorm <= range.end)
+                            {
+								param->setValueWithGesture(val);
+                            }
+                            else
+                            {
+                                tek.setText(param->getText(val, 0));
+                                tek.enable();
+                                tek.repaint();
+                            }
                         }
                     }
                     tek.disable();

@@ -1203,7 +1203,7 @@ namespace param
 			params.push_back(makeParam(PID::Delta, state, 0.f, makeRange::toggle(), Unit::Power));
 #endif
 			// TUNING PARAMS:
-			params.push_back(makeParam(PID::Xen, state, 12.f, makeRange::withCentre(1.f, PPD_MaxXen, 12.f), Unit::Xen));
+			params.push_back(makeParam(PID::Xen, state, 12.f, makeRange::withCentre(2.f, PPD_MaxXen, 12.f), Unit::Xen));
 			params.push_back(makeParam(PID::MasterTune, state, 440.f, makeRange::withCentre(420.f, 460.f, 440.f), Unit::Hz));
 			params.push_back(makeParam(PID::BaseNote, state, 69.f, makeRange::withCentre(0.f, 127.f, 69.f), Unit::Note));
 			params.push_back(makeParam(PID::PitchbendRange, state, 2.f, makeRange::stepped(0.f, 48.f, 1.f), Unit::Semi));

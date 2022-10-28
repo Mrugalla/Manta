@@ -67,7 +67,7 @@ namespace gui
     String ButtonParameterRandomizer::makeTooltip()
     {
         Random rand;
-        static constexpr float count = 224.f;
+        static constexpr float count = 225.f;
         const auto v = static_cast<int>(std::round(rand.nextFloat() * count));
         switch (v)
         {
@@ -296,6 +296,7 @@ namespace gui
 		case 222: return "This is the last tooltip message. I promise.";
 		case 223: return "Insanity is the only way to achieve perfection.";
 		case 224: return "Destructive forces cause constructive changes.";
+        case 225: return "Division by Zero is neither undefined nor infinite, but simply insane.";
         default: "Are you sure?";
         }
         return "You are not supposed to read this message!";

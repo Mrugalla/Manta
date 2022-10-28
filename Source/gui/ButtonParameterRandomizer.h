@@ -18,7 +18,8 @@ namespace gui
 
         void add(const RandFunc&);
 
-        void operator()();
+		/* isAbsolute */
+        void operator()(bool);
 
 		std::vector<Param*> randomizables;
         std::vector<RandFunc> randFuncs;

@@ -26,13 +26,15 @@ TO DO:
 
 39: rand relative for all parameters at once
 
+plugin crash when all tuning settings on lowest value
+
 formulaparser
 	randomize button should postfix>>infix and infix>>string
 
 manta 2
 	am/rm between lanes
 
-randomizer dangerous - make locks more obvious
+randomizer dangerous
 	sometimes hard to click on small knobs
 	macro needs to be lockable too
 

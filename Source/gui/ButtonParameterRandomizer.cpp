@@ -30,29 +30,47 @@ namespace gui
         randFuncs.push_back(p);
     }
 
-    void ButtonParameterRandomizer::operator()()
+    void ButtonParameterRandomizer::operator()(bool isAbsolute)
     {
         juce::Random rand;
         for (auto& func : randFuncs)
             func(rand);
-        for (auto randomizable : randomizables)
-            if (randomizable->id != PID::Power && randomizable->id != PID::Clipper)
-            {
-                const auto& range = randomizable->range;
+		if(isAbsolute)
+        {
+            for (auto randomizable : randomizables)
+                if (randomizable->id != PID::Power && randomizable->id != PID::Clipper)
+                {
+                    const auto& range = randomizable->range;
 
-                const auto v = rand.nextFloat();
-                const auto vD = range.convertFrom0to1(v);
-                const auto vL = range.snapToLegalValue(vD);
-                const auto vF = range.convertTo0to1(vL);
+                    const auto v = rand.nextFloat();
+                    const auto vD = range.convertFrom0to1(v);
+                    const auto vL = range.snapToLegalValue(vD);
+                    const auto vF = range.convertTo0to1(vL);
 
-                randomizable->setValueWithGesture(vF);
-            }
+                    randomizable->setValueWithGesture(vF);
+                }
+        }
+		else
+		{
+			for (auto randomizable : randomizables)
+				if (randomizable->id != PID::Power && randomizable->id != PID::Clipper)
+				{
+					const auto& range = randomizable->range;
+					
+                    const auto valNorm = randomizable->getValue();
+                    const auto valRand = rand.nextFloat() * .05f - .025f;
+                    const auto nValNorm = juce::jlimit(0.f, 1.f, valNorm + valRand);
+
+                    randomizable->setValueWithGesture(nValNorm);
+				}
+		}
     }
 
     void ButtonParameterRandomizer::mouseUp(const Mouse& mouse)
     {
         if (mouse.mouseWasDraggedSinceMouseDown()) return;
-        this->operator()();
+        bool isAbsolute = !mouse.mods.isShiftDown();
+        this->operator()(isAbsolute);
         setTooltip(makeTooltip());
         Button::mouseUp(mouse);
         Comp::mouseEnter(mouse);
@@ -67,7 +85,7 @@ namespace gui
     String ButtonParameterRandomizer::makeTooltip()
     {
         Random rand;
-        static constexpr float count = 225.f;
+        static constexpr float count = 228.f;
         const auto v = static_cast<int>(std::round(rand.nextFloat() * count));
         switch (v)
         {
@@ -297,6 +315,9 @@ namespace gui
 		case 223: return "Insanity is the only way to achieve perfection.";
 		case 224: return "Destructive forces cause constructive changes.";
         case 225: return "Division by Zero is neither undefined nor infinite, but simply insane.";
+        case 226: return "Hold shift as you click this button to randomize sensitively.";
+		case 227: return "Did you know you can hold shift to randomize sensitively?";
+		case 228: return "If you hold shift while clicking on this button, it will randomize sensitively.";
         default: "Are you sure?";
         }
         return "You are not supposed to read this message!";

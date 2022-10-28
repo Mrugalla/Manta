@@ -65,89 +65,6 @@ namespace gui
 		});
 	}
 
-	void Button::enableParameterSwitch(const std::vector<PID>& _pIDs)
-	{
-		pID = _pIDs;
-
-		stopTimer();
-
-		const auto numParams = pID.size();
-		for (auto p = 0; p < numParams; ++p)
-		{
-			onClick.push_back([param = utils.getParam(pID[p])](Button& btn, const Mouse& mouse)
-			{
-				if (mouse.mods.isRightButtonDown())
-				{
-					btn.utils.getEventSystem().notify(EvtType::ButtonRightClicked, &btn);
-					return;
-				}
-				if (mouse.mods.isCtrlDown())
-				{
-					// open textbox
-					return;
-				}
-				const auto ts = param->getValue() > .5f ? 0.f : 1.f;
-				param->setValueWithGesture(ts);
-			});
-		}
-		
-		onTimer.push_back([this](Button&)
-		{
-			bool shallRepaint = false;
-
-			const auto param = utils.getParam(pID[0]);
-
-			const auto lckd = param->isLocked();
-			if (locked != lckd)
-			{
-				locked = lckd;
-				label.textCID = locked ? ColourID::Inactive : ColourID::Interact;
-				shallRepaint = true;
-			}
-
-			const auto nTs = param->getValue() > .5f ? 1 : 0;
-			if (toggleState != nTs)
-			{
-				toggleState = nTs;
-
-				if (toggleTexts.size() > toggleState)
-					label.setText(toggleTexts[toggleState]);
-
-				shallRepaint = true;
-			}
-
-			if (shallRepaint)
-				repaintWithChildren(this);
-		});
-
-		onMouseWheel.push_back([](Button& btn, const Mouse&, const MouseWheel& wheel)
-		{
-			auto move = wheel.deltaY > 0 ? 1.f : -1.f;
-			move *= wheel.isReversed ? -1.f : 1.f;
-
-			const auto& pIDs = btn.pID;
-			for (auto pID : pIDs)
-			{
-				auto param = btn.getUtils().getParam(pID);
-				auto& range = param->range;
-				auto interval = range.interval * move;
-				auto denorm = std::round(param->getValueDenorm());
-				auto val = denorm + interval;
-				if (val > range.end)
-					val = range.start;
-				if (val < range.start)
-					val = range.end;
-				param->setValueWithGesture(range.convertTo0to1(val));
-			}
-		});
-		
-		setTooltip(param::toTooltip(pID[0]));
-
-		initLockButton();
-
-		startTimerHz(24);
-	}
-
 	void Button::enableParameter(const std::vector<PID>& _pIDs)
 	{
 		pID = _pIDs;
@@ -179,14 +96,15 @@ namespace gui
 					val = range.start;
 				else if (val < range.start)
 					val = range.end;
+				btn.toggleState = static_cast<int>(val - range.start);
 				param->setValueWithGesture(range.convertTo0to1(val));
 			}
 		});
 
 		onMouseWheel.push_back([](Button& btn, const Mouse&, const MouseWheel& wheel)
 		{
-			if (btn.toggleNext != 0)
-				return;
+			//if (btn.toggleNext != 0)
+			//	return;
 
 			auto move = wheel.deltaY > 0 ? 1.f : -1.f;
 			move *= wheel.isReversed ? -1.f : 1.f;
@@ -968,6 +886,8 @@ namespace gui
 				g.drawLine({ pt3, pt4 }, thicc);
 			}
 		});
+
+		b.toggleNext = withToggle ? 1 : 0;
 	}
 
 	void makeToggleButton(Button& b, const String& txt)
@@ -977,46 +897,48 @@ namespace gui
 		{
 			btn.toggleState = btn.toggleState == 0 ? 1 : 0;
 		});
+		b.toggleNext = 1;
 	}
 
-	void makeParameterSwitchButton(Button& b, PID pID, String&& txt)
-	{
-		makeTextButton(b, std::move(txt), true);
-		b.enableParameterSwitch({ pID });
-	}
-
-	void makeParameterSwitchButton(Button& b, PID pID, ButtonSymbol symbol)
+	void makeParameter(Button& b, const std::vector<PID>& pIDs, ButtonSymbol symbol)
 	{
 		makeSymbolButton(b, symbol);
-		b.enableParameterSwitch({ pID });
-	}
-
-	void makeParameterSwitchButton(Button& b, const std::vector<PID>& pIDs, ButtonSymbol symbol)
-	{
-		makeSymbolButton(b, symbol);
-		b.enableParameterSwitch(pIDs);
-	}
-
-	void makeParameterSwitchButton(Button& b, const std::vector<PID>& pIDs, String&& txt)
-	{
-		makeToggleButton(b, txt);
-		b.enableParameterSwitch(pIDs);
-	}
-
-	void makeParameter(Button& b, const std::vector<PID>& pIDs)
-	{
-		const auto mainParam = b.getUtils().getParam(pIDs[0]);
-		const auto numSteps = mainParam->getNumSteps();
-		const auto numStepsF = static_cast<float>(numSteps);
-		const auto numStepsInv = 1.f / numStepsF;
-		auto x = numStepsInv * .5f;
-		std::vector<String> strVec;
-		strVec.reserve(numSteps);
-		for (auto i = 0; i < numSteps; ++i, x += numStepsInv)
-			strVec.emplace_back(mainParam->getText(x, 420));
-
-		makeTextButton(b, strVec, false);
 		b.enableParameter(pIDs);
+	}
+
+	void makeParameter(Button& b, const std::vector<PID>& pIDs, const String& text, bool withToggle)
+	{
+		if (text != "")
+			if(withToggle)
+				makeToggleButton(b, text);
+			else
+				makeTextButton(b, text, withToggle);
+		else
+		{
+			const auto mainParam = b.getUtils().getParam(pIDs[0]);
+			const auto numSteps = mainParam->getNumSteps();
+			const auto numStepsF = static_cast<float>(numSteps);
+			const auto numStepsInv = 1.f / numStepsF;
+			auto x = numStepsInv * .5f;
+			std::vector<String> strVec;
+			strVec.reserve(numSteps);
+			for (auto i = 0; i < numSteps; ++i, x += numStepsInv)
+				strVec.emplace_back(mainParam->getText(x, 420));
+
+			makeTextButton(b, strVec, false);
+		}
+
+		b.enableParameter(pIDs);
+	}
+
+	void makeParameter(Button& b, PID pID, ButtonSymbol symbol)
+	{
+		makeParameter(b, std::vector<PID>{ pID }, symbol);
+	}
+	
+	void makeParameter(Button& b, PID pID, const String& text, bool withToggle)
+	{
+		makeParameter(b, std::vector<PID>{ pID }, text, withToggle);
 	}
 
 	template<size_t NumButtons>

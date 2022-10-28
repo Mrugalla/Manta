@@ -129,7 +129,7 @@ namespace gui
 						for (auto i = 0; i < numSelected; ++i)
 							pIDs.push_back(selected[i]->rightClickParam->id);
 
-						makeParameterSwitchButton(*enabled, pIDs, ButtonSymbol::Power);
+						makeParameter(*enabled, pIDs, ButtonSymbol::Power);
 					}
 
 					gain = std::make_unique<Knob>(u);
@@ -169,7 +169,7 @@ namespace gui
 						for (auto i = 0; i < numSelected; ++i)
 							pIDs.push_back(selected[i]->morePIDs[8]);
 
-						makeParameterSwitchButton(*snap, pIDs, "Snap");
+						makeParameter(*snap, pIDs, "Snap", true);
 					}
 
 					slope = std::make_unique<Button>(u);

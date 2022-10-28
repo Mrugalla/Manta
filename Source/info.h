@@ -25,7 +25,6 @@ HOW TO USE:
 TO DO:
 
 39: rand relative for all parameters at once
-42. buttons need lock
 
 formulaparser
 	randomize button should postfix>>infix and infix>>string
@@ -34,7 +33,6 @@ manta 2
 	am/rm between lanes
 
 randomizer dangerous - make locks more obvious
-	not obvious enough yet for buttons
 	sometimes hard to click on small knobs
 	macro needs to be lockable too
 

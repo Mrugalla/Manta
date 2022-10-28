@@ -283,7 +283,7 @@ namespace gui
 
 		makeParameter(macro, PID::Macro, "Macro", false);
 
-		makeParameterSwitchButton(clipper, PID::Clipper, "Clip");
+		makeParameter(clipper, { PID::Clipper }, "Clip", true);
 		addAndMakeVisible(clipper);
 
 #if PPDHasPatchBrowser
@@ -298,7 +298,7 @@ namespace gui
 		makeParameter(gainIn, PID::GainIn, "In", true, &utils.getMeter(0));
 		addAndMakeVisible(gainIn);
 #if PPDHasUnityGain
-		makeParameterSwitchButton(unityGain, PID::UnityGain, ButtonSymbol::UnityGain);
+		makeParameter(unityGain, PID::UnityGain, ButtonSymbol::UnityGain);
 		addAndMakeVisible(unityGain);
 #endif
 #endif
@@ -312,31 +312,31 @@ namespace gui
 		addAndMakeVisible(mix);
 #if PPDHasHQ
 		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::HQ)));
-		makeParameterSwitchButton(*buttonsBottom.back(), PID::HQ, "HQ");
+		makeParameter(*buttonsBottom.back(), PID::HQ, "HQ");
 		buttonsBottom.back()->getLabel().mode = Label::Mode::TextToLabelBounds;
 #endif
 #if PPDHasStereoConfig
 		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::StereoConfig)));
-		makeParameterSwitchButton(*buttonsBottom.back(), PID::StereoConfig, ButtonSymbol::StereoConfig);
+		makeParameter(*buttonsBottom.back(), PID::StereoConfig, ButtonSymbol::StereoConfig);
 		buttonsBottom.back()->getLabel().mode = Label::Mode::TextToLabelBounds;
 #endif
 		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::Power)));
-		makeParameterSwitchButton(*buttonsBottom.back(), PID::Power, ButtonSymbol::Power);
+		makeParameter(*buttonsBottom.back(), PID::Power, ButtonSymbol::Power);
 #if PPDHasPolarity
 		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::Polarity)));
-		makeParameterSwitchButton(*buttonsBottom.back(), PID::Polarity, ButtonSymbol::Polarity);
+		makeParameter(*buttonsBottom.back(), PID::Polarity, ButtonSymbol::Polarity);
 #endif
 #if PPDHasLookahead
 		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::Lookahead)));
-		makeParameterSwitchButton(*buttonsBottom.back(), PID::Lookahead, ButtonSymbol::Lookahead);
+		makeParameter(*buttonsBottom.back(), PID::Lookahead, ButtonSymbol::Lookahead);
 #endif
 #if PPD_MixOrGainDry == 1
 		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::MuteDry)));
-		makeParameterSwitchButton(*buttonsBottom.back(), PID::MuteDry, "Mute\nDry");
+		makeParameter(*buttonsBottom.back(), PID::MuteDry, "Mute\nDry", true);
 #endif
 #if PPDHasDelta
 		buttonsBottom.push_back(std::make_unique<Button>(u, param::toTooltip(PID::Delta)));
-		makeParameterSwitchButton(*buttonsBottom.back(), PID::Delta, "D");
+		makeParameter(*buttonsBottom.back(), PID::Delta, "D");
 #endif
 
 		for (auto& bb : buttonsBottom)

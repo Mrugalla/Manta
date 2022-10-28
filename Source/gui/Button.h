@@ -35,8 +35,6 @@ namespace gui
 		
 		void initLockButton();
 
-		void enableParameterSwitch(const std::vector<PID>&);
-
 		/* pIDs */
 		void enableParameter(const std::vector<PID>&);
 
@@ -113,18 +111,17 @@ namespace gui
 
 	void makeToggleButton(Button&, const String&);
 
-	/* btn, pID, text */
-	void makeParameterSwitchButton(Button&, PID, String&&);
+	/* button, pIDs, symbol, withToggle */
+	void makeParameter(Button&, const std::vector<PID>&, ButtonSymbol);
+	
+	/* button, pIDs, text, withToggle */
+	void makeParameter(Button&, const std::vector<PID>&, const String& = "", bool = false);
 
-	void makeParameterSwitchButton(Button&, PID, ButtonSymbol);
+	/* button, pID, symbol, withToggle */
+	void makeParameter(Button&, PID, ButtonSymbol);
 
-	void makeParameterSwitchButton(Button&, const std::vector<PID>&, ButtonSymbol);
-
-	/* btn, pIDs, text */
-	void makeParameterSwitchButton(Button&, const std::vector<PID>&, String&&);
-
-	/* button, pIDs, text */
-	void makeParameter(Button&, const std::vector<PID>&);
+	/* button, pID, text, withToggle */
+	void makeParameter(Button&, PID, const String & = "", bool = false);
 
 	template<size_t NumButtons>
 	void makeParameterButtonsGroup(std::array<Button, NumButtons>&, PID, const char* /*txt*/, bool /*onlyText*/);

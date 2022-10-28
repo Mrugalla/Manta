@@ -34,7 +34,7 @@ namespace gui
 
         Colour defaultColour() noexcept
         {
-            return Colour(0xffe56a14);
+            return Colour(0xffeba021);
         }
 
         void init(Props* p)

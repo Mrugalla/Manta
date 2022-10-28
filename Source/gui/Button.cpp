@@ -193,22 +193,20 @@ namespace gui
 
 	void Button::resized()
 	{
+		const auto thicc = utils.thicc;
+		const auto thicc2 = thicc * 2.f;
+		const auto bounds = getLocalBounds().toFloat().reduced(thicc2);
+		
 		if (label.isVisible())
-		{
-			const auto thicc = utils.thicc;
-			const auto thicc2 = thicc * 2.f;
-			const auto bounds = getLocalBounds().toFloat().reduced(thicc2);
-
 			label.setBounds(bounds.toNearestInt());
 
-			if (lockButton != nullptr)
-			{
-				const auto w = bounds.getWidth() * .5f;
-				const auto h = bounds.getHeight() * .5f;
-				const auto x = static_cast<float>(getWidth()) - w;
-				const auto y = static_cast<float>(getHeight()) - h;
-				lockButton->setBounds(BoundsF(x, y, w, h).toNearestInt());
-			}
+		if (lockButton != nullptr)
+		{
+			const auto w = bounds.getWidth() * .5f;
+			const auto h = bounds.getHeight() * .5f;
+			const auto x = static_cast<float>(getWidth()) - w;
+			const auto y = static_cast<float>(getHeight()) - h;
+			lockButton->setBounds(BoundsF(x, y, w, h).toNearestInt());
 		}
 	}
 

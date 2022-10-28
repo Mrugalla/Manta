@@ -32,6 +32,8 @@ namespace gui
 		void enableLabel(const String&);
 
 		void enableLabel(const std::vector<String>&);
+		
+		void initLockButton();
 
 		void enableParameterSwitch(const std::vector<PID>&);
 
@@ -54,6 +56,7 @@ namespace gui
 		std::vector<PID> pID;
 		bool locked;
 		int toggleNext;
+		std::unique_ptr<Button> lockButton;
 	protected:
 		Label label;
 		std::vector<String> toggleTexts;

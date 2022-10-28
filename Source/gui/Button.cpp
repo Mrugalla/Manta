@@ -48,11 +48,28 @@ namespace gui
 		addAndMakeVisible(label);
 	}
 
+	void Button::initLockButton()
+	{
+		lockButton = std::make_unique<Button>(utils, "Click here to lock this parameter.");
+		addAndMakeVisible(*lockButton);
+
+		makeTextButton(*lockButton, "L", true);
+
+		lockButton->onClick.push_back([&parent = *this](Button& btn, const Mouse&)
+		{
+			for (auto pID : parent.pID)
+			{
+				const auto param = btn.getUtils().getParam(pID);
+				param->setLocked(!param->isLocked());
+			}
+		});
+	}
+
 	void Button::enableParameterSwitch(const std::vector<PID>& _pIDs)
 	{
-		stopTimer();
-
 		pID = _pIDs;
+
+		stopTimer();
 
 		const auto numParams = pID.size();
 		for (auto p = 0; p < numParams; ++p)
@@ -125,6 +142,8 @@ namespace gui
 		});
 		
 		setTooltip(param::toTooltip(pID[0]));
+
+		initLockButton();
 
 		startTimerHz(24);
 	}
@@ -221,6 +240,8 @@ namespace gui
 
 		setTooltip(param::toTooltip(pID[0]));
 
+		initLockButton();
+
 		startTimerHz(24);
 	}
 
@@ -236,7 +257,8 @@ namespace gui
 		locked(false),
 		toggleNext(0),
 		label(utils, ""),
-		toggleTexts()
+		toggleTexts(),
+		lockButton(nullptr)
 	{
 		setInterceptsMouseClicks(true, true);
 	}
@@ -256,10 +278,19 @@ namespace gui
 		if (label.isVisible())
 		{
 			const auto thicc = utils.thicc;
-			const auto thicc4 = thicc * 2.f;
-			const auto bounds = getLocalBounds().toFloat().reduced(thicc4);
+			const auto thicc2 = thicc * 2.f;
+			const auto bounds = getLocalBounds().toFloat().reduced(thicc2);
 
 			label.setBounds(bounds.toNearestInt());
+
+			if (lockButton != nullptr)
+			{
+				const auto w = bounds.getWidth() * .5f;
+				const auto h = bounds.getHeight() * .5f;
+				const auto x = static_cast<float>(getWidth()) - w;
+				const auto y = static_cast<float>(getHeight()) - h;
+				lockButton->setBounds(BoundsF(x, y, w, h).toNearestInt());
+			}
 		}
 	}
 

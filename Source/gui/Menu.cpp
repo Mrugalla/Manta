@@ -242,9 +242,10 @@ namespace gui
 
 	String ErkenntnisseComp::getFolder()
 	{
-		auto specialLoc = File::getSpecialLocation(File::SpecialLocationType::userApplicationDataDirectory);
+		const auto slash = File::getSeparatorString();
+		const auto specialLoc = File::getSpecialLocation(File::SpecialLocationType::userApplicationDataDirectory);
 
-		return specialLoc.getFullPathName() + "\\Mrugalla\\SharedState\\TheManifestOfWisdom\\";
+		return specialLoc.getFullPathName() + slash + "Mrugalla" + slash + "SharedState" + slash + "TheManifestOfWisdom" + slash;
 	}
 
 	void ErkenntnisseComp::saveToDisk()

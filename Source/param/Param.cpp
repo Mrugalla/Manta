@@ -188,6 +188,8 @@ namespace param
 		case PID::Lane1DelayOct: return "Define an octave-offset of this lane's delay.";
 		case PID::Lane1DelaySemi: return "Define a semitone-offset of this lane's delay.";
 		case PID::Lane1RMDepth: return "Define the depth of this lane's ring modulation.";
+		case PID::Lane1RMOct: return "Define an octave-offset of this lane's ring modulation.";
+		case PID::Lane1RMSemi: return "Define a semitone-offset of this lane's ring modulation.";
 		case PID::Lane1Gain: return "Define this lane's output gain.";
 
 		case PID::Lane2Enabled: return "Turn on or off the second lane.";
@@ -200,6 +202,8 @@ namespace param
 		case PID::Lane2DelayOct: return "Define an octave-offset of this lane's delay.";
 		case PID::Lane2DelaySemi: return "Define a semitone-offset of this lane's delay.";
 		case PID::Lane2RMDepth: return "Define the depth of this lane's ring modulation.";
+		case PID::Lane2RMOct: return "Define an octave-offset of this lane's ring modulation.";
+		case PID::Lane2RMSemi: return "Define a semitone-offset of this lane's ring modulation.";
 		case PID::Lane2Gain: return "Define this lane's output gain.";
 
 		case PID::Lane3Enabled: return "Turn on or off the third lane.";
@@ -212,6 +216,8 @@ namespace param
 		case PID::Lane3DelayOct: return "Define an octave-offset of this lane's delay.";
 		case PID::Lane3DelaySemi: return "Define a semitone-offset of this lane's delay.";
 		case PID::Lane3RMDepth: return "Define the depth of this lane's ring modulation.";
+		case PID::Lane3RMOct: return "Define an octave-offset of this lane's ring modulation.";
+		case PID::Lane3RMSemi: return "Define a semitone-offset of this lane's ring modulation.";
 		case PID::Lane3Gain: return "Define this lane's output gain.";
 
 		default: return "Invalid Tooltip.";

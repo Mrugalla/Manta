@@ -24,14 +24,21 @@ HOW TO USE:
 
 TO DO:
 
-formulaparser
+Formulaparser
 	randomize button should postfix>>infix and infix>>string
 
-manta 2
-	am/rm between lanes
+EQPad
+	can be confusing when multiple selected filters overlap after dragged out of bounds
+	in decibels
+		then with automatic range
+			like [-3, 3]db or [-12, 12]db
 
-randomizer dangerous
-	macro needs to be lockable too
+Manta 2
+	am/rm between lanes
+	visualize feedback of comb filter and heat?
+
+Parameter Randomizer Workflow
+	Macro needs to be lockable too
 
 WaveTableDisplay
 	spectral mode doesn't make sense yet
@@ -46,11 +53,6 @@ Reduce RAM-Usage
 
 WaveTable
 	implement spline editor
-
-filterResponseGraph
-	in decibels
-		then with automatic range
-			like [-3, 3]db or [-12, 12]db
 
 tuningeditor
 	button to play chromatic scale for preview
@@ -88,7 +90,7 @@ PatchBrowser
 	revisit tag system
 
 TextEditor
-	multiline text
+	if multiline text
 		where does click put tick?
 
 sta::State

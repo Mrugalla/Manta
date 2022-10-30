@@ -16,7 +16,8 @@ namespace gui
 		emptyString(_emptyString), txt(""),
 		blinkyBoy(),
 		tickIdx(0),
-		drawTick(false)
+		drawTick(false),
+		multiLine(true)
 	{
 		addAndMakeVisible(label);
 		label.mode = Label::Mode::TextToLabelBounds;
@@ -37,7 +38,8 @@ namespace gui
 		emptyString(_emptyString), txt(""),
 		blinkyBoy(),
 		tickIdx(0),
-		drawTick(false)
+		drawTick(false),
+		multiLine(false)
 	{
 		addAndMakeVisible(label);
 		label.mode = Label::Mode::TextToLabelBounds;
@@ -46,8 +48,11 @@ namespace gui
 
 	void TextEditor::addText(const String& text)
 	{
-		txt = txt.substring(0, tickIdx) + text + txt.substring(tickIdx);
-		tickIdx += text.length();
+		auto nText = text;
+		removeMultiLine(nText);
+		txt = txt.substring(0, tickIdx) + nText + txt.substring(tickIdx);
+		
+		tickIdx += nText.length();
 		updateLabel();
 	}
 
@@ -96,6 +101,7 @@ namespace gui
 		if (txt == str)
 			return;
 		txt = str;
+		removeMultiLine(txt);
 		tickIdx = juce::jlimit(0, txt.length(), tickIdx);
 		updateLabel();
 	}
@@ -251,12 +257,24 @@ namespace gui
 		else
 		{
 			const auto chr = key.getTextCharacter();
+			if(!multiLine)
+				if (chr == '\n' || chr == '\r')
+					return false;
 			txt = txt.substring(0, tickIdx) + chr + txt.substring(tickIdx);
 			++tickIdx;
 			drawTick = true;
 			updateLabel();
 			onType();
 			return true;
+		}
+	}
+
+	void TextEditor::removeMultiLine(String& text)
+	{
+		if (!multiLine)
+		{
+			text = text.replace("\r", "");
+			text = text.replace("\n", "");
 		}
 	}
 

@@ -1041,7 +1041,7 @@ namespace gui
                             auto& range = param->range;
 
                             const auto valDenorm = param->getValForTextDenorm(tek.txt);
-							const auto val = range.snapToLegalValue(juce::jlimit(range.start, range.end, valDenorm));
+							const auto val = range.convertTo0to1(range.snapToLegalValue(juce::jlimit(range.start, range.end, valDenorm)));
                             if (valDenorm >= range.start && valDenorm <= range.end)
                             {
 								param->setValueWithGesture(val);
@@ -1076,7 +1076,7 @@ namespace gui
     TextEditorKnobs::TextEditorKnobs(Utils& u) :
         TextEditor(u, "Enter a value for this parameter.", makeNotify(*this))
     {
-
+        multiLine = false;
     }
 
     void TextEditorKnobs::paint(Graphics& g)

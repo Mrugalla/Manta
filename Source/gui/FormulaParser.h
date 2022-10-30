@@ -88,6 +88,8 @@ namespace gui
 			};
 
 			setInterceptsMouseClicks(true, true);
+
+			multiLine = false;
 		}
 
 		/* samples */

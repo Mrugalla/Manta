@@ -25,7 +25,7 @@ namespace gui
 			Comp(u, "", CursorType::Default),
 			mainLabel(u, "Main"),
 			filterLabel(u, "Filter"),
-			feedbackLabel(u, "Feedback"),
+			feedbackLabel(u, "Comb"),
 			heatLabel(u, "Heat"),
 			ringModLabel(u, "Phase Distortion"),
 			enabled(),

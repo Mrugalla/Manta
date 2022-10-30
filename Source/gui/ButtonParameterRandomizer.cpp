@@ -55,9 +55,7 @@ namespace gui
 			for (auto randomizable : randomizables)
 				if (randomizable->id != PID::Power && randomizable->id != PID::Clipper)
 				{
-					const auto& range = randomizable->range;
-					
-                    const auto valNorm = randomizable->getValue();
+					const auto valNorm = randomizable->getValue();
                     const auto valRand = rand.nextFloat() * .05f - .025f;
                     const auto nValNorm = juce::jlimit(0.f, 1.f, valNorm + valRand);
 

@@ -24,7 +24,11 @@ HOW TO USE:
 
 TO DO:
 
+make toast component
+	use for formulaparser error messages
+
 Formulaparser
+	wide when has focus
 	randomize button should postfix>>infix and infix>>string
 
 EQPad

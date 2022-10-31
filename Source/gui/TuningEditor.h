@@ -209,15 +209,15 @@ namespace gui
 			selection.mode = title.mode;
 
 			addAndMakeVisible(xen);
-			utils.getParam(PID::Xen)->setLocked(true);
+			//utils.getParam(PID::Xen)->setLocked(true);
 
 			addAndMakeVisible(baseNote);
 			makeParameter(baseNote, PID::BaseNote, "Base Note");
-			utils.getParam(PID::BaseNote)->setLocked(true);
+			//utils.getParam(PID::BaseNote)->setLocked(true);
 
 			addAndMakeVisible(masterTune);
 			makeParameter(masterTune, PID::MasterTune, "Master Tune");
-			utils.getParam(PID::MasterTune)->setLocked(true);
+			//utils.getParam(PID::MasterTune)->setLocked(true);
 
 #if PPDMIDINumVoices != 0
 			addAndMakeVisible(pitchbend);

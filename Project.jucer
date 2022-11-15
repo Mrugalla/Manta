@@ -2,12 +2,12 @@
 
 <JUCERPROJECT id="j9fiOT" name="Manta" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Mrugalla"
-              companyWebsite="https://github.com/Mrugalla" pluginFormats="buildStandalone,buildVST3"
+              companyWebsite="https://github.com/Mrugalla" pluginFormats="buildLV2,buildStandalone,buildVST3"
               pluginCharacteristicsValue="pluginWantsMidiIn" pluginDesc="Parallel Bandpass Filters And More"
               pluginManufacturer="Mrugalla" pluginManufacturerCode="Mrug" pluginCode="8171"
               pluginVSTNumMidiInputs="1" pluginVST3Category="Fx" cppLanguageStandard="20"
               pluginName="Manta" defines="PPDEditorWidth=946&#10;PPDEditorHeight=574&#10;&#10;PPDHasEditor=true&#10;PPDHasPatchBrowser=true&#10;&#10;PPDHasSidechain=false&#10;&#10;PPDHasGainIn=true&#10;PPDHasUnityGain=true&#10;PPDHasHQ=false&#10;PPDHasStereoConfig=false&#10;PPDHasPolarity=true&#10;PPDHasLookahead=false&#10;PPDHasDelta=false&#10;&#10;PPDFPSKnobs=40&#10;PPDFPSMeters=40&#10;PPDFPSTextEditor=3&#10;&#10;PPDMetersUseRMS=true&#10;&#10;PPD_GainIn_Min=-12&#10;PPD_GainIn_Max=12&#10;PPD_GainOut_Min=-60&#10;PPD_GainOut_Max=60&#10;PPD_UnityGainDefault=true&#10;&#10;PPD_DebugFormularParser=false&#10;&#10;PPD_MixOrGainDry=1&#10;PPD_MIDINumVoices=0&#10;PPD_MaxXen=128&#10;&#10;PPDPitchShifterSizeMs=1000&#10;PPDPitchShifterNumVoices=7"
-              maxBinaryFileSize="20971520">
+              maxBinaryFileSize="20971520" lv2Uri="https://github.com/Mrugalla/Manta">
   <MAINGROUP id="c82PPq" name="Manta">
     <GROUP id="{329F0704-CF49-5A90-357A-72806BBA6C7A}" name="Source">
       <GROUP id="{C3E83797-8352-773C-9028-12ECA83F553B}" name="svg">
@@ -175,7 +175,7 @@
     <FILE id="bEUJ6d" name="info.h" compile="0" resource="0" file="Source/info.h"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
-               JUCE_ENABLE_REPAINT_DEBUGGING="0"/>
+               JUCE_ENABLE_REPAINT_DEBUGGING="0" JUCE_WEB_BROWSER="0" JUCE_USE_CURL="0"/>
   <EXPORTFORMATS>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
@@ -199,6 +199,27 @@
         <MODULEPATH id="juce_dsp" path="D:/PluginDev/JUCE/modules"/>
       </MODULEPATHS>
     </VS2022>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
+        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
+        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../juce"/>
+        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
+        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
+        <MODULEPATH id="juce_core" path="../../juce"/>
+        <MODULEPATH id="juce_data_structures" path="../../juce"/>
+        <MODULEPATH id="juce_dsp" path="../../juce"/>
+        <MODULEPATH id="juce_events" path="../../juce"/>
+        <MODULEPATH id="juce_graphics" path="../../juce"/>
+        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
+        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

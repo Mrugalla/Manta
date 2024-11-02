@@ -28,7 +28,7 @@ namespace audio
 				filta()
 			{}
 
-			void operator()(float** laneBuf, float** samples, int numChannels, int numSamples,
+			void operator()(float* const* laneBuf, float* const* samples, int numChannels, int numSamples,
 				float* fcBuf, float* resoBuf, int stage) noexcept
 			{
 				{
@@ -78,7 +78,7 @@ namespace audio
 				ringBuffer.setSize(2, size, false, true, false);
 			}
 
-			void operator()(float** samples, int numChannels, int numSamples, const int* wHead, const float* rHead,
+			void operator()(float* const* samples, int numChannels, int numSamples, const int* wHead, const float* rHead,
 				const float* feedback) noexcept
 			{
 				auto ringBuffr = ringBuffer.getArrayOfWritePointers();
@@ -130,7 +130,7 @@ namespace audio
 				oscBuffer.resize(blockSize, 0.f);
 			}
 
-			void operator()(float** samples, int numChannels, int numSamples,
+			void operator()(float* const* samples, int numChannels, int numSamples,
 				float* _rmDepth, float* _freqHz) noexcept
 			{
 				for (auto s = 0; s < numSamples; ++s)
@@ -208,7 +208,7 @@ namespace audio
 				delaySizeF = static_cast<float>(delaySize);
 			}
 
-			void operator()(float** samples, int numChannels, int numSamples,
+			void operator()(float* const* samples, int numChannels, int numSamples,
 				bool enabled, float _pitch, float _resonance, int _slope, float _drive, float _feedback,
 				float _oct, float _semi, float _rmOct, float _rmSemi, float _rmDepth, float _gain,
 				const int* wHead, const XenManager& xen) noexcept
@@ -269,7 +269,7 @@ namespace audio
 				ringMod.waveTable.loadPatch(state, "manta/lane" + String(i));
 			}
 
-			void addTo(float** samples, int numChannels, int numSamples) noexcept
+			void addTo(float* const* samples, int numChannels, int numSamples) noexcept
 			{
 				auto lane = laneBuffer.getArrayOfReadPointers();
 
@@ -307,7 +307,7 @@ namespace audio
 				return x + d * (w - x);
 			}
 
-			void distort(float** samples, int numChannels, int numSamples, const float* driveBuf) noexcept
+			void distort(float* const* samples, int numChannels, int numSamples, const float* driveBuf) noexcept
 			{
 				for (auto ch = 0; ch < numChannels; ++ch)
 				{
@@ -318,7 +318,7 @@ namespace audio
 				}
 			}
 
-			void applyGain(float** samples, int numChannels, int numSamples, const float* gainBuf) noexcept
+			void applyGain(float* const* samples, int numChannels, int numSamples, const float* gainBuf) noexcept
 			{
 				for (auto ch = 0; ch < numChannels; ++ch)
 					SIMD::multiply(samples[ch], gainBuf, numSamples);
@@ -350,7 +350,7 @@ namespace audio
 		* l2Enabled [0, 1], l2Pitch [12, N]note, l2Resonance [1, N]q, l2Slope [1, 4]db/oct, l2Drive [0, 1]%, l2Feedback [0, 1]%, l2Gain [-60, 60]db
 		* l3Enabled [0, 1], l3Pitch [12, N]note, l3Resonance [1, N]q, l3Slope [1, 4]db/oct, l3Drive [0, 1]%, l3Feedback [0, 1]%, l3Gain [-60, 60]db
 		*/
-		void operator()(float** samples, int numChannels, int numSamples,
+		void operator()(float* const* samples, int numChannels, int numSamples,
 			bool l1Enabled, bool l1Snap, float l1Pitch, float l1Resonance, int l1Slope, float l1Drive, float l1Feedback, float l1Oct, float l1Semi, float l1RMOct, float l1RMSemi, float l1RMDepth, float l1Gain,
 			bool l2Enabled, bool l2Snap, float l2Pitch, float l2Resonance, int l2Slope, float l2Drive, float l2Feedback, float l2Oct, float l2Semi, float l2RMOct, float l2RMSemi, float l2RMDepth, float l2Gain,
 			bool l3Enabled, bool l3Snap, float l3Pitch, float l3Resonance, int l3Slope, float l3Drive, float l3Feedback, float l3Oct, float l3Semi, float l3RMOct, float l3RMSemi, float l3RMDepth, float l3Gain) noexcept

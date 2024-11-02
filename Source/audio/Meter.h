@@ -36,10 +36,10 @@ namespace audio
 
 #if PPDHasGainIn
 		/*samples,numChannels,numSamples*/
-		void processIn(const float**, int, int) noexcept;
+		void processIn(const float* const*, int, int) noexcept;
 #endif
 		/*samples,numChannels,numSamples*/
-		void processOut(const float**, int, int) noexcept;
+		void processOut(const float* const*, int, int) noexcept;
 
 		const std::atomic<float>& operator()(int i) const noexcept;
 
@@ -51,6 +51,6 @@ namespace audio
 
 	private:
 		/*val,samples,numChannels,numSamples*/
-		void process(Val&, const float**, int, int) noexcept;
+		void process(Val&, const float* const*, int, int) noexcept;
 	};
 }

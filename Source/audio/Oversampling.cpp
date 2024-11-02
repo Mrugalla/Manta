@@ -118,7 +118,7 @@ namespace audio
 		ring.setSize(2 + (PPDHasSidechain ? 2 : 0), irSize, false, true, false);
 	}
 
-	void Convolver::processBlock(float** samples, int numChannels, int numSamples) noexcept
+	void Convolver::processBlock(float* const* samples, int numChannels, int numSamples) noexcept
 	{
 		for (auto ch = 0; ch < numChannels; ++ch)
 		{
@@ -155,7 +155,7 @@ namespace audio
 
 	/////////////////////////////////////////////////////
 	
-	void zeroStuff(float** samplesUp, const float** samplesIn, int numChannels, int numSamples1x) noexcept
+	void zeroStuff(float* const* samplesUp, const float* const* samplesIn, int numChannels, int numSamples1x) noexcept
 	{
 		for (auto ch = 0; ch < numChannels; ++ch)
 		{
@@ -171,7 +171,7 @@ namespace audio
 		}
 	}
 
-	void decimate(float** samplesOut, const float** samplesUp, int numChannels, int numSamples1x) noexcept
+	void decimate(float* const* samplesOut, const float* const* samplesUp, int numChannels, int numSamples1x) noexcept
 	{
 		for (auto ch = 0; ch < numChannels; ++ch)
 		{

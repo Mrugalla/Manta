@@ -114,7 +114,7 @@ namespace audio
 			buffer.resize(blockSize, 0.f);
 		}
 
-		void operator()(float** samples, int numChannels, int numSamples) noexcept
+		void operator()(float* const* samples, int numChannels, int numSamples) noexcept
 		{
 			if (noteOn.load())
 			{

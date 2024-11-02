@@ -79,7 +79,7 @@ namespace audio
 			void prepare(int);
 
 			/*samples, numChannels, numSamples, wHead, readHead [0, size[, window, feedback[-1,1]*/
-			void operator()(float**, int, int, const int*, const float*, const float*, float) noexcept;
+			void operator()(float* const*, int, int, const int*, const float*, const float*, float) noexcept;
 
 		protected:
 			std::array<std::vector<float>, 2> ringBuffer;
@@ -96,13 +96,13 @@ namespace audio
 			void prepare(float, int, int);
 
 			/*samples, numChannels, numSamples, wHead, grainBuf, tune, feedback*/
-			void operator()(float**, int, int, const int*, const float*, float, float) noexcept;
+			void operator()(float* const*, int, int, const int*, const float*, float, float) noexcept;
 
 			/*samples, numChannels, numSamples*/
-			void copyTo(float**, int, int) noexcept;
+			void copyTo(float* const*, int, int) noexcept;
 
 			/*samples, numChannels, numSamples*/
-			void addTo(float**, int, int) noexcept;
+			void addTo(float* const*, int, int) noexcept;
 
 		protected:
 			AudioBuffer audioBuffer;
@@ -124,7 +124,7 @@ namespace audio
 		void prepare(float, int);
 
 		/*samples, numChannels, numSamples, tuneP[-24,24], grainSizeP[0, sizeF], feedback[0,1], numVoicesP[1,NumVoices],spreadTuneP[0,1]*/
-		void operator()(float**, int, int, float, float, float, int, float) noexcept;
+		void operator()(float* const*, int, int, float, float, float, int, float) noexcept;
 
 	protected:
 		WHead wHead;

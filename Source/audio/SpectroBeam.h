@@ -47,7 +47,7 @@ namespace audio
 			smpls.resize(blockSize);
 		}
 
-		void operator()(float** samples, int numChannels, int numSamples) noexcept
+		void operator()(float* const* samples, int numChannels, int numSamples) noexcept
 		{
 			const auto chInv = 1.f / numChannels;
 

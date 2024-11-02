@@ -12,10 +12,10 @@ namespace audio
 		void prepare(int, int);
 
 		/* dry, inputSamples, numChannels, numSamples */
-		void operator()(float**, float**, int, int) noexcept;
+		void operator()(float* const*, float* const*, int, int) noexcept;
 
 		/* samples, numChannels, numSamples */
-		void operator()(float**, int, int) noexcept;
+		void operator()(float* const*, int, int) noexcept;
 
 	protected:
 		AudioBuffer ring;

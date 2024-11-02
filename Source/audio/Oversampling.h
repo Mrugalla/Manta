@@ -49,7 +49,7 @@ namespace audio
 		void prepare();
 
 		/*samples,numChannels,numSamples*/
-		void processBlock(float**, int, int) noexcept;
+		void processBlock(float* const*, int, int) noexcept;
 
 	protected:
 		AudioBuffer ring;
@@ -65,10 +65,10 @@ namespace audio
 	};
 
 	/*samplesUp,samplesIn,numChannels,numSamples1x*/
-	void zeroStuff(float**, const float**, int, int) noexcept;
+	void zeroStuff(float* const*, const float* const*, int, int) noexcept;
 
 	/*samplesOut,samplesUp,numChannels,numSamples1x*/
-	void decimate(float**, const float**, int, int) noexcept;
+	void decimate(float* const*, const float* const*, int, int) noexcept;
 
 	class Oversampler
 	{

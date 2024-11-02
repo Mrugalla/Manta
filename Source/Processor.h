@@ -94,16 +94,16 @@ namespace audio
         void processBlock(AudioBuffer&, juce::MidiBuffer&);
         
         /* samples, numChannels, numSamples, samplesSC, numChannelsSC */
-        void processBlockDownsampled(float**, int numChannels, int numSamples
+        void processBlockDownsampled(float* const*, int numChannels, int numSamples
 #if PPDHasSidechain
-            , float**, int
+            , float* const*, int
 #endif
         ) noexcept;
 
         /* samples, numChannels, numSamples, samplesSC, numChannelsSC */
-        void processBlockUpsampled(float**, int, int
+        void processBlockUpsampled(float* const*, int, int
 #if PPDHasSidechain
-            , float**, int
+            , float* const*, int
 #endif
         ) noexcept;
 

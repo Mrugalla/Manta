@@ -33,7 +33,7 @@ namespace audio
 		}
 	}
 
-	void LatencyCompensation::operator()(float** dry, float** inputSamples, int numChannels, int numSamples) noexcept
+	void LatencyCompensation::operator()(float* const* dry, float* const* inputSamples, int numChannels, int numSamples) noexcept
 	{
 		if (latency != 0)
 		{
@@ -61,7 +61,7 @@ namespace audio
 				SIMD::copy(dry[ch], inputSamples[ch], numSamples);
 	}
 
-	void LatencyCompensation::operator()(float** samples, int numChannels, int numSamples) noexcept
+	void LatencyCompensation::operator()(float* const* samples, int numChannels, int numSamples) noexcept
 	{
 		if (latency != 0)
 		{

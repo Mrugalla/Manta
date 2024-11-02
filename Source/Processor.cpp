@@ -401,18 +401,18 @@ namespace audio
 #endif
     }
 
-    void Processor::processBlockDownsampled(float** samples, int numChannels, int numSamples
+    void Processor::processBlockDownsampled(float* const* samples, int numChannels, int numSamples
 #if PPDHasSidechain
-        , float** samplesSC, int numChannelsSC
+        , float* const* samplesSC, int numChannelsSC
 #endif
         ) noexcept
         {
             spectroBeam(samples, numChannels, numSamples);
         }
 
-    void Processor::processBlockUpsampled(float** samples, int numChannels, int numSamples
+    void Processor::processBlockUpsampled(float* const* samples, int numChannels, int numSamples
 #if PPDHasSidechain
-        , float** samplesSC, int numChannelsSC
+        , float* const* samplesSC, int numChannelsSC
 #endif
     ) noexcept
     {
